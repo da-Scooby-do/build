@@ -72,16 +72,19 @@ create table categories (
 -- =====================================================
 
 -- Profiles extend auth.users (created automatically by Supabase Auth)
+-- Email is REQUIRED for every customer account.
 create table profiles (
   id                 uuid primary key references auth.users(id) on delete cascade,
   full_name          text,
   phone              text,
-  email              text,
+  email              text not null,
   user_type          user_type default 'customer',
   preferred_language language_pref default 'ar',
   avatar_url         text,
   created_at         timestamptz default now(),
-  updated_at         timestamptz default now()
+  updated_at         timestamptz default now(),
+  constraint profiles_email_format check (email ~* '^[^@\s]+@[^@\s]+\.[^@\s]+$'),
+  constraint profiles_email_unique unique (email)
 );
 
 -- Suppliers (vendors / merchants)
@@ -380,12 +383,18 @@ create trigger products_set_updated_at before update on products
 create trigger orders_set_updated_at before update on orders
   for each row execute function trg_set_updated_at();
 
--- Auto-create profile when a new user signs up via Supabase Auth
+-- Auto-create profile when a new user signs up via Supabase Auth.
+-- Pulls full_name and phone from the raw_user_meta_data sent by the signup form.
 create or replace function trg_create_profile()
 returns trigger as $$
 begin
-  insert into public.profiles (id, email, phone)
-  values (new.id, new.email, new.phone);
+  insert into public.profiles (id, email, phone, full_name)
+  values (
+    new.id,
+    new.email,
+    coalesce(new.phone, new.raw_user_meta_data->>'phone'),
+    new.raw_user_meta_data->>'full_name'
+  );
   return new;
 end;
 $$ language plpgsql security definer;

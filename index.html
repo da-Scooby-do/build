@@ -5020,38 +5020,33 @@ p {
         <button id="tabSignup" onclick="switchAuth('signup')">إنشاء حساب</button>
       </div>
 
-      <!-- Step 1: Phone -->
-      <form id="authStep1" onsubmit="sendOTP(event)">
+      <!-- Email-based auth -->
+      <form id="authForm" onsubmit="submitAuth(event)">
         <div class="fld" id="nameField" style="display:none; margin-bottom:14px;">
           <label>الاسم الكامل</label>
-          <input type="text" placeholder="أحمد الحربي" />
+          <input type="text" name="fullName" placeholder="أحمد الحربي" autocomplete="name" />
         </div>
-        <div class="fld" style="margin-bottom:18px;">
-          <label>رقم الجوال</label>
+        <div class="fld" style="margin-bottom:14px;">
+          <label>البريد الإلكتروني <span style="color:var(--danger,#d33);">*</span></label>
+          <input type="email" name="email" required placeholder="name@example.com" autocomplete="email" />
+        </div>
+        <div class="fld" id="phoneField" style="display:none; margin-bottom:14px;">
+          <label>رقم الجوال (اختياري)</label>
           <div style="display:flex; gap:6px;">
             <span
               style="display:flex; align-items:center; padding:0 12px; border:1px solid var(--gray-200); border-radius: var(--radius-md); background: var(--gray-50); font-weight:700; color: var(--navy-900);">+966</span>
-            <input type="tel" required placeholder="5xxxxxxxx" maxlength="9" pattern="[0-9]{9}" style="flex:1;" />
+            <input type="tel" name="phone" placeholder="5xxxxxxxx" maxlength="9" pattern="[0-9]{9}" style="flex:1;" autocomplete="tel-national" />
           </div>
         </div>
-        <button type="submit" class="btn btn-amber btn-block">إرسال رمز التحقق</button>
-        <p style="text-align:center; font-size:.78rem; color:var(--gray-500); margin-top:14px;">سنرسل رمز SMS مكون من ٤
-          أرقام إلى رقم جوالك.</p>
-      </form>
-
-      <!-- Step 2: OTP -->
-      <form id="authStep2" style="display:none;" onsubmit="submitAuth(event)">
-        <p style="text-align:center; color: var(--gray-700); margin: 4px 0 0;">أدخل رمز التحقق المرسل إلى جوالك</p>
-        <div class="otp-row">
-          <input type="text" maxlength="1" inputmode="numeric" />
-          <input type="text" maxlength="1" inputmode="numeric" />
-          <input type="text" maxlength="1" inputmode="numeric" />
-          <input type="text" maxlength="1" inputmode="numeric" />
+        <div class="fld" style="margin-bottom:18px;">
+          <label>كلمة المرور <span style="color:var(--danger,#d33);">*</span></label>
+          <input type="password" name="password" required minlength="8" placeholder="٨ أحرف على الأقل" autocomplete="current-password" />
+          <p id="pwHint" style="font-size:.75rem; color:var(--gray-500); margin:6px 0 0; display:none;">يجب أن تكون ٨ أحرف على الأقل وتحتوي على رقم.</p>
         </div>
-        <button type="submit" class="btn btn-amber btn-block">تأكيد الرمز</button>
-        <p style="text-align:center; font-size:.82rem; margin-top:14px;"><a href="#"
-            onclick="event.preventDefault(); document.getElementById('authStep2').style.display='none'; document.getElementById('authStep1').style.display='block';"
-            style="color: var(--navy-700);">تغيير رقم الجوال</a></p>
+        <button type="submit" class="btn btn-amber btn-block" id="authSubmitBtn">تسجيل الدخول</button>
+        <p style="text-align:center; font-size:.82rem; margin-top:14px;">
+          <a href="#" id="forgotLink" onclick="forgotPassword(event)" style="color: var(--navy-700);">نسيت كلمة المرور؟</a>
+        </p>
       </form>
     </div>
   </div>
@@ -5872,53 +5867,131 @@ p {
     }
 
     /* ============================================================
-       AUTH (with phone OTP)
+       AUTH (email + password — Supabase compatible)
        ============================================================ */
-    function openAuth(mode) { $('#authModal').classList.add('open'); switchAuth(mode); $('#authStep1').style.display = 'block'; $('#authStep2').style.display = 'none'; }
+    let __authMode = 'login'; // 'login' or 'signup'
+
+    function openAuth(mode) {
+      $('#authModal').classList.add('open');
+      switchAuth(mode || 'login');
+    }
     function closeAuth() { $('#authModal').classList.remove('open'); }
+
     function switchAuth(mode) {
+      __authMode = mode;
       const isSignup = mode === 'signup';
       $('#tabLogin').classList.toggle('active', !isSignup);
       $('#tabSignup').classList.toggle('active', isSignup);
       $('#authTitle').textContent = isSignup ? 'إنشاء حساب جديد' : 'تسجيل الدخول';
-      $('#authSubtitle').textContent = isSignup ? 'أنشئ حسابك ببضع خطوات وابدأ الطلب فورًا.' : 'استمتع بتجربة طلب كاملة ومتابعة حالة شحناتك.';
+      $('#authSubtitle').textContent = isSignup
+        ? 'أنشئ حسابك بالبريد الإلكتروني وابدأ الطلب فورًا.'
+        : 'سجّل دخولك بالبريد الإلكتروني لمتابعة طلباتك.';
       $('#nameField').style.display = isSignup ? 'flex' : 'none';
+      $('#phoneField').style.display = isSignup ? 'flex' : 'none';
+      $('#pwHint').style.display = isSignup ? 'block' : 'none';
+      $('#authSubmitBtn').textContent = isSignup ? 'إنشاء الحساب' : 'تسجيل الدخول';
+      $('#forgotLink').style.display = isSignup ? 'none' : 'inline';
+      // Reset password autocomplete hint
+      const pw = $('#authForm input[name="password"]');
+      if (pw) pw.setAttribute('autocomplete', isSignup ? 'new-password' : 'current-password');
     }
-    async function sendOTP(e) {
-      e.preventDefault();
-      const phone = ($('#phoneField input')?.value || $('#authStep1 input[type="tel"]')?.value || '').replace(/\D/g, '');
-      $('#authStep1').style.display = 'none';
-      $('#authStep2').style.display = 'block';
-      // auto-advance OTP inputs
-      $$('#authStep2 .otp-row input').forEach((input, i, arr) => {
-        input.addEventListener('input', () => { if (input.value && arr[i + 1]) arr[i + 1].focus(); });
-      });
-      if (phone && window.API && API.isOnline()) {
-        try {
-          const r = await API.sendOTP(phone);
-          window.__otpPhone = phone;
-          toast(r.devCode ? 'تم إرسال الرمز (تجريبي: ' + r.devCode + ')' : 'تم إرسال رمز التحقق إلى جوالك');
-        } catch (err) { toast('تعذر إرسال الرمز — حاول لاحقًا', '⚠'); }
-      } else {
-        toast('تم إرسال رمز التحقق ٤ أرقام (الرمز التجريبي: ٤٢٤٢)');
-      }
-    }
+
     async function submitAuth(e) {
       e.preventDefault();
-      // Try OTP verify first if step2 visible
-      const step2Visible = $('#authStep2') && $('#authStep2').style.display !== 'none';
-      if (step2Visible && window.API && API.isOnline() && window.__otpPhone) {
-        const code = Array.from($$('#authStep2 .otp-row input')).map(i => i.value).join('');
-        if (code.length === 4) {
-          try {
-            await verifyPhoneOTP(window.__otpPhone, code);
-            return;
-          } catch { toast('رمز غير صحيح', '⚠'); return; }
-        }
+      const form = e.target;
+      const email = form.email.value.trim().toLowerCase();
+      const password = form.password.value;
+      const fullName = (form.fullName?.value || '').trim();
+      const phoneInput = (form.phone?.value || '').replace(/\D/g, '');
+      const phone = phoneInput ? '+966' + phoneInput : null;
+
+      if (!email || !password) { toast('يرجى إدخال البريد وكلمة المرور', '⚠'); return; }
+      if (__authMode === 'signup' && password.length < 8) {
+        toast('كلمة المرور يجب أن تكون ٨ أحرف على الأقل', '⚠'); return;
       }
-      // Fallback: just close and toast
-      closeAuth();
-      toast('تم الدخول بنجاح — مرحبًا بك في بناء');
+
+      const btn = $('#authSubmitBtn');
+      const originalText = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = __authMode === 'signup' ? 'جارٍ إنشاء الحساب...' : 'جارٍ تسجيل الدخول...';
+
+      try {
+        // Supabase path (if client is loaded)
+        if (window.supabaseClient) {
+          if (__authMode === 'signup') {
+            const { data, error } = await window.supabaseClient.auth.signUp({
+              email, password,
+              options: { data: { full_name: fullName, phone } }
+            });
+            if (error) throw error;
+            toast('تم إنشاء الحساب — تحقق من بريدك لتأكيد التسجيل', '✉');
+            closeAuth();
+          } else {
+            const { data, error } = await window.supabaseClient.auth.signInWithPassword({ email, password });
+            if (error) throw error;
+            toast('تم تسجيل الدخول بنجاح — مرحبًا بك في بِناء', '✓');
+            closeAuth();
+            if (typeof onAuthChange === 'function') onAuthChange(data.user);
+          }
+        }
+        // Legacy REST API path (server folder)
+        else if (window.API && API.isOnline()) {
+          if (__authMode === 'signup') {
+            await API.signup({ email, password, fullName, phone });
+            toast('تم إنشاء الحساب بنجاح', '✓');
+          } else {
+            await API.login({ email, password });
+            toast('تم تسجيل الدخول بنجاح', '✓');
+          }
+          closeAuth();
+        }
+        // Offline fallback (no backend yet)
+        else {
+          // Store minimal local profile so the UI works during development
+          localStorage.setItem('bena_user', JSON.stringify({ email, fullName, phone }));
+          toast(__authMode === 'signup' ? 'تم إنشاء الحساب (وضع تجريبي)' : 'تم تسجيل الدخول (وضع تجريبي)', '✓');
+          closeAuth();
+        }
+      } catch (err) {
+        const msg = err?.message || 'حدث خطأ — حاول مرة أخرى';
+        // Translate common Supabase errors to Arabic
+        const arMsg =
+          /already registered|user already/i.test(msg) ? 'هذا البريد مسجل مسبقًا — جرّب تسجيل الدخول' :
+          /invalid login credentials/i.test(msg) ? 'البريد أو كلمة المرور غير صحيحة' :
+          /email not confirmed/i.test(msg) ? 'يرجى تأكيد بريدك الإلكتروني أولاً' :
+          /password should be at least/i.test(msg) ? 'كلمة المرور قصيرة جدًا' :
+          msg;
+        toast(arMsg, '⚠');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = originalText;
+      }
+    }
+
+    async function forgotPassword(e) {
+      e.preventDefault();
+      const email = ($('#authForm input[name="email"]')?.value || '').trim().toLowerCase();
+      if (!email) { toast('أدخل بريدك الإلكتروني أولاً', '⚠'); return; }
+      try {
+        if (window.supabaseClient) {
+          const { error } = await window.supabaseClient.auth.resetPasswordForEmail(email, {
+            redirectTo: window.location.origin
+          });
+          if (error) throw error;
+        }
+        toast('تم إرسال رابط إعادة التعيين إلى بريدك', '✉');
+      } catch (err) {
+        toast(err?.message || 'تعذر الإرسال', '⚠');
+      }
+    }
+
+    async function signOut() {
+      if (window.supabaseClient) {
+        await window.supabaseClient.auth.signOut();
+      }
+      localStorage.removeItem('bena_user');
+      toast('تم تسجيل الخروج', '✓');
+      if (typeof onAuthChange === 'function') onAuthChange(null);
     }
 
     /* ============================================================
