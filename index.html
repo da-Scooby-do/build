@@ -4866,6 +4866,224 @@ p {
   <!-- ============================================================
      VIEW: POLICY (returns / terms / FAQ)
      ============================================================ -->
+  <!-- ============================================================
+       ADMIN / OWNER DASHBOARD (only visible to user_type='admin')
+       ============================================================ -->
+  <section class="view" id="view-admin" style="display:none;">
+    <section class="page-intro" style="background: linear-gradient(135deg, #0a1322, #1a3066); color:#fff;">
+      <div class="container">
+        <div class="title-row">
+          <h1 style="color:#fff;">لوحة تحكم المالك 🛠️</h1>
+          <p class="sub" style="color:rgba(255,255,255,.85);">إدارة المنتجات، الموردين، الطلبات، ومتابعة الإيرادات.</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="container" style="padding:32px 0;">
+
+      <!-- Stats cards -->
+      <div class="admin-stats" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:18px; margin-bottom:28px;">
+        <div class="stat-card" style="background:var(--white); border:1px solid var(--gray-150); border-radius:var(--radius-lg); padding:22px; box-shadow:var(--shadow-xs);">
+          <div style="color:var(--gray-500); font-size:.85rem; margin-bottom:8px;">إيرادات اليوم</div>
+          <div id="statRevToday" style="font-size:1.8rem; font-weight:800; color:var(--navy-900); font-family:var(--font-display);">٠ ر.س</div>
+        </div>
+        <div class="stat-card" style="background:var(--white); border:1px solid var(--gray-150); border-radius:var(--radius-lg); padding:22px; box-shadow:var(--shadow-xs);">
+          <div style="color:var(--gray-500); font-size:.85rem; margin-bottom:8px;">إيرادات هذا الشهر</div>
+          <div id="statRevMonth" style="font-size:1.8rem; font-weight:800; color:#10a86b; font-family:var(--font-display);">٠ ر.س</div>
+        </div>
+        <div class="stat-card" style="background:var(--white); border:1px solid var(--gray-150); border-radius:var(--radius-lg); padding:22px; box-shadow:var(--shadow-xs);">
+          <div style="color:var(--gray-500); font-size:.85rem; margin-bottom:8px;">إجمالي الإيرادات</div>
+          <div id="statRevTotal" style="font-size:1.8rem; font-weight:800; color:var(--amber-500); font-family:var(--font-display);">٠ ر.س</div>
+        </div>
+        <div class="stat-card" style="background:var(--white); border:1px solid var(--gray-150); border-radius:var(--radius-lg); padding:22px; box-shadow:var(--shadow-xs);">
+          <div style="color:var(--gray-500); font-size:.85rem; margin-bottom:8px;">طلبات الشهر</div>
+          <div id="statOrdersMonth" style="font-size:1.8rem; font-weight:800; color:var(--navy-700); font-family:var(--font-display);">٠</div>
+        </div>
+        <div class="stat-card" style="background:var(--white); border:1px solid var(--gray-150); border-radius:var(--radius-lg); padding:22px; box-shadow:var(--shadow-xs);">
+          <div style="color:var(--gray-500); font-size:.85rem; margin-bottom:8px;">إجمالي العملاء</div>
+          <div id="statCustomers" style="font-size:1.8rem; font-weight:800; color:var(--navy-900); font-family:var(--font-display);">٠</div>
+        </div>
+        <div class="stat-card" style="background:var(--white); border:1px solid var(--gray-150); border-radius:var(--radius-lg); padding:22px; box-shadow:var(--shadow-xs);">
+          <div style="color:var(--gray-500); font-size:.85rem; margin-bottom:8px;">طلبات قيد المعالجة</div>
+          <div id="statPendingOrders" style="font-size:1.8rem; font-weight:800; color:#e0a100; font-family:var(--font-display);">٠</div>
+        </div>
+      </div>
+
+      <!-- Tab nav -->
+      <div class="admin-tabs" style="display:flex; gap:0; border-bottom:2px solid var(--gray-150); margin-bottom:24px; flex-wrap:wrap;">
+        <button class="admin-tab active" onclick="switchAdminTab('orders')" data-tab="orders" style="padding:12px 22px; background:transparent; border:0; border-bottom:3px solid var(--amber-400); font-weight:700; color:var(--navy-900); cursor:pointer;">الطلبات الأخيرة</button>
+        <button class="admin-tab" onclick="switchAdminTab('products')" data-tab="products" style="padding:12px 22px; background:transparent; border:0; border-bottom:3px solid transparent; font-weight:600; color:var(--gray-500); cursor:pointer;">المنتجات</button>
+        <button class="admin-tab" onclick="switchAdminTab('suppliers')" data-tab="suppliers" style="padding:12px 22px; background:transparent; border:0; border-bottom:3px solid transparent; font-weight:600; color:var(--gray-500); cursor:pointer;">الموردون</button>
+        <button class="admin-tab" onclick="switchAdminTab('categories')" data-tab="categories" style="padding:12px 22px; background:transparent; border:0; border-bottom:3px solid transparent; font-weight:600; color:var(--gray-500); cursor:pointer;">التصنيفات</button>
+        <button class="admin-tab" onclick="switchAdminTab('customers')" data-tab="customers" style="padding:12px 22px; background:transparent; border:0; border-bottom:3px solid transparent; font-weight:600; color:var(--gray-500); cursor:pointer;">العملاء</button>
+      </div>
+
+      <!-- ORDERS TAB -->
+      <div class="admin-panel" id="adminPanel-orders">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+          <h3 style="margin:0;">الطلبات الأخيرة</h3>
+          <button class="btn btn-ghost" onclick="refreshAdminData()">🔄 تحديث</button>
+        </div>
+        <div style="overflow-x:auto; background:var(--white); border:1px solid var(--gray-150); border-radius:var(--radius-lg);">
+          <table style="width:100%; border-collapse:collapse;">
+            <thead style="background:var(--gray-50); border-bottom:1px solid var(--gray-150);">
+              <tr>
+                <th style="padding:12px; text-align:right; font-weight:700; color:var(--navy-900); font-size:.88rem;">رقم الطلب</th>
+                <th style="padding:12px; text-align:right; font-weight:700; color:var(--navy-900); font-size:.88rem;">التاريخ</th>
+                <th style="padding:12px; text-align:right; font-weight:700; color:var(--navy-900); font-size:.88rem;">العميل</th>
+                <th style="padding:12px; text-align:right; font-weight:700; color:var(--navy-900); font-size:.88rem;">المبلغ</th>
+                <th style="padding:12px; text-align:right; font-weight:700; color:var(--navy-900); font-size:.88rem;">الحالة</th>
+                <th style="padding:12px; text-align:right; font-weight:700; color:var(--navy-900); font-size:.88rem;"></th>
+              </tr>
+            </thead>
+            <tbody id="adminOrdersTbody">
+              <tr><td colspan="6" style="padding:30px; text-align:center; color:var(--gray-500);">جارٍ التحميل...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PRODUCTS TAB -->
+      <div class="admin-panel" id="adminPanel-products" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+          <h3 style="margin:0;">إدارة المنتجات</h3>
+          <button class="btn btn-amber" onclick="openProductEditor()">+ إضافة منتج</button>
+        </div>
+        <div style="overflow-x:auto; background:var(--white); border:1px solid var(--gray-150); border-radius:var(--radius-lg);">
+          <table style="width:100%; border-collapse:collapse;">
+            <thead style="background:var(--gray-50);">
+              <tr>
+                <th style="padding:12px; text-align:right; font-size:.88rem;">الصورة</th>
+                <th style="padding:12px; text-align:right; font-size:.88rem;">الاسم</th>
+                <th style="padding:12px; text-align:right; font-size:.88rem;">التصنيف</th>
+                <th style="padding:12px; text-align:right; font-size:.88rem;">السعر</th>
+                <th style="padding:12px; text-align:right; font-size:.88rem;">المخزون</th>
+                <th style="padding:12px; text-align:right; font-size:.88rem;">المدينة</th>
+                <th style="padding:12px; text-align:right; font-size:.88rem;"></th>
+              </tr>
+            </thead>
+            <tbody id="adminProductsTbody">
+              <tr><td colspan="7" style="padding:30px; text-align:center; color:var(--gray-500);">جارٍ التحميل...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- SUPPLIERS TAB -->
+      <div class="admin-panel" id="adminPanel-suppliers" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+          <h3 style="margin:0;">إدارة الموردين</h3>
+          <button class="btn btn-amber" onclick="openSupplierEditor()">+ إضافة مورد</button>
+        </div>
+        <div style="overflow-x:auto; background:var(--white); border:1px solid var(--gray-150); border-radius:var(--radius-lg);">
+          <table style="width:100%; border-collapse:collapse;">
+            <thead style="background:var(--gray-50);">
+              <tr>
+                <th style="padding:12px; text-align:right; font-size:.88rem;">المعرّف</th>
+                <th style="padding:12px; text-align:right; font-size:.88rem;">الاسم</th>
+                <th style="padding:12px; text-align:right; font-size:.88rem;">السجل التجاري</th>
+                <th style="padding:12px; text-align:right; font-size:.88rem;">الجوال</th>
+                <th style="padding:12px; text-align:right; font-size:.88rem;">التقييم</th>
+                <th style="padding:12px; text-align:right; font-size:.88rem;">موثّق</th>
+                <th style="padding:12px; text-align:right; font-size:.88rem;"></th>
+              </tr>
+            </thead>
+            <tbody id="adminSuppliersTbody">
+              <tr><td colspan="7" style="padding:30px; text-align:center; color:var(--gray-500);">جارٍ التحميل...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- CATEGORIES TAB -->
+      <div class="admin-panel" id="adminPanel-categories" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+          <h3 style="margin:0;">التصنيفات</h3>
+          <button class="btn btn-amber" onclick="addCategoryPrompt()">+ تصنيف جديد</button>
+        </div>
+        <div id="adminCategoriesGrid" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:14px;">
+          <div style="grid-column:1/-1; padding:30px; text-align:center; color:var(--gray-500);">جارٍ التحميل...</div>
+        </div>
+      </div>
+
+      <!-- CUSTOMERS TAB -->
+      <div class="admin-panel" id="adminPanel-customers" style="display:none;">
+        <h3 style="margin:0 0 16px;">العملاء المسجّلون</h3>
+        <div style="overflow-x:auto; background:var(--white); border:1px solid var(--gray-150); border-radius:var(--radius-lg);">
+          <table style="width:100%; border-collapse:collapse;">
+            <thead style="background:var(--gray-50);">
+              <tr>
+                <th style="padding:12px; text-align:right; font-size:.88rem;">الاسم</th>
+                <th style="padding:12px; text-align:right; font-size:.88rem;">البريد</th>
+                <th style="padding:12px; text-align:right; font-size:.88rem;">الجوال</th>
+                <th style="padding:12px; text-align:right; font-size:.88rem;">النوع</th>
+                <th style="padding:12px; text-align:right; font-size:.88rem;">تاريخ التسجيل</th>
+              </tr>
+            </thead>
+            <tbody id="adminCustomersTbody">
+              <tr><td colspan="5" style="padding:30px; text-align:center; color:var(--gray-500);">جارٍ التحميل...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Product editor modal -->
+  <div class="modal-backdrop" id="productModal" onclick="if(event.target===this)closeProductEditor()">
+    <div class="modal" style="max-width:560px;">
+      <button class="close-x" onclick="closeProductEditor()">✕</button>
+      <h2 id="productModalTitle">إضافة منتج جديد</h2>
+      <form id="productForm" onsubmit="saveProduct(event)" style="display:grid; gap:12px;">
+        <input type="hidden" name="id" />
+        <div class="fld"><label>اسم المنتج (عربي) *</label><input type="text" name="name_ar" required></div>
+        <div class="fld"><label>التصنيف *</label><select name="category_id" id="prodCategorySelect" required><option value="">اختر تصنيفًا</option></select></div>
+        <div class="fld"><label>المورد *</label><select name="supplier_id" id="prodSupplierSelect" required><option value="">اختر موردًا</option></select></div>
+        <div class="fld"><label>المدينة</label><select name="city_code" id="prodCitySelect"><option value="">اختر مدينة</option></select></div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          <div class="fld"><label>السعر (ر.س) *</label><input type="number" name="price" step="0.01" min="0" required></div>
+          <div class="fld"><label>الوحدة *</label><input type="text" name="unit_ar" placeholder="م³، طن، كيس" required></div>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          <div class="fld"><label>الكمية المتوفرة</label><input type="number" name="stock_quantity" min="0"></div>
+          <div class="fld"><label>الحد الأدنى للطلب</label><input type="number" name="min_order_quantity" min="1" value="1"></div>
+        </div>
+        <div class="fld"><label>وسم (مثل: فوري، معتمد SASO)</label><input type="text" name="tag_ar"></div>
+        <div class="fld"><label>رابط الصورة الرئيسية</label><input type="url" name="main_image" placeholder="https://..."></div>
+        <div class="fld"><label>الوصف</label><textarea name="description_ar" rows="3"></textarea></div>
+        <div style="display:flex; gap:10px; margin-top:6px;">
+          <button type="submit" class="btn btn-amber btn-block">حفظ المنتج</button>
+          <button type="button" class="btn btn-ghost" onclick="closeProductEditor()">إلغاء</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Supplier editor modal -->
+  <div class="modal-backdrop" id="supplierModal" onclick="if(event.target===this)closeSupplierEditor()">
+    <div class="modal" style="max-width:520px;">
+      <button class="close-x" onclick="closeSupplierEditor()">✕</button>
+      <h2 id="supplierModalTitle">إضافة مورد جديد</h2>
+      <form id="supplierForm" onsubmit="saveSupplier(event)" style="display:grid; gap:12px;">
+        <input type="hidden" name="id" />
+        <div class="fld"><label>المعرّف (مثل s11) *</label><input type="text" name="new_id" pattern="s[0-9]+" placeholder="s11" required></div>
+        <div class="fld"><label>اسم المورد (عربي) *</label><input type="text" name="name_ar" required></div>
+        <div class="fld"><label>السجل التجاري</label><input type="text" name="cr_number" pattern="[0-9]{10}" placeholder="١٠ أرقام"></div>
+        <div class="fld"><label>الرقم الضريبي (VAT)</label><input type="text" name="vat_number" pattern="[0-9]{15}" placeholder="١٥ رقم"></div>
+        <div class="fld"><label>رقم الجوال</label><input type="tel" name="phone" placeholder="+9665xxxxxxxx"></div>
+        <div class="fld"><label>البريد الإلكتروني</label><input type="email" name="email"></div>
+        <div class="fld"><label>سنة التأسيس</label><input type="number" name="established_year" min="1900" max="2030"></div>
+        <div class="fld"><label>وصف المورد</label><textarea name="description_ar" rows="2"></textarea></div>
+        <label style="display:flex; gap:8px; align-items:center;"><input type="checkbox" name="is_verified"> مورد موثّق</label>
+        <div style="display:flex; gap:10px; margin-top:6px;">
+          <button type="submit" class="btn btn-amber btn-block">حفظ المورد</button>
+          <button type="button" class="btn btn-ghost" onclick="closeSupplierEditor()">إلغاء</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <section class="view" id="view-policy">
     <section class="page-intro">
       <div class="container">
@@ -5149,36 +5367,425 @@ p {
     /* ============================================================
        AUTH STATE — update UI when user logs in/out
        ============================================================ */
-    window.onAuthChange = function (user) {
+    window.currentUser = null;
+    window.isAdmin = false;
+
+    window.onAuthChange = async function (user) {
+      window.currentUser = user;
+      window.isAdmin = false;
       if (user) {
-        // Logged in: hide login/signup buttons, show account chip
+        // Fetch profile to check role
+        try {
+          if (window.supabaseClient) {
+            const { data: profile } = await window.supabaseClient
+              .from('profiles')
+              .select('user_type, full_name')
+              .eq('id', user.id)
+              .single();
+            window.isAdmin = profile?.user_type === 'admin';
+            if (profile?.full_name) user.user_metadata = { ...(user.user_metadata||{}), full_name: profile.full_name };
+          }
+        } catch (e) { console.warn('profile fetch failed', e); }
+
         const email = user.email || '';
         const name = user.user_metadata?.full_name || email.split('@')[0];
+
         document.querySelectorAll('.auth-buttons .btn').forEach(btn => {
           const label = btn.textContent.trim();
           if (label === 'دخول' || label === 'إنشاء حساب') btn.style.display = 'none';
         });
-        // Add a logged-in chip if not already there
-        if (!document.getElementById('userChip')) {
-          const authBtns = document.querySelector('.auth-buttons');
-          if (authBtns) {
-            const chip = document.createElement('button');
-            chip.id = 'userChip';
-            chip.className = 'btn btn-ghost';
-            chip.style.cssText = 'display:flex; align-items:center; gap:8px;';
-            chip.innerHTML = `<span>👤</span><span>${name}</span><span style="opacity:.6; font-size:.8rem;">·</span><span style="color:var(--gray-500); font-size:.85rem;" onclick="signOut(); return false;">خروج</span>`;
-            chip.onclick = (e) => {
-              if (e.target.textContent === 'خروج') { e.stopPropagation(); signOut(); }
-            };
-            authBtns.appendChild(chip);
+
+        document.getElementById('userChip')?.remove();
+        const authBtns = document.querySelector('.auth-buttons');
+        if (authBtns) {
+          const chip = document.createElement('div');
+          chip.id = 'userChip';
+          chip.style.cssText = 'display:flex; align-items:center; gap:10px;';
+          const adminBadge = window.isAdmin
+            ? `<a href="#admin" data-link class="btn btn-amber" style="padding:8px 14px; font-size:.85rem;">🛠️ لوحة التحكم</a>`
+            : '';
+          chip.innerHTML = `
+            ${adminBadge}
+            <button class="btn btn-ghost" style="display:flex; align-items:center; gap:8px; padding:8px 12px;">
+              <span>👤</span><span>${name}</span>
+            </button>
+            <button class="btn btn-ghost" onclick="signOut()" style="padding:8px 12px; font-size:.85rem; color:var(--gray-500);">خروج</button>
+          `;
+          authBtns.appendChild(chip);
+        }
+
+        if (window.isAdmin) {
+          console.log('[bena] Logged in as ADMIN');
+          // Auto-redirect admins to dashboard on login
+          if (location.hash !== '#admin' && !location.hash.startsWith('#admin')) {
+            // Don't force redirect, just make the button visible. Comment line below to auto-redirect:
+            // location.hash = '#admin';
           }
         }
+
+        // Re-render whatever page they're on (in case admin features need to appear)
+        if (typeof renderRoute === 'function') renderRoute();
       } else {
-        // Logged out
         document.querySelectorAll('.auth-buttons .btn').forEach(btn => btn.style.display = '');
         document.getElementById('userChip')?.remove();
       }
     };
+
+    /* ============================================================
+       ADMIN DASHBOARD — owner only
+       ============================================================ */
+    function arEN(n) { return new Intl.NumberFormat('ar-SA').format(n); }
+    function arSAR(n) { return new Intl.NumberFormat('ar-SA', { style:'currency', currency:'SAR', maximumFractionDigits:0 }).format(n||0); }
+
+    async function loadAdminDashboard() {
+      if (!window.isAdmin) {
+        document.getElementById('view-admin').innerHTML = '<div class="container" style="padding:60px 20px; text-align:center;"><h2>🔒 صفحة محظورة</h2><p>هذه الصفحة مخصصة للمالك فقط.</p></div>';
+        return;
+      }
+      if (!window.supabaseClient) return;
+
+      // Load stats
+      try {
+        const { data: stats } = await window.supabaseClient.from('sales_stats').select('*').single();
+        if (stats) {
+          document.getElementById('statRevToday').textContent = arSAR(stats.revenue_today);
+          document.getElementById('statRevMonth').textContent = arSAR(stats.revenue_this_month);
+          document.getElementById('statRevTotal').textContent = arSAR(stats.total_revenue);
+          document.getElementById('statOrdersMonth').textContent = arEN(stats.orders_this_month);
+          document.getElementById('statCustomers').textContent = arEN(stats.total_customers);
+          document.getElementById('statPendingOrders').textContent = arEN(stats.pending_orders);
+        }
+      } catch (e) { console.warn('stats load failed', e); }
+
+      // Load current tab content
+      const activeTab = document.querySelector('.admin-tab.active')?.dataset.tab || 'orders';
+      loadAdminTab(activeTab);
+    }
+
+    function switchAdminTab(name) {
+      document.querySelectorAll('.admin-tab').forEach(t => {
+        const isActive = t.dataset.tab === name;
+        t.classList.toggle('active', isActive);
+        t.style.borderBottomColor = isActive ? 'var(--amber-400)' : 'transparent';
+        t.style.color = isActive ? 'var(--navy-900)' : 'var(--gray-500)';
+        t.style.fontWeight = isActive ? '700' : '600';
+      });
+      document.querySelectorAll('.admin-panel').forEach(p => p.style.display = 'none');
+      const panel = document.getElementById('adminPanel-' + name);
+      if (panel) panel.style.display = 'block';
+      loadAdminTab(name);
+    }
+
+    async function loadAdminTab(name) {
+      if (!window.supabaseClient || !window.isAdmin) return;
+      if (name === 'orders')    return loadAdminOrders();
+      if (name === 'products')  return loadAdminProducts();
+      if (name === 'suppliers') return loadAdminSuppliers();
+      if (name === 'categories')return loadAdminCategories();
+      if (name === 'customers') return loadAdminCustomers();
+    }
+
+    function refreshAdminData() { loadAdminDashboard(); toast('تم تحديث البيانات', '✓'); }
+
+    async function loadAdminOrders() {
+      const tbody = document.getElementById('adminOrdersTbody');
+      const { data, error } = await window.supabaseClient
+        .from('orders')
+        .select('id, order_number, created_at, total, status, payment_status, user_id, profiles(full_name,email)')
+        .order('created_at', { ascending: false })
+        .limit(50);
+      if (error) { tbody.innerHTML = `<tr><td colspan="6" style="padding:20px; text-align:center; color:#d33;">خطأ: ${error.message}</td></tr>`; return; }
+      if (!data?.length) { tbody.innerHTML = '<tr><td colspan="6" style="padding:30px; text-align:center; color:var(--gray-500);">لا توجد طلبات بعد</td></tr>'; return; }
+      const statusAr = {
+        pending:'قيد الانتظار', confirmed:'مؤكد', preparing:'قيد التحضير',
+        shipped:'تم الشحن', delivered:'تم التسليم', cancelled:'ملغي', refunded:'مسترجع'
+      };
+      tbody.innerHTML = data.map(o => `
+        <tr style="border-top:1px solid var(--gray-150);">
+          <td style="padding:12px; font-weight:600;">${o.order_number}</td>
+          <td style="padding:12px; color:var(--gray-600); font-size:.88rem;">${new Date(o.created_at).toLocaleDateString('ar-SA')}</td>
+          <td style="padding:12px;">${o.profiles?.full_name || o.profiles?.email || '—'}</td>
+          <td style="padding:12px; font-weight:700;">${arSAR(o.total)}</td>
+          <td style="padding:12px;"><span style="background:var(--gray-100); padding:4px 10px; border-radius:12px; font-size:.8rem;">${statusAr[o.status]||o.status}</span></td>
+          <td style="padding:12px;"><select onchange="updateOrderStatus('${o.id}', this.value)" style="padding:6px 10px; border:1px solid var(--gray-200); border-radius:6px; background:var(--white); font-size:.85rem;">
+            ${Object.entries(statusAr).map(([k,v]) => `<option value="${k}" ${k===o.status?'selected':''}>${v}</option>`).join('')}
+          </select></td>
+        </tr>
+      `).join('');
+    }
+
+    async function updateOrderStatus(orderId, newStatus) {
+      const { error } = await window.supabaseClient.from('orders').update({ status: newStatus }).eq('id', orderId);
+      if (error) { toast(error.message, '⚠'); return; }
+      toast('تم تحديث الحالة', '✓');
+      loadAdminDashboard();
+    }
+
+    async function loadAdminProducts() {
+      const tbody = document.getElementById('adminProductsTbody');
+      const { data, error } = await window.supabaseClient
+        .from('products')
+        .select('id, name_ar, price, unit_ar, stock_quantity, main_image, city_code, category_id, categories(name_ar), cities(name_ar)')
+        .order('created_at', { ascending: false });
+      if (error) { tbody.innerHTML = `<tr><td colspan="7" style="padding:20px; text-align:center; color:#d33;">${error.message}</td></tr>`; return; }
+      if (!data?.length) { tbody.innerHTML = '<tr><td colspan="7" style="padding:30px; text-align:center; color:var(--gray-500);">لا توجد منتجات</td></tr>'; return; }
+      tbody.innerHTML = data.map(p => `
+        <tr style="border-top:1px solid var(--gray-150);">
+          <td style="padding:8px;">${p.main_image ? `<img src="${p.main_image}" style="width:48px; height:48px; object-fit:cover; border-radius:6px;">` : '—'}</td>
+          <td style="padding:12px; font-weight:600;">${p.name_ar}</td>
+          <td style="padding:12px; color:var(--gray-600); font-size:.85rem;">${p.categories?.name_ar || '—'}</td>
+          <td style="padding:12px; font-weight:700;">${arSAR(p.price)} / ${p.unit_ar||''}</td>
+          <td style="padding:12px;">${p.stock_quantity != null ? arEN(p.stock_quantity) : '—'}</td>
+          <td style="padding:12px; color:var(--gray-600); font-size:.85rem;">${p.cities?.name_ar || '—'}</td>
+          <td style="padding:12px; white-space:nowrap;">
+            <button class="btn btn-ghost" onclick='openProductEditor(${JSON.stringify(p).replace(/'/g,"&#39;")})' style="padding:6px 10px; font-size:.8rem;">✏️</button>
+            <button class="btn btn-ghost" onclick="deleteProduct('${p.id}', '${(p.name_ar||'').replace(/'/g,"\\'")}')" style="padding:6px 10px; font-size:.8rem; color:#d33;">🗑️</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function deleteProduct(id, name) {
+      if (!confirm(`هل تريد حذف "${name}"؟`)) return;
+      const { error } = await window.supabaseClient.from('products').delete().eq('id', id);
+      if (error) { toast(error.message, '⚠'); return; }
+      toast('تم حذف المنتج', '✓');
+      loadAdminProducts();
+    }
+
+    async function openProductEditor(product) {
+      const modal = document.getElementById('productModal');
+      const form = document.getElementById('productForm');
+      form.reset();
+      document.getElementById('productModalTitle').textContent = product ? 'تعديل منتج' : 'إضافة منتج جديد';
+
+      // Populate dropdowns
+      const [cats, sups, cits] = await Promise.all([
+        window.supabaseClient.from('categories').select('id, name_ar').order('sort_order'),
+        window.supabaseClient.from('suppliers').select('id, name_ar').order('name_ar'),
+        window.supabaseClient.from('cities').select('code, name_ar').order('name_ar')
+      ]);
+      const catSel = form.category_id;
+      const supSel = form.supplier_id;
+      const citySel = form.city_code;
+      catSel.innerHTML = '<option value="">اختر تصنيفًا</option>' + (cats.data||[]).map(c => `<option value="${c.id}">${c.name_ar}</option>`).join('');
+      supSel.innerHTML = '<option value="">اختر موردًا</option>' + (sups.data||[]).map(s => `<option value="${s.id}">${s.name_ar}</option>`).join('');
+      citySel.innerHTML = '<option value="">اختر مدينة</option>' + (cits.data||[]).map(c => `<option value="${c.code}">${c.name_ar}</option>`).join('');
+
+      if (product && typeof product === 'object') {
+        form.id.value = product.id || '';
+        for (const k of ['name_ar','price','unit_ar','stock_quantity','min_order_quantity','tag_ar','main_image','description_ar']) {
+          if (form[k]) form[k].value = product[k] || '';
+        }
+        if (product.category_id) catSel.value = product.category_id;
+        if (product.supplier_id) supSel.value = product.supplier_id;
+        if (product.city_code) citySel.value = product.city_code;
+      }
+      modal.classList.add('open');
+    }
+    function closeProductEditor() { document.getElementById('productModal').classList.remove('open'); }
+
+    async function saveProduct(e) {
+      e.preventDefault();
+      const f = e.target;
+      const isEdit = !!f.id.value;
+      const data = {
+        name_ar: f.name_ar.value.trim(),
+        category_id: f.category_id.value,
+        supplier_id: f.supplier_id.value,
+        city_code: f.city_code.value || null,
+        price: parseFloat(f.price.value),
+        unit_ar: f.unit_ar.value.trim(),
+        stock_quantity: f.stock_quantity.value ? parseInt(f.stock_quantity.value) : null,
+        min_order_quantity: parseInt(f.min_order_quantity.value || '1'),
+        tag_ar: f.tag_ar.value.trim() || null,
+        main_image: f.main_image.value.trim() || null,
+        description_ar: f.description_ar.value.trim() || null
+      };
+      let result;
+      if (isEdit) {
+        result = await window.supabaseClient.from('products').update(data).eq('id', f.id.value);
+      } else {
+        // Generate a new product ID
+        const { data: existing } = await window.supabaseClient.from('products').select('id').order('id', { ascending: false }).limit(1);
+        const lastNum = existing?.[0]?.id ? parseInt(existing[0].id.replace(/\D/g,'')) : 0;
+        data.id = 'p' + (lastNum + 1);
+        result = await window.supabaseClient.from('products').insert(data);
+      }
+      if (result.error) { toast(result.error.message, '⚠'); return; }
+      toast(isEdit ? 'تم حفظ التعديلات' : 'تم إضافة المنتج', '✓');
+      closeProductEditor();
+      loadAdminProducts();
+      loadAdminDashboard();
+    }
+
+    async function loadAdminSuppliers() {
+      const tbody = document.getElementById('adminSuppliersTbody');
+      const { data, error } = await window.supabaseClient.from('suppliers').select('*').order('name_ar');
+      if (error) { tbody.innerHTML = `<tr><td colspan="7" style="padding:20px; text-align:center; color:#d33;">${error.message}</td></tr>`; return; }
+      if (!data?.length) { tbody.innerHTML = '<tr><td colspan="7" style="padding:30px; text-align:center; color:var(--gray-500);">لا يوجد موردون</td></tr>'; return; }
+      tbody.innerHTML = data.map(s => `
+        <tr style="border-top:1px solid var(--gray-150);">
+          <td style="padding:12px; font-mono;">${s.id}</td>
+          <td style="padding:12px; font-weight:600;">${s.name_ar}</td>
+          <td style="padding:12px; color:var(--gray-600); font-size:.85rem;">${s.cr_number || '—'}</td>
+          <td style="padding:12px; color:var(--gray-600); font-size:.85rem;">${s.phone || '—'}</td>
+          <td style="padding:12px;">⭐ ${s.rating || '0'} (${arEN(s.review_count||0)})</td>
+          <td style="padding:12px;">${s.is_verified ? '✅' : '—'}</td>
+          <td style="padding:12px; white-space:nowrap;">
+            <button class="btn btn-ghost" onclick='openSupplierEditor(${JSON.stringify(s).replace(/'/g,"&#39;")})' style="padding:6px 10px; font-size:.8rem;">✏️</button>
+            <button class="btn btn-ghost" onclick="deleteSupplier('${s.id}', '${(s.name_ar||'').replace(/'/g,"\\'")}')" style="padding:6px 10px; font-size:.8rem; color:#d33;">🗑️</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function deleteSupplier(id, name) {
+      if (!confirm(`حذف "${name}"؟ سيتم حذف منتجاته أيضًا.`)) return;
+      const { error } = await window.supabaseClient.from('suppliers').delete().eq('id', id);
+      if (error) { toast(error.message, '⚠'); return; }
+      toast('تم حذف المورد', '✓');
+      loadAdminSuppliers();
+    }
+
+    function openSupplierEditor(supplier) {
+      const modal = document.getElementById('supplierModal');
+      const form = document.getElementById('supplierForm');
+      form.reset();
+      document.getElementById('supplierModalTitle').textContent = supplier ? 'تعديل مورد' : 'إضافة مورد جديد';
+      if (supplier && typeof supplier === 'object') {
+        form.id.value = supplier.id || '';
+        form.new_id.value = supplier.id || '';
+        form.new_id.disabled = true;
+        for (const k of ['name_ar','cr_number','vat_number','phone','email','established_year','description_ar']) {
+          if (form[k]) form[k].value = supplier[k] || '';
+        }
+        form.is_verified.checked = !!supplier.is_verified;
+      } else {
+        form.new_id.disabled = false;
+      }
+      modal.classList.add('open');
+    }
+    function closeSupplierEditor() { document.getElementById('supplierModal').classList.remove('open'); }
+
+    async function saveSupplier(e) {
+      e.preventDefault();
+      const f = e.target;
+      const isEdit = !!f.id.value;
+      const data = {
+        name_ar: f.name_ar.value.trim(),
+        cr_number: f.cr_number.value.trim() || null,
+        vat_number: f.vat_number.value.trim() || null,
+        phone: f.phone.value.trim() || null,
+        email: f.email.value.trim() || null,
+        established_year: f.established_year.value ? parseInt(f.established_year.value) : null,
+        description_ar: f.description_ar.value.trim() || null,
+        is_verified: f.is_verified.checked
+      };
+      let result;
+      if (isEdit) {
+        result = await window.supabaseClient.from('suppliers').update(data).eq('id', f.id.value);
+      } else {
+        data.id = f.new_id.value.trim();
+        result = await window.supabaseClient.from('suppliers').insert(data);
+      }
+      if (result.error) { toast(result.error.message, '⚠'); return; }
+      toast(isEdit ? 'تم حفظ المورد' : 'تم إضافة المورد', '✓');
+      closeSupplierEditor();
+      loadAdminSuppliers();
+    }
+
+    async function loadAdminCategories() {
+      const grid = document.getElementById('adminCategoriesGrid');
+      const { data, error } = await window.supabaseClient.from('categories').select('*').order('sort_order');
+      if (error) { grid.innerHTML = `<div style="color:#d33; padding:20px;">${error.message}</div>`; return; }
+      if (!data?.length) { grid.innerHTML = '<div style="grid-column:1/-1; padding:30px; text-align:center; color:var(--gray-500);">لا توجد تصنيفات</div>'; return; }
+      grid.innerHTML = data.map(c => `
+        <div style="background:var(--white); border:1px solid var(--gray-150); border-radius:var(--radius-md); padding:18px; display:flex; flex-direction:column; gap:8px;">
+          <div style="font-weight:700; font-size:1.05rem;">${c.name_ar}</div>
+          <div style="color:var(--gray-500); font-size:.82rem;">${c.name_en || ''} • ${c.id}</div>
+          <div style="display:flex; gap:6px; margin-top:6px;">
+            <button class="btn btn-ghost" onclick="renameCategory('${c.id}', '${(c.name_ar||'').replace(/'/g,"\\'")}')" style="padding:6px 10px; font-size:.78rem;">✏️ تعديل</button>
+            <button class="btn btn-ghost" onclick="deleteCategory('${c.id}', '${(c.name_ar||'').replace(/'/g,"\\'")}')" style="padding:6px 10px; font-size:.78rem; color:#d33;">🗑️</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function addCategoryPrompt() {
+      const nameAr = prompt('اسم التصنيف بالعربي:');
+      if (!nameAr) return;
+      const nameEn = prompt('Category name in English (optional):') || '';
+      const id = 'cat-' + (nameEn || nameAr).toLowerCase().replace(/[^a-z0-9-]/g,'-').slice(0,20) + '-' + Date.now().toString(36).slice(-4);
+      const { error } = await window.supabaseClient.from('categories').insert({ id, name_ar: nameAr, name_en: nameEn, sort_order: 999 });
+      if (error) { toast(error.message, '⚠'); return; }
+      toast('تم إضافة التصنيف', '✓');
+      loadAdminCategories();
+    }
+
+    async function renameCategory(id, oldName) {
+      const newName = prompt('الاسم الجديد:', oldName);
+      if (!newName || newName === oldName) return;
+      const { error } = await window.supabaseClient.from('categories').update({ name_ar: newName }).eq('id', id);
+      if (error) { toast(error.message, '⚠'); return; }
+      toast('تم التعديل', '✓');
+      loadAdminCategories();
+    }
+
+    async function deleteCategory(id, name) {
+      if (!confirm(`حذف التصنيف "${name}"؟`)) return;
+      const { error } = await window.supabaseClient.from('categories').delete().eq('id', id);
+      if (error) { toast(error.message, '⚠'); return; }
+      toast('تم الحذف', '✓');
+      loadAdminCategories();
+    }
+
+    async function loadAdminCustomers() {
+      const tbody = document.getElementById('adminCustomersTbody');
+      const { data, error } = await window.supabaseClient
+        .from('profiles')
+        .select('id, full_name, email, phone, user_type, created_at')
+        .order('created_at', { ascending: false })
+        .limit(100);
+      if (error) { tbody.innerHTML = `<tr><td colspan="5" style="padding:20px; text-align:center; color:#d33;">${error.message}</td></tr>`; return; }
+      if (!data?.length) { tbody.innerHTML = '<tr><td colspan="5" style="padding:30px; text-align:center; color:var(--gray-500);">لا يوجد عملاء بعد</td></tr>'; return; }
+      const typeAr = { customer:'عميل', contractor:'مقاول', business:'منشأة', supplier:'مورد', admin:'مالك' };
+      tbody.innerHTML = data.map(p => `
+        <tr style="border-top:1px solid var(--gray-150);">
+          <td style="padding:12px; font-weight:600;">${p.full_name || '—'}</td>
+          <td style="padding:12px; color:var(--gray-600); font-size:.85rem;">${p.email}</td>
+          <td style="padding:12px; color:var(--gray-600); font-size:.85rem;">${p.phone || '—'}</td>
+          <td style="padding:12px;"><span style="background:${p.user_type==='admin'?'#fef3c7':'var(--gray-100)'}; padding:4px 10px; border-radius:12px; font-size:.8rem;">${typeAr[p.user_type]||p.user_type}</span></td>
+          <td style="padding:12px; color:var(--gray-600); font-size:.85rem;">${new Date(p.created_at).toLocaleDateString('ar-SA')}</td>
+        </tr>
+      `).join('');
+    }
+
+    // Hook into the existing router so #admin loads the dashboard
+    const __originalGoFn = window.go;
+    window.go = function(hash) {
+      const result = __originalGoFn ? __originalGoFn(hash) : null;
+      if (hash === '#admin' || hash?.startsWith('#admin')) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        const adminView = document.getElementById('view-admin');
+        if (adminView) {
+          adminView.style.display = 'block';
+          adminView.classList.add('active');
+          loadAdminDashboard();
+        }
+      } else {
+        const adminView = document.getElementById('view-admin');
+        if (adminView) { adminView.style.display = 'none'; adminView.classList.remove('active'); }
+      }
+      return result;
+    };
+    // If page loads with #admin in URL
+    window.addEventListener('hashchange', () => {
+      if (location.hash === '#admin') window.go('#admin');
+    });
+    window.addEventListener('load', () => {
+      if (location.hash === '#admin') setTimeout(() => window.go('#admin'), 300);
+    });
 
     /* ============================================================
        DATA: Suppliers
