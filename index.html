@@ -5052,13 +5052,15 @@ p {
         </p>
       </form>
 
-      <!-- STEP 2: 6-digit email PIN verification -->
+      <!-- STEP 2: Email PIN verification (Supabase default is 6 or 8 digits) -->
       <form id="verifyForm" style="display:none;" onsubmit="verifyEmailPin(event)">
         <p style="text-align:center; color: var(--gray-700); margin: 4px 0 18px;">
-          أرسلنا رمز تحقق من ٦ أرقام إلى<br>
+          أرسلنا رمز التحقق إلى<br>
           <strong id="verifyEmailLabel" style="color: var(--navy-900);"></strong>
         </p>
-        <div class="otp-row" style="margin-bottom:18px;">
+        <div class="otp-row" style="margin-bottom:18px; gap:6px;">
+          <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" required />
+          <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" required />
           <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" required />
           <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" required />
           <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" required />
@@ -6009,11 +6011,12 @@ p {
           if (e.key === 'Backspace' && !input.value && inputs[i - 1]) inputs[i - 1].focus();
         };
         input.onpaste = (e) => {
-          const text = (e.clipboardData?.getData('text') || '').replace(/\D/g, '').slice(0, 6);
-          if (text.length === 6) {
+          const raw = (e.clipboardData?.getData('text') || '').replace(/\D/g, '');
+          const text = raw.slice(0, inputs.length);
+          if (text.length >= 6) {
             e.preventDefault();
             text.split('').forEach((d, idx) => { if (inputs[idx]) inputs[idx].value = d; });
-            inputs[5].focus();
+            inputs[Math.min(text.length, inputs.length) - 1].focus();
           }
         };
       });
@@ -6106,8 +6109,8 @@ p {
       e.preventDefault();
       const inputs = $$('#verifyForm .otp-row input');
       const code = Array.from(inputs).map(i => i.value).join('');
-      if (code.length !== 6 || !/^\d{6}$/.test(code)) {
-        toast('أدخل الرمز الكامل من ٦ أرقام', '⚠'); return;
+      if (!/^\d{6,8}$/.test(code)) {
+        toast('أدخل الرمز الكامل من بريدك', '⚠'); return;
       }
       if (!__pendingEmail) { toast('انتهت الجلسة — أعد المحاولة', '⚠'); showAuthStep1(); return; }
 

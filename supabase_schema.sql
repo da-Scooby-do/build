@@ -24,6 +24,48 @@
 
 
 -- =====================================================
+-- 0. CLEANUP — drops any existing version from previous runs.
+--    Safe to re-run this whole file as many times as you want.
+-- =====================================================
+drop trigger if exists on_auth_user_created on auth.users;
+
+drop table if exists zatca_invoices  cascade;
+drop table if exists rfq_responses   cascade;
+drop table if exists rfq_items       cascade;
+drop table if exists rfqs            cascade;
+drop table if exists reviews         cascade;
+drop table if exists order_items     cascade;
+drop table if exists orders          cascade;
+drop table if exists wishlist        cascade;
+drop table if exists cart_items      cascade;
+drop table if exists addresses       cascade;
+drop table if exists product_tiers   cascade;
+drop table if exists product_specs   cascade;
+drop table if exists product_images  cascade;
+drop table if exists products        cascade;
+drop table if exists suppliers       cascade;
+drop table if exists profiles        cascade;
+drop table if exists categories      cascade;
+drop table if exists cities          cascade;
+
+drop type if exists user_type            cascade;
+drop type if exists order_status         cascade;
+drop type if exists payment_status       cascade;
+drop type if exists payment_method_type  cascade;
+drop type if exists rfq_status           cascade;
+drop type if exists response_status      cascade;
+drop type if exists language_pref        cascade;
+
+drop function if exists trg_set_updated_at()      cascade;
+drop function if exists trg_create_profile()      cascade;
+drop function if exists generate_order_number()   cascade;
+drop function if exists generate_rfq_number()     cascade;
+
+drop sequence if exists order_number_seq cascade;
+drop sequence if exists rfq_number_seq   cascade;
+
+
+-- =====================================================
 -- 1. EXTENSIONS
 -- =====================================================
 create extension if not exists "uuid-ossp";
