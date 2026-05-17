@@ -3836,6 +3836,295 @@ p {
   .zoom-modal img { max-width:100%; max-height:90vh; border-radius: var(--radius-md); }
   .zoom-modal .x { position:absolute; top:20px; left:20px; background: var(--white); width:40px; height:40px;
   border-radius:50%; border:0; cursor:pointer; font-size: 1.2rem; }
+
+  /* ============================================================
+     CINEMATIC MOTION + INTERACTIONS
+     ============================================================ */
+  html { scroll-behavior: smooth; }
+
+  /* Respect users who prefer reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: .001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /* Reveal on scroll — base */
+  .reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity .85s cubic-bezier(.22,.61,.36,1), transform .85s cubic-bezier(.22,.61,.36,1);
+    will-change: opacity, transform;
+  }
+  .reveal.in-view { opacity: 1; transform: translateY(0); }
+
+  /* Reveal variants */
+  .reveal-fade            { transform: none; }
+  .reveal-left            { transform: translateX(28px); }
+  .reveal-right           { transform: translateX(-28px); }
+  .reveal-left.in-view,
+  .reveal-right.in-view   { transform: translateX(0); }
+  .reveal-scale           { transform: scale(.94); }
+  .reveal-scale.in-view   { transform: scale(1); }
+
+  /* Stagger children */
+  .reveal-stagger > * {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity .7s ease-out, transform .7s ease-out;
+  }
+  .reveal-stagger.in-view > *:nth-child(1)  { transition-delay:  40ms; }
+  .reveal-stagger.in-view > *:nth-child(2)  { transition-delay:  90ms; }
+  .reveal-stagger.in-view > *:nth-child(3)  { transition-delay: 140ms; }
+  .reveal-stagger.in-view > *:nth-child(4)  { transition-delay: 190ms; }
+  .reveal-stagger.in-view > *:nth-child(5)  { transition-delay: 240ms; }
+  .reveal-stagger.in-view > *:nth-child(6)  { transition-delay: 290ms; }
+  .reveal-stagger.in-view > *:nth-child(7)  { transition-delay: 340ms; }
+  .reveal-stagger.in-view > *:nth-child(8)  { transition-delay: 390ms; }
+  .reveal-stagger.in-view > *:nth-child(9)  { transition-delay: 440ms; }
+  .reveal-stagger.in-view > *:nth-child(10) { transition-delay: 490ms; }
+  .reveal-stagger.in-view > *:nth-child(11) { transition-delay: 540ms; }
+  .reveal-stagger.in-view > *:nth-child(12) { transition-delay: 590ms; }
+  .reveal-stagger.in-view > * { opacity: 1; transform: translateY(0); }
+
+  /* Card hover lifts */
+  .product-card, .stat-card, .step-card, .cat-tile, .supplier-group, .auth-card, .modal {
+    transition:
+      transform .35s cubic-bezier(.22,.61,.36,1),
+      box-shadow .35s cubic-bezier(.22,.61,.36,1),
+      border-color .25s ease;
+  }
+  .product-card:hover, .stat-card:hover, .cat-tile:hover, .step-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 18px 40px rgba(15,26,46,.13);
+    border-color: var(--amber-300, #f5c270);
+  }
+
+  /* Subtle image zoom on hover */
+  .product-card .thumb, .cat-tile, .gallery-main {
+    overflow: hidden;
+  }
+  .product-card .thumb img, .cat-tile img, .gallery-main img {
+    transition: transform .9s cubic-bezier(.22,.61,.36,1);
+  }
+  .product-card:hover .thumb img, .cat-tile:hover img {
+    transform: scale(1.07);
+  }
+
+  /* Button micro-interactions */
+  .btn {
+    transition: transform .14s ease, background .25s ease, box-shadow .3s ease, border-color .25s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn:active { transform: scale(.96); }
+  .btn-amber:hover {
+    box-shadow: 0 10px 24px rgba(245,165,36,.35);
+  }
+  .btn-primary:hover {
+    box-shadow: 0 10px 24px rgba(15,26,46,.25);
+  }
+
+  /* Ripple effect */
+  .btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at var(--rx,50%) var(--ry,50%), rgba(255,255,255,.35) 0%, transparent 45%);
+    opacity: 0;
+    transition: opacity .5s ease;
+    pointer-events: none;
+  }
+  .btn.is-rippling::after { opacity: 1; transition: opacity 0s; }
+
+  /* SPA view transition — fade in active view */
+  .view {
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity .55s cubic-bezier(.22,.61,.36,1), transform .55s cubic-bezier(.22,.61,.36,1);
+    pointer-events: none;
+  }
+  .view.active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  /* Modal entrance */
+  .modal-backdrop {
+    opacity: 0;
+    transition: opacity .3s ease;
+    backdrop-filter: blur(0px);
+  }
+  .modal-backdrop.open {
+    opacity: 1;
+    backdrop-filter: blur(6px);
+  }
+  .modal-backdrop .modal {
+    transform: translateY(20px) scale(.96);
+    transition: transform .4s cubic-bezier(.22,.61,.36,1), opacity .3s ease;
+    opacity: 0;
+  }
+  .modal-backdrop.open .modal {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+
+  /* Toast slide-in */
+  .toast {
+    animation: toastIn .4s cubic-bezier(.22,.61,.36,1);
+  }
+  @keyframes toastIn {
+    from { opacity: 0; transform: translateY(-12px) scale(.96); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  /* Hero animated gradient */
+  .hero::before {
+    will-change: background-position;
+  }
+  @keyframes heroSubtle {
+    0%, 100% { background-position: 50% 50%; }
+    50%      { background-position: 52% 48%; }
+  }
+
+  /* Counter animations on stat cards */
+  .stat-card .stat-num,
+  .stat-card div[id^="stat"] {
+    transition: color .3s ease;
+  }
+  .stat-bumping {
+    animation: statBump .55s cubic-bezier(.22,.61,.36,1);
+  }
+  @keyframes statBump {
+    0%   { transform: scale(1);   color: var(--amber-400); }
+    40%  { transform: scale(1.08); }
+    100% { transform: scale(1); }
+  }
+
+  /* Smooth nav link underline */
+  .main-nav a {
+    position: relative;
+  }
+  .main-nav a::after {
+    content: '';
+    position: absolute;
+    inset-block-end: -4px;
+    inset-inline-start: 0;
+    width: 0;
+    height: 2px;
+    background: var(--amber-400);
+    transition: width .35s cubic-bezier(.22,.61,.36,1);
+  }
+  .main-nav a:hover::after,
+  .main-nav a.active::after { width: 100%; }
+
+  /* Heart animation */
+  @keyframes heartPop {
+    0%   { transform: scale(1); }
+    35%  { transform: scale(1.35); }
+    60%  { transform: scale(.85); }
+    100% { transform: scale(1); }
+  }
+  .heart-pop { animation: heartPop .55s ease; }
+
+  /* Skeleton shimmer (already exists, just smoother) */
+  .skeleton { animation-timing-function: ease-in-out; }
+
+  /* Admin panel — mobile-friendly horizontal tab scroll */
+  .admin-tabs {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+  .admin-tabs::-webkit-scrollbar { height: 4px; }
+  .admin-tabs::-webkit-scrollbar-thumb { background: var(--gray-200); border-radius: 4px; }
+  .admin-tab {
+    scroll-snap-align: start;
+    white-space: nowrap;
+    transition: color .25s ease, border-color .25s ease, background .25s ease;
+  }
+  .admin-tab:hover { background: var(--gray-50); }
+
+  /* Admin panels fade transition */
+  .admin-panel {
+    animation: panelFade .4s cubic-bezier(.22,.61,.36,1);
+  }
+  @keyframes panelFade {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Stat card hover */
+  .stat-card { cursor: default; position: relative; overflow: hidden; }
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg, transparent 30%, rgba(245,165,36,.06) 50%, transparent 70%);
+    transform: translateX(-100%);
+    transition: transform .8s ease;
+    pointer-events: none;
+  }
+  .stat-card:hover::before { transform: translateX(100%); }
+
+  /* Smooth section header underline */
+  .section-title, .section h2 {
+    position: relative;
+    display: inline-block;
+  }
+
+  /* Float animation for floating WhatsApp/cart buttons */
+  .wa-float, .back-to-top {
+    transition: transform .25s ease, box-shadow .3s ease;
+  }
+  .wa-float:hover, .back-to-top:hover {
+    transform: translateY(-3px) scale(1.05);
+  }
+
+  /* Page load shimmer */
+  body { animation: bodyFade .4s ease; }
+  @keyframes bodyFade {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  /* Add to cart bounce */
+  @keyframes cartBounce {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.15); color: var(--amber-400); }
+  }
+  .cart-bouncing { animation: cartBounce .6s ease; }
+
+  /* Tables row hover */
+  tbody tr {
+    transition: background .25s ease;
+  }
+  tbody tr:hover {
+    background: var(--gray-50, #f9fafb);
+  }
+
+  /* Input focus glow */
+  input:focus, select:focus, textarea:focus {
+    transition: border-color .25s ease, box-shadow .25s ease;
+  }
+  input:focus, select:focus, textarea:focus {
+    box-shadow: 0 0 0 3px rgba(245,165,36,.15);
+  }
+
+  /* OTP input pop on entry */
+  .otp-row input {
+    transition: transform .15s ease, border-color .2s ease, box-shadow .25s ease;
+  }
+  .otp-row input:not(:placeholder-shown) {
+    border-color: var(--amber-400);
+    background: rgba(245,165,36,.04);
+  }
+
   </style>
 
   <!-- Supabase JS SDK -->
@@ -5786,6 +6075,194 @@ p {
     window.addEventListener('load', () => {
       if (location.hash === '#admin') setTimeout(() => window.go('#admin'), 300);
     });
+
+    /* ============================================================
+       CINEMATIC MOTION ENGINE
+       ============================================================ */
+    const __reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // 1. Scroll-reveal observer ─────────────────────────────────
+    let __revealObserver = null;
+    function ensureRevealObserver() {
+      if (__revealObserver || __reduceMotion) return;
+      __revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('in-view');
+            __revealObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    }
+    function applyReveal(scope = document) {
+      ensureRevealObserver();
+      if (!__revealObserver) {
+        // Reduced motion → just show everything
+        scope.querySelectorAll('.reveal, .reveal-stagger').forEach(el => el.classList.add('in-view'));
+        return;
+      }
+      // Auto-tag common content blocks for reveal
+      const autoSelectors = [
+        '.section', '.cta-band', '.rfq-banner', '.zatca-card',
+        '.supplier-hero', '.page-intro', '.summary-card',
+        '.related-strip', '.confirm-card', '.policy-shell',
+        '.stats-strip-home', '.stats-strip'
+      ];
+      scope.querySelectorAll(autoSelectors.join(',')).forEach(el => {
+        if (!el.classList.contains('reveal')) el.classList.add('reveal');
+      });
+      // Stagger grids
+      scope.querySelectorAll('.product-grid, .cat-grid, .step-grid, .supplier-stats, .admin-stats').forEach(el => {
+        if (!el.classList.contains('reveal-stagger')) el.classList.add('reveal-stagger');
+      });
+      scope.querySelectorAll('.reveal, .reveal-stagger').forEach(el => {
+        if (!el.classList.contains('in-view')) __revealObserver.observe(el);
+      });
+    }
+
+    // 2. Animated number counter ────────────────────────────────
+    function animateNum(el, target, duration = 1100) {
+      if (__reduceMotion) { el.textContent = formatVal(target); return; }
+      const start = parseFloat((el.dataset.curVal || '0')) || 0;
+      const t0 = performance.now();
+      const isCurrency = String(el.textContent).includes('ر.س') || el.id?.startsWith('statRev');
+      function formatVal(n) {
+        if (isCurrency) return new Intl.NumberFormat('ar-SA', { style:'currency', currency:'SAR', maximumFractionDigits:0 }).format(n);
+        return new Intl.NumberFormat('ar-SA').format(Math.round(n));
+      }
+      function step(now) {
+        const p = Math.min(1, (now - t0) / duration);
+        const eased = 1 - Math.pow(1 - p, 3);
+        const val = start + (target - start) * eased;
+        el.textContent = formatVal(val);
+        if (p < 1) requestAnimationFrame(step);
+        else { el.textContent = formatVal(target); el.dataset.curVal = String(target); }
+      }
+      el.classList.add('stat-bumping');
+      setTimeout(() => el.classList.remove('stat-bumping'), 600);
+      requestAnimationFrame(step);
+    }
+
+    // 3. Ripple effect on buttons ───────────────────────────────
+    document.addEventListener('pointerdown', (e) => {
+      const btn = e.target.closest('.btn');
+      if (!btn || __reduceMotion) return;
+      const rect = btn.getBoundingClientRect();
+      btn.style.setProperty('--rx', `${e.clientX - rect.left}px`);
+      btn.style.setProperty('--ry', `${e.clientY - rect.top}px`);
+      btn.classList.add('is-rippling');
+      setTimeout(() => btn.classList.remove('is-rippling'), 450);
+    });
+
+    // 4. Wishlist heart pop ─────────────────────────────────────
+    document.addEventListener('click', (e) => {
+      const heart = e.target.closest('.heart-btn');
+      if (heart && !__reduceMotion) {
+        heart.classList.remove('heart-pop');
+        void heart.offsetWidth; // reflow to restart animation
+        heart.classList.add('heart-pop');
+      }
+    });
+
+    // 5. Smooth view transitions — re-apply reveals after route change
+    const __prevGo = window.go;
+    window.go = function(hash) {
+      const result = __prevGo ? __prevGo(hash) : null;
+      // Brief delay for the new view to render
+      setTimeout(() => {
+        applyReveal();
+        // Animate stat cards if we're on the admin view
+        if (hash === '#admin' || hash?.startsWith('#admin')) {
+          requestAnimationFrame(() => animateAllStatCards());
+        }
+        // Scroll to top of new view smoothly
+        window.scrollTo({ top: 0, behavior: __reduceMotion ? 'auto' : 'smooth' });
+      }, 60);
+      return result;
+    };
+
+    // 6. Stat-card animated counters (admin dashboard)
+    function animateAllStatCards() {
+      document.querySelectorAll('#view-admin [id^="stat"]').forEach(el => {
+        // Parse current numeric value from displayed text
+        const raw = (el.textContent || '').replace(/[^\d.]/g, '');
+        const num = parseFloat(raw) || 0;
+        // Reset and animate from 0
+        el.dataset.curVal = '0';
+        animateNum(el, num, 1200);
+      });
+    }
+
+    // Patch loadAdminDashboard so stats animate after fetching
+    if (typeof loadAdminDashboard === 'function') {
+      const __origLoadDashboard = loadAdminDashboard;
+      window.loadAdminDashboard = async function() {
+        await __origLoadDashboard.apply(this, arguments);
+        setTimeout(animateAllStatCards, 100);
+      };
+    }
+
+    // 7. Cart bounce when something is added
+    document.addEventListener('cart:added', () => {
+      const cartBtn = document.querySelector('.cart-btn');
+      if (cartBtn && !__reduceMotion) {
+        cartBtn.classList.remove('cart-bouncing');
+        void cartBtn.offsetWidth;
+        cartBtn.classList.add('cart-bouncing');
+      }
+    });
+    // Hook into existing addToCart if defined
+    if (typeof window.addToCart === 'function') {
+      const __origAdd = window.addToCart;
+      window.addToCart = function(...args) {
+        const r = __origAdd.apply(this, args);
+        document.dispatchEvent(new CustomEvent('cart:added'));
+        return r;
+      };
+    }
+
+    // 8. Initial reveal pass on first paint
+    if (document.readyState !== 'loading') {
+      applyReveal();
+    } else {
+      document.addEventListener('DOMContentLoaded', () => applyReveal());
+    }
+    window.addEventListener('load', () => setTimeout(() => applyReveal(), 50));
+
+    // Re-apply when navigating between SPA views
+    window.addEventListener('hashchange', () => setTimeout(applyReveal, 80));
+
+    // 9. Subtle parallax on hero (only on desktop)
+    if (!__reduceMotion && window.matchMedia('(min-width: 900px)').matches) {
+      const hero = document.querySelector('.hero');
+      if (hero) {
+        window.addEventListener('scroll', () => {
+          const y = window.scrollY;
+          if (y < 700) {
+            hero.style.backgroundPosition = `center ${50 + y * 0.05}%`;
+          }
+        }, { passive: true });
+      }
+    }
+
+    // 10. Tilt cards on mouse move (desktop only, subtle)
+    if (!__reduceMotion && window.matchMedia('(min-width: 1024px)').matches) {
+      document.addEventListener('mousemove', (e) => {
+        const card = e.target.closest('.stat-card');
+        if (!card) return;
+        const r = card.getBoundingClientRect();
+        const cx = (e.clientX - r.left) / r.width - 0.5;
+        const cy = (e.clientY - r.top) / r.height - 0.5;
+        card.style.transform = `perspective(900px) rotateX(${-cy * 3}deg) rotateY(${cx * 3}deg) translateY(-3px)`;
+      });
+      document.addEventListener('mouseleave', (e) => {
+        document.querySelectorAll('.stat-card').forEach(c => c.style.transform = '');
+      }, true);
+      document.addEventListener('mouseout', (e) => {
+        const card = e.target.closest?.('.stat-card');
+        if (card && !card.contains(e.relatedTarget)) card.style.transform = '';
+      });
+    }
 
     /* ============================================================
        DATA: Suppliers
