@@ -5020,7 +5020,7 @@ p {
         <button id="tabSignup" onclick="switchAuth('signup')">إنشاء حساب</button>
       </div>
 
-      <!-- Email-based auth -->
+      <!-- STEP 1: Email + password form -->
       <form id="authForm" onsubmit="submitAuth(event)">
         <div class="fld" id="nameField" style="display:none; margin-bottom:14px;">
           <label>الاسم الكامل</label>
@@ -5041,11 +5041,35 @@ p {
         <div class="fld" style="margin-bottom:18px;">
           <label>كلمة المرور <span style="color:var(--danger,#d33);">*</span></label>
           <input type="password" name="password" required minlength="8" placeholder="٨ أحرف على الأقل" autocomplete="current-password" />
-          <p id="pwHint" style="font-size:.75rem; color:var(--gray-500); margin:6px 0 0; display:none;">يجب أن تكون ٨ أحرف على الأقل وتحتوي على رقم.</p>
+          <p id="pwHint" style="font-size:.75rem; color:var(--gray-500); margin:6px 0 0; display:none;">يجب أن تكون ٨ أحرف على الأقل.</p>
         </div>
         <button type="submit" class="btn btn-amber btn-block" id="authSubmitBtn">تسجيل الدخول</button>
         <p style="text-align:center; font-size:.82rem; margin-top:14px;">
           <a href="#" id="forgotLink" onclick="forgotPassword(event)" style="color: var(--navy-700);">نسيت كلمة المرور؟</a>
+        </p>
+      </form>
+
+      <!-- STEP 2: 6-digit email PIN verification -->
+      <form id="verifyForm" style="display:none;" onsubmit="verifyEmailPin(event)">
+        <p style="text-align:center; color: var(--gray-700); margin: 4px 0 18px;">
+          أرسلنا رمز تحقق من ٦ أرقام إلى<br>
+          <strong id="verifyEmailLabel" style="color: var(--navy-900);"></strong>
+        </p>
+        <div class="otp-row" style="margin-bottom:18px;">
+          <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" required />
+          <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" required />
+          <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" required />
+          <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" required />
+          <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" required />
+          <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" required />
+        </div>
+        <button type="submit" class="btn btn-amber btn-block" id="verifyBtn">تأكيد الرمز وتفعيل الحساب</button>
+        <p style="text-align:center; font-size:.82rem; margin-top:14px;">
+          لم يصلك الرمز؟
+          <a href="#" id="resendLink" onclick="resendEmailPin(event)" style="color: var(--navy-700); font-weight:700;">إعادة الإرسال</a>
+        </p>
+        <p style="text-align:center; font-size:.78rem; margin-top:6px;">
+          <a href="#" onclick="backToAuthStep1(event)" style="color: var(--gray-500);">← تغيير البريد الإلكتروني</a>
         </p>
       </form>
     </div>
@@ -5867,15 +5891,60 @@ p {
     }
 
     /* ============================================================
-       AUTH (email + password — Supabase compatible)
+       AUTH (email + password + 6-digit email PIN — Supabase)
+
+       Flow:
+         SIGNUP:  email+password → Supabase sends 6-digit PIN to email
+                  → user enters PIN → account verified & logged in
+         LOGIN:   email+password → logged in (only if email is verified)
+         FORGOT:  email → password reset PIN sent to email
        ============================================================ */
-    let __authMode = 'login'; // 'login' or 'signup'
+    let __authMode = 'login';            // 'login' or 'signup'
+    let __pendingEmail = null;           // email awaiting PIN verification
+    let __pendingPassword = null;        // password to set after PIN verify (for forgot flow)
 
     function openAuth(mode) {
       $('#authModal').classList.add('open');
       switchAuth(mode || 'login');
+      showAuthStep1();
     }
-    function closeAuth() { $('#authModal').classList.remove('open'); }
+    function closeAuth() {
+      $('#authModal').classList.remove('open');
+      __pendingEmail = null;
+      __pendingPassword = null;
+    }
+
+    function showAuthStep1() {
+      $('#authForm').style.display = 'block';
+      $('#verifyForm').style.display = 'none';
+    }
+    function showAuthStep2(email) {
+      $('#authForm').style.display = 'none';
+      $('#verifyForm').style.display = 'block';
+      $('#verifyEmailLabel').textContent = email;
+      // Clear and focus first PIN input
+      const inputs = $$('#verifyForm .otp-row input');
+      inputs.forEach(i => i.value = '');
+      setTimeout(() => inputs[0]?.focus(), 50);
+      // Auto-advance + paste support
+      inputs.forEach((input, i) => {
+        input.oninput = () => {
+          if (input.value.length === 1 && inputs[i + 1]) inputs[i + 1].focus();
+        };
+        input.onkeydown = (e) => {
+          if (e.key === 'Backspace' && !input.value && inputs[i - 1]) inputs[i - 1].focus();
+        };
+        input.onpaste = (e) => {
+          const text = (e.clipboardData?.getData('text') || '').replace(/\D/g, '').slice(0, 6);
+          if (text.length === 6) {
+            e.preventDefault();
+            text.split('').forEach((d, idx) => { if (inputs[idx]) inputs[idx].value = d; });
+            inputs[5].focus();
+          }
+        };
+      });
+    }
+    function backToAuthStep1(e) { e?.preventDefault(); showAuthStep1(); }
 
     function switchAuth(mode) {
       __authMode = mode;
@@ -5884,14 +5953,13 @@ p {
       $('#tabSignup').classList.toggle('active', isSignup);
       $('#authTitle').textContent = isSignup ? 'إنشاء حساب جديد' : 'تسجيل الدخول';
       $('#authSubtitle').textContent = isSignup
-        ? 'أنشئ حسابك بالبريد الإلكتروني وابدأ الطلب فورًا.'
+        ? 'أنشئ حسابك بالبريد الإلكتروني — سنرسل لك رمز تأكيد من ٦ أرقام.'
         : 'سجّل دخولك بالبريد الإلكتروني لمتابعة طلباتك.';
       $('#nameField').style.display = isSignup ? 'flex' : 'none';
       $('#phoneField').style.display = isSignup ? 'flex' : 'none';
       $('#pwHint').style.display = isSignup ? 'block' : 'none';
-      $('#authSubmitBtn').textContent = isSignup ? 'إنشاء الحساب' : 'تسجيل الدخول';
+      $('#authSubmitBtn').textContent = isSignup ? 'إنشاء الحساب وإرسال الرمز' : 'تسجيل الدخول';
       $('#forgotLink').style.display = isSignup ? 'none' : 'inline';
-      // Reset password autocomplete hint
       const pw = $('#authForm input[name="password"]');
       if (pw) pw.setAttribute('autocomplete', isSignup ? 'new-password' : 'current-password');
     }
@@ -5906,17 +5974,17 @@ p {
       const phone = phoneInput ? '+966' + phoneInput : null;
 
       if (!email || !password) { toast('يرجى إدخال البريد وكلمة المرور', '⚠'); return; }
-      if (__authMode === 'signup' && password.length < 8) {
-        toast('كلمة المرور يجب أن تكون ٨ أحرف على الأقل', '⚠'); return;
+      if (__authMode === 'signup') {
+        if (password.length < 8) { toast('كلمة المرور يجب أن تكون ٨ أحرف على الأقل', '⚠'); return; }
+        if (!fullName) { toast('يرجى إدخال الاسم الكامل', '⚠'); return; }
       }
 
       const btn = $('#authSubmitBtn');
       const originalText = btn.textContent;
       btn.disabled = true;
-      btn.textContent = __authMode === 'signup' ? 'جارٍ إنشاء الحساب...' : 'جارٍ تسجيل الدخول...';
+      btn.textContent = __authMode === 'signup' ? 'جارٍ الإرسال...' : 'جارٍ تسجيل الدخول...';
 
       try {
-        // Supabase path (if client is loaded)
         if (window.supabaseClient) {
           if (__authMode === 'signup') {
             const { data, error } = await window.supabaseClient.auth.signUp({
@@ -5924,8 +5992,9 @@ p {
               options: { data: { full_name: fullName, phone } }
             });
             if (error) throw error;
-            toast('تم إنشاء الحساب — تحقق من بريدك لتأكيد التسجيل', '✉');
-            closeAuth();
+            __pendingEmail = email;
+            toast('تم إرسال رمز التحقق إلى بريدك الإلكتروني', '✉');
+            showAuthStep2(email);
           } else {
             const { data, error } = await window.supabaseClient.auth.signInWithPassword({ email, password });
             if (error) throw error;
@@ -5934,37 +6003,93 @@ p {
             if (typeof onAuthChange === 'function') onAuthChange(data.user);
           }
         }
-        // Legacy REST API path (server folder)
-        else if (window.API && API.isOnline()) {
-          if (__authMode === 'signup') {
-            await API.signup({ email, password, fullName, phone });
-            toast('تم إنشاء الحساب بنجاح', '✓');
-          } else {
-            await API.login({ email, password });
-            toast('تم تسجيل الدخول بنجاح', '✓');
-          }
-          closeAuth();
-        }
-        // Offline fallback (no backend yet)
+        // Offline / dev fallback
         else {
-          // Store minimal local profile so the UI works during development
-          localStorage.setItem('bena_user', JSON.stringify({ email, fullName, phone }));
-          toast(__authMode === 'signup' ? 'تم إنشاء الحساب (وضع تجريبي)' : 'تم تسجيل الدخول (وضع تجريبي)', '✓');
-          closeAuth();
+          if (__authMode === 'signup') {
+            __pendingEmail = email;
+            localStorage.setItem('bena_pending_signup', JSON.stringify({ email, password, fullName, phone }));
+            toast('وضع تجريبي — استخدم الرمز ٠٠٠٠٠٠ للتأكيد', '✉');
+            showAuthStep2(email);
+          } else {
+            const stored = JSON.parse(localStorage.getItem('bena_user') || 'null');
+            if (stored && stored.email === email) {
+              toast('تم تسجيل الدخول (وضع تجريبي)', '✓');
+              closeAuth();
+            } else {
+              toast('الحساب غير موجود (وضع تجريبي)', '⚠');
+            }
+          }
         }
       } catch (err) {
-        const msg = err?.message || 'حدث خطأ — حاول مرة أخرى';
-        // Translate common Supabase errors to Arabic
-        const arMsg =
-          /already registered|user already/i.test(msg) ? 'هذا البريد مسجل مسبقًا — جرّب تسجيل الدخول' :
-          /invalid login credentials/i.test(msg) ? 'البريد أو كلمة المرور غير صحيحة' :
-          /email not confirmed/i.test(msg) ? 'يرجى تأكيد بريدك الإلكتروني أولاً' :
-          /password should be at least/i.test(msg) ? 'كلمة المرور قصيرة جدًا' :
-          msg;
-        toast(arMsg, '⚠');
+        toast(translateAuthError(err?.message), '⚠');
       } finally {
         btn.disabled = false;
         btn.textContent = originalText;
+      }
+    }
+
+    async function verifyEmailPin(e) {
+      e.preventDefault();
+      const inputs = $$('#verifyForm .otp-row input');
+      const code = Array.from(inputs).map(i => i.value).join('');
+      if (code.length !== 6 || !/^\d{6}$/.test(code)) {
+        toast('أدخل الرمز الكامل من ٦ أرقام', '⚠'); return;
+      }
+      if (!__pendingEmail) { toast('انتهت الجلسة — أعد المحاولة', '⚠'); showAuthStep1(); return; }
+
+      const btn = $('#verifyBtn');
+      const originalText = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'جارٍ التحقق...';
+
+      try {
+        if (window.supabaseClient) {
+          const { data, error } = await window.supabaseClient.auth.verifyOtp({
+            email: __pendingEmail,
+            token: code,
+            type: 'signup'
+          });
+          if (error) throw error;
+          toast('تم تفعيل حسابك بنجاح — مرحبًا بك في بِناء 🎉', '✓');
+          closeAuth();
+          if (typeof onAuthChange === 'function') onAuthChange(data.user);
+        } else {
+          // Dev fallback
+          if (code === '000000') {
+            const pending = JSON.parse(localStorage.getItem('bena_pending_signup') || '{}');
+            localStorage.setItem('bena_user', JSON.stringify(pending));
+            localStorage.removeItem('bena_pending_signup');
+            toast('تم تفعيل الحساب (وضع تجريبي)', '✓');
+            closeAuth();
+          } else {
+            throw new Error('Invalid code');
+          }
+        }
+      } catch (err) {
+        toast(/expired|invalid/i.test(err?.message) ? 'الرمز غير صحيح أو منتهي الصلاحية' : (err?.message || 'فشل التحقق'), '⚠');
+        // Clear inputs so user can re-enter
+        inputs.forEach(i => i.value = '');
+        inputs[0]?.focus();
+      } finally {
+        btn.disabled = false;
+        btn.textContent = originalText;
+      }
+    }
+
+    async function resendEmailPin(e) {
+      e.preventDefault();
+      if (!__pendingEmail) return;
+      try {
+        if (window.supabaseClient) {
+          const { error } = await window.supabaseClient.auth.resend({
+            type: 'signup',
+            email: __pendingEmail
+          });
+          if (error) throw error;
+        }
+        toast('تم إعادة إرسال الرمز إلى بريدك', '✉');
+      } catch (err) {
+        toast(err?.message || 'تعذر الإرسال', '⚠');
       }
     }
 
@@ -5979,7 +6104,7 @@ p {
           });
           if (error) throw error;
         }
-        toast('تم إرسال رابط إعادة التعيين إلى بريدك', '✉');
+        toast('تم إرسال تعليمات إعادة تعيين كلمة المرور إلى بريدك', '✉');
       } catch (err) {
         toast(err?.message || 'تعذر الإرسال', '⚠');
       }
@@ -5992,6 +6117,17 @@ p {
       localStorage.removeItem('bena_user');
       toast('تم تسجيل الخروج', '✓');
       if (typeof onAuthChange === 'function') onAuthChange(null);
+    }
+
+    function translateAuthError(msg) {
+      msg = msg || 'حدث خطأ — حاول مرة أخرى';
+      if (/already registered|user already|already been registered/i.test(msg)) return 'هذا البريد مسجل مسبقًا — جرّب تسجيل الدخول';
+      if (/invalid login credentials/i.test(msg)) return 'البريد أو كلمة المرور غير صحيحة';
+      if (/email not confirmed/i.test(msg)) return 'يرجى تأكيد بريدك الإلكتروني أولاً (تحقق من الرمز)';
+      if (/password should be at least/i.test(msg)) return 'كلمة المرور قصيرة جدًا';
+      if (/rate limit|too many/i.test(msg)) return 'محاولات كثيرة — انتظر دقيقة ثم حاول مجددًا';
+      if (/network|fetch/i.test(msg)) return 'مشكلة في الاتصال — تحقق من الإنترنت';
+      return msg;
     }
 
     /* ============================================================
