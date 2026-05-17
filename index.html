@@ -3837,6 +3837,9 @@ p {
   .zoom-modal .x { position:absolute; top:20px; left:20px; background: var(--white); width:40px; height:40px;
   border-radius:50%; border:0; cursor:pointer; font-size: 1.2rem; }
   </style>
+
+  <!-- Supabase JS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body>
@@ -5104,6 +5107,77 @@ p {
   </button>
 
   <script>
+    /* ============================================================
+       SUPABASE — backend client
+       Project: vpvgvmmbmacfufdooahv
+       Publishable anon key (safe for frontend, protected by RLS)
+       ============================================================ */
+    const SUPABASE_URL = 'https://vpvgvmmbmacfufdooahv.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwdmd2bW1ibWFjZnVmZG9vYWh2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NTQzMDcsImV4cCI6MjA5NDMzMDMwN30.67eBYeHVrY-ZNGhLheR1kFEBvdLCaTJ3pD0D2tiHE48';
+
+    if (window.supabase && window.supabase.createClient) {
+      window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: true,
+          flowType: 'pkce'
+        }
+      });
+      console.log('[bena] Supabase client initialized');
+
+      // Restore session on page load
+      window.supabaseClient.auth.getSession().then(({ data: { session } }) => {
+        if (session?.user && typeof window.onAuthChange === 'function') {
+          window.onAuthChange(session.user);
+        }
+      });
+
+      // Listen for auth state changes (login, logout, token refresh)
+      window.supabaseClient.auth.onAuthStateChange((event, session) => {
+        console.log('[bena] auth event:', event);
+        if (typeof window.onAuthChange === 'function') {
+          window.onAuthChange(session?.user || null);
+        }
+      });
+    } else {
+      console.warn('[bena] Supabase SDK failed to load — falling back to offline mode');
+    }
+
+    /* ============================================================
+       AUTH STATE — update UI when user logs in/out
+       ============================================================ */
+    window.onAuthChange = function (user) {
+      if (user) {
+        // Logged in: hide login/signup buttons, show account chip
+        const email = user.email || '';
+        const name = user.user_metadata?.full_name || email.split('@')[0];
+        document.querySelectorAll('.auth-buttons .btn').forEach(btn => {
+          const label = btn.textContent.trim();
+          if (label === 'دخول' || label === 'إنشاء حساب') btn.style.display = 'none';
+        });
+        // Add a logged-in chip if not already there
+        if (!document.getElementById('userChip')) {
+          const authBtns = document.querySelector('.auth-buttons');
+          if (authBtns) {
+            const chip = document.createElement('button');
+            chip.id = 'userChip';
+            chip.className = 'btn btn-ghost';
+            chip.style.cssText = 'display:flex; align-items:center; gap:8px;';
+            chip.innerHTML = `<span>👤</span><span>${name}</span><span style="opacity:.6; font-size:.8rem;">·</span><span style="color:var(--gray-500); font-size:.85rem;" onclick="signOut(); return false;">خروج</span>`;
+            chip.onclick = (e) => {
+              if (e.target.textContent === 'خروج') { e.stopPropagation(); signOut(); }
+            };
+            authBtns.appendChild(chip);
+          }
+        }
+      } else {
+        // Logged out
+        document.querySelectorAll('.auth-buttons .btn').forEach(btn => btn.style.display = '');
+        document.getElementById('userChip')?.remove();
+      }
+    };
+
     /* ============================================================
        DATA: Suppliers
        ============================================================ */
