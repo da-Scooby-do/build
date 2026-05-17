@@ -4268,6 +4268,97 @@ p {
     background: rgba(245,165,36,.04);
   }
 
+  /* ============================================================
+     DARK MODE VISIBILITY FIXES
+     ============================================================ */
+
+  /* 1. Fix the giant "01" watermark on step/supplier cards — too visible in dark mode */
+  .step-card::before {
+    color: rgba(15, 26, 46, 0.04);
+  }
+  [data-theme="dark"] .step-card::before {
+    color: rgba(255, 255, 255, 0.025) !important;
+  }
+
+  /* 2. Fix the cart/wishlist button in dark mode — it was inverting to light bg + light text (invisible) */
+  [data-theme="dark"] .cart-btn {
+    background: #1c2c4a !important;
+    color: #f1f5fa !important;
+    border: 1px solid #2d4170;
+  }
+  [data-theme="dark"] .cart-btn:hover {
+    background: #243557 !important;
+    border-color: var(--amber-400);
+  }
+  /* Override the inline-style wishlist variant in dark mode */
+  [data-theme="dark"] .cart-btn[style*="transparent"] {
+    background: transparent !important;
+    color: #f1f5fa !important;
+    border: 1px solid #2d4170 !important;
+  }
+  [data-theme="dark"] .cart-btn[style*="transparent"]:hover {
+    background: #1c2c4a !important;
+    border-color: var(--amber-400) !important;
+  }
+
+  /* 3. Fix badge text clipping (the "SA." / rating pills inside supplier cards) */
+  .badge-verified,
+  .badge-row,
+  .badge,
+  .badge-saso {
+    white-space: nowrap;
+    overflow: visible;
+    flex-shrink: 0;
+  }
+  .step-card,
+  .product-card,
+  .supplier-group {
+    min-width: 0;
+  }
+  .step-card .badge-row {
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 8px;
+    justify-content: center;
+  }
+  .step-card .badge-verified,
+  .step-card .badge {
+    font-size: .72rem;
+    padding: 3px 7px;
+    line-height: 1.4;
+  }
+
+  /* Bonus: step/supplier card content stays readable */
+  .step-card {
+    text-align: center;
+    z-index: 1;
+  }
+  .step-card * { position: relative; z-index: 2; }
+  .step-card::before { z-index: 0; }
+
+  /* Better header button spacing in dark mode */
+  [data-theme="dark"] .auth-buttons {
+    gap: 8px;
+  }
+
+  /* User chip styles when logged in (improve visual cohesion) */
+  #userChip {
+    display: flex !important;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: nowrap;
+  }
+  #userChip .btn-ghost {
+    border: 1px solid var(--gray-200);
+    background: var(--gray-50);
+    color: var(--navy-900);
+  }
+  [data-theme="dark"] #userChip .btn-ghost {
+    background: #1c2c4a;
+    border-color: #2d4170;
+    color: #f1f5fa;
+  }
+
   </style>
 
   <!-- Supabase JS SDK -->
