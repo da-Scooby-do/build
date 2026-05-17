@@ -4359,6 +4359,229 @@ p {
     color: #f1f5fa;
   }
 
+  /* ============================================================
+     REVIEWS & RATINGS
+     ============================================================ */
+  .reviews-block {
+    background: var(--white);
+    border: 1px solid var(--gray-150);
+    border-radius: var(--radius-lg);
+    padding: 28px;
+    box-shadow: var(--shadow-xs);
+  }
+  [data-theme="dark"] .reviews-block {
+    background: #0f1a2e;
+    border-color: #243557;
+  }
+  .reviews-header {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 32px;
+    align-items: center;
+    padding-bottom: 22px;
+    border-bottom: 1px solid var(--gray-150);
+    margin-bottom: 22px;
+  }
+  [data-theme="dark"] .reviews-header { border-color: #243557; }
+  @media (max-width: 640px) {
+    .reviews-header { grid-template-columns: 1fr; gap: 18px; text-align: center; }
+  }
+  .reviews-avg {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .reviews-avg .num {
+    font-family: var(--font-display);
+    font-size: 3.2rem;
+    font-weight: 800;
+    color: var(--amber-500);
+    line-height: 1;
+  }
+  .reviews-avg .stars { display: flex; gap: 2px; color: var(--amber-400); }
+  .reviews-avg .count { color: var(--gray-500); font-size: .85rem; }
+
+  .reviews-bars { display: flex; flex-direction: column; gap: 6px; }
+  .review-bar-row {
+    display: grid;
+    grid-template-columns: 30px 1fr 36px;
+    gap: 10px;
+    align-items: center;
+    font-size: .82rem;
+    color: var(--gray-600);
+  }
+  .review-bar-track {
+    height: 8px;
+    background: var(--gray-100);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  [data-theme="dark"] .review-bar-track { background: #1c2c4a; }
+  .review-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--amber-400), var(--amber-500));
+    transition: width .8s cubic-bezier(.22,.61,.36,1);
+  }
+
+  /* Write review card */
+  .write-review {
+    background: linear-gradient(135deg, rgba(245,165,36,.06), rgba(245,165,36,.01));
+    border: 1px dashed var(--amber-300, #f5c270);
+    border-radius: var(--radius-lg);
+    padding: 22px;
+    margin-bottom: 22px;
+  }
+  [data-theme="dark"] .write-review {
+    background: linear-gradient(135deg, rgba(245,165,36,.08), rgba(245,165,36,.02));
+    border-color: #5a4116;
+  }
+  .write-review h4 { margin: 0 0 6px; color: var(--navy-900); font-family: var(--font-display); }
+  .write-review .sub { color: var(--gray-500); font-size: .88rem; margin: 0 0 14px; }
+
+  .star-picker { display: inline-flex; gap: 4px; direction: ltr; margin-bottom: 12px; }
+  .star-picker button {
+    width: 38px; height: 38px;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    color: var(--gray-300, #cbd5e1);
+    transition: transform .18s ease, color .18s ease;
+    padding: 0;
+    display: grid;
+    place-items: center;
+  }
+  .star-picker button:hover { transform: scale(1.15); }
+  .star-picker button.is-on { color: var(--amber-400); }
+  .star-picker svg { width: 30px; height: 30px; fill: currentColor; }
+
+  .write-review textarea {
+    width: 100%;
+    min-height: 90px;
+    padding: 12px 14px;
+    border: 1.5px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    font-family: inherit;
+    font-size: .95rem;
+    background: var(--white);
+    color: var(--navy-900);
+    resize: vertical;
+    margin-bottom: 12px;
+    transition: border-color .2s ease, box-shadow .2s ease;
+  }
+  .write-review textarea:focus {
+    border-color: var(--amber-400);
+    outline: 0;
+    box-shadow: 0 0 0 3px rgba(245,165,36,.15);
+  }
+  [data-theme="dark"] .write-review textarea {
+    background: #0a1322; color: var(--ink); border-color: #243557;
+  }
+
+  /* Review item */
+  .review-item {
+    padding: 18px 0;
+    border-bottom: 1px solid var(--gray-150);
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    gap: 14px;
+  }
+  [data-theme="dark"] .review-item { border-color: #243557; }
+  .review-item:last-child { border-bottom: 0; }
+  .review-avatar {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--navy-700), var(--navy-900));
+    color: #fff;
+    display: grid;
+    place-items: center;
+    font-weight: 700;
+    font-size: 1.05rem;
+  }
+  .review-content { min-width: 0; }
+  .review-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+  }
+  .review-name { font-weight: 700; color: var(--navy-900); }
+  .review-date { font-size: .78rem; color: var(--gray-500); }
+  .review-stars { display: inline-flex; gap: 1px; color: var(--amber-400); }
+  .review-stars svg { width: 14px; height: 14px; fill: currentColor; }
+  .review-verified-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: rgba(16,168,107,.1); color: #10a86b;
+    padding: 2px 8px; border-radius: 10px;
+    font-size: .72rem; font-weight: 600;
+  }
+  .review-comment {
+    color: var(--gray-700);
+    line-height: 1.65;
+    font-size: .95rem;
+    margin: 0;
+    word-wrap: break-word;
+  }
+  [data-theme="dark"] .review-comment { color: var(--gray-700); }
+  .review-actions {
+    display: flex;
+    gap: 14px;
+    margin-top: 8px;
+    font-size: .82rem;
+  }
+  .review-actions button {
+    background: transparent;
+    border: 0;
+    color: var(--gray-500);
+    cursor: pointer;
+    padding: 4px 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: color .2s ease;
+  }
+  .review-actions button:hover { color: var(--amber-500); }
+  .review-actions button.is-marked { color: var(--amber-500); font-weight: 700; }
+
+  .reviews-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--gray-500);
+  }
+  .reviews-empty .icon { font-size: 2.4rem; margin-bottom: 8px; opacity: .6; }
+
+  /* Auth prompt for non-logged-in viewers */
+  .auth-prompt {
+    background: var(--gray-50);
+    border: 1px solid var(--gray-150);
+    border-radius: var(--radius-lg);
+    padding: 18px;
+    text-align: center;
+    color: var(--gray-700);
+    margin-bottom: 18px;
+  }
+  [data-theme="dark"] .auth-prompt {
+    background: #0c1628;
+    border-color: #243557;
+    color: var(--gray-600);
+  }
+  .auth-prompt a {
+    color: var(--amber-500);
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  /* Star ratings on product cards (small inline) */
+  .rating-inline {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: .85rem;
+    color: var(--navy-700);
+  }
+  .rating-inline .star { color: var(--amber-400); }
+
   </style>
 
   <!-- Supabase JS SDK -->
@@ -4876,6 +5099,12 @@ p {
     </section>
     <section class="catalog-shell" style="padding-top:0;">
       <div class="container" id="productDetail"></div>
+    </section>
+    <!-- Reviews section: rendered by loadProductReviews() when product opens -->
+    <section class="catalog-shell" style="padding-top:0;">
+      <div class="container">
+        <div id="productReviewsSection" style="margin-top:24px;"></div>
+      </div>
     </section>
   </section>
 
@@ -6518,6 +6747,257 @@ p {
         }, { passive: true });
       }
     }
+
+    /* ============================================================
+       REVIEWS & RATINGS
+       ============================================================ */
+    window.__currentReviewProductId = null;
+    window.__pendingRating = 0;
+
+    function starSvg(filled) {
+      return `<svg viewBox="0 0 24 24"><path d="M12 2l2.39 7.36H22l-6.19 4.5L18.18 22 12 17.27 5.82 22l2.37-8.14L2 9.36h7.61z"${filled ? '' : ' opacity=".25"'}/></svg>`;
+    }
+    function renderStars(rating, max = 5) {
+      let html = '';
+      for (let i = 1; i <= max; i++) html += starSvg(i <= Math.round(rating));
+      return html;
+    }
+    function timeAgo(dateStr) {
+      const d = new Date(dateStr);
+      const sec = Math.floor((Date.now() - d.getTime()) / 1000);
+      if (sec < 60) return 'الآن';
+      if (sec < 3600) return `منذ ${Math.floor(sec/60)} دقيقة`;
+      if (sec < 86400) return `منذ ${Math.floor(sec/3600)} ساعة`;
+      if (sec < 604800) return `منذ ${Math.floor(sec/86400)} يوم`;
+      return d.toLocaleDateString('ar-SA');
+    }
+
+    async function loadProductReviews(productId, containerSelector = '#productReviewsSection') {
+      window.__currentReviewProductId = productId;
+      const container = document.querySelector(containerSelector);
+      if (!container) return;
+      container.innerHTML = '<div class="reviews-block"><div style="text-align:center; padding:30px; color:var(--gray-500);">جارٍ تحميل التقييمات...</div></div>';
+
+      if (!window.supabaseClient) {
+        container.innerHTML = '';
+        return;
+      }
+
+      try {
+        // Fetch reviews + check if logged-in user is eligible to write one
+        const [reviewsRes, productRes] = await Promise.all([
+          window.supabaseClient
+            .from('product_reviews_view')
+            .select('*')
+            .eq('product_id', productId)
+            .order('created_at', { ascending: false })
+            .limit(50),
+          window.supabaseClient
+            .from('products')
+            .select('rating, review_count')
+            .eq('id', productId)
+            .single()
+        ]);
+
+        const reviews = reviewsRes.data || [];
+        const product = productRes.data || { rating: 0, review_count: 0 };
+
+        // Calculate star distribution
+        const dist = [0, 0, 0, 0, 0];
+        reviews.forEach(r => { if (r.rating >= 1 && r.rating <= 5) dist[r.rating - 1]++; });
+        const total = reviews.length || 1;
+
+        const avg = product.rating || 0;
+        const count = product.review_count || reviews.length;
+
+        // Check if user can write a review
+        const user = window.currentUser;
+        const userReview = user ? reviews.find(r => r.user_id === user.id) : null;
+
+        let writeReviewHTML = '';
+        if (!user) {
+          writeReviewHTML = `
+            <div class="auth-prompt">
+              <p style="margin:0;">سجّل دخولك لكتابة تقييم</p>
+              <button class="btn btn-amber" style="margin-top:10px;" onclick="openAuth('login')">تسجيل الدخول</button>
+            </div>`;
+        } else if (userReview) {
+          writeReviewHTML = `
+            <div class="write-review">
+              <h4>تقييمك</h4>
+              <p class="sub">يمكنك حذف تقييمك إذا أردت تعديله.</p>
+              <div class="review-stars" style="margin-bottom:8px;">${renderStars(userReview.rating)}</div>
+              <p class="review-comment" style="margin-bottom:12px;">${escapeHtml(userReview.comment || '')}</p>
+              <button class="btn btn-ghost" onclick="deleteMyReview(${userReview.id})">🗑️ حذف التقييم</button>
+            </div>`;
+        } else {
+          writeReviewHTML = `
+            <div class="write-review">
+              <h4>شارك رأيك في هذا المنتج</h4>
+              <p class="sub">تقييمك يساعد المشترين الآخرين على اتخاذ قرار أفضل.</p>
+              <form onsubmit="submitReview(event, '${productId}')">
+                <div class="star-picker" id="starPicker">
+                  ${[1,2,3,4,5].map(i => `
+                    <button type="button" data-star="${i}" onclick="setRating(${i})" aria-label="${i} نجمة">
+                      <svg viewBox="0 0 24 24"><path d="M12 2l2.39 7.36H22l-6.19 4.5L18.18 22 12 17.27 5.82 22l2.37-8.14L2 9.36h7.61z"/></svg>
+                    </button>`).join('')}
+                </div>
+                <textarea name="comment" placeholder="اكتب تجربتك مع المنتج..." minlength="3" maxlength="800"></textarea>
+                <button type="submit" class="btn btn-amber">📝 نشر التقييم</button>
+              </form>
+            </div>`;
+        }
+
+        // Build summary header
+        const headerHTML = count > 0 ? `
+          <div class="reviews-header">
+            <div class="reviews-avg">
+              <div class="num">${avg.toFixed(1)}</div>
+              <div class="stars">${renderStars(avg)}</div>
+              <div class="count">${count.toLocaleString('ar-SA')} تقييم</div>
+            </div>
+            <div class="reviews-bars">
+              ${[5,4,3,2,1].map(stars => {
+                const c = dist[stars - 1];
+                const pct = total ? Math.round((c / total) * 100) : 0;
+                return `
+                  <div class="review-bar-row">
+                    <span>${stars} ★</span>
+                    <div class="review-bar-track"><div class="review-bar-fill" style="width:${pct}%"></div></div>
+                    <span>${c}</span>
+                  </div>`;
+              }).join('')}
+            </div>
+          </div>` : '';
+
+        // Build list of review items
+        let listHTML;
+        if (!reviews.length) {
+          listHTML = `
+            <div class="reviews-empty">
+              <div class="icon">💬</div>
+              <p style="margin:0;">لا توجد تقييمات بعد — كن أول من يقيّم!</p>
+            </div>`;
+        } else {
+          listHTML = reviews.map(r => {
+            const initial = (r.reviewer_name || '?').charAt(0).toUpperCase();
+            return `
+              <div class="review-item">
+                <div class="review-avatar">${escapeHtml(initial)}</div>
+                <div class="review-content">
+                  <div class="review-meta">
+                    <span class="review-name">${escapeHtml(r.reviewer_name || 'مستخدم')}</span>
+                    ${r.is_verified ? '<span class="review-verified-badge">✓ مشترٍ موثّق</span>' : ''}
+                    <span class="review-stars">${renderStars(r.rating)}</span>
+                    <span class="review-date">${timeAgo(r.created_at)}</span>
+                  </div>
+                  ${r.comment ? `<p class="review-comment">${escapeHtml(r.comment)}</p>` : ''}
+                  <div class="review-actions">
+                    <button onclick="markHelpful(${r.id}, this)">
+                      👍 <span>مفيد</span>${r.helpful_count ? `<span style="margin-right:4px;">(${r.helpful_count})</span>` : ''}
+                    </button>
+                  </div>
+                </div>
+              </div>`;
+          }).join('');
+        }
+
+        container.innerHTML = `
+          <div class="reviews-block">
+            <h2 style="margin:0 0 18px; font-family:var(--font-display); color:var(--navy-900);">التقييمات والمراجعات</h2>
+            ${headerHTML}
+            ${writeReviewHTML}
+            <div class="reviews-list">${listHTML}</div>
+          </div>
+        `;
+      } catch (err) {
+        console.error('reviews load failed', err);
+        container.innerHTML = `<div class="reviews-block"><p style="color:var(--gray-500); text-align:center;">تعذّر تحميل التقييمات</p></div>`;
+      }
+    }
+
+    function escapeHtml(s) {
+      return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+
+    function setRating(n) {
+      window.__pendingRating = n;
+      document.querySelectorAll('#starPicker button').forEach(b => {
+        const s = parseInt(b.dataset.star);
+        b.classList.toggle('is-on', s <= n);
+      });
+    }
+
+    async function submitReview(e, productId) {
+      e.preventDefault();
+      const form = e.target;
+      const comment = form.comment.value.trim();
+      const rating = window.__pendingRating;
+
+      if (!rating) { toast('اختر عدد النجوم أولاً', '⚠'); return; }
+      if (!window.currentUser) { toast('يجب تسجيل الدخول أولاً', '⚠'); return; }
+
+      const btn = form.querySelector('button[type="submit"]');
+      btn.disabled = true;
+      const originalText = btn.textContent;
+      btn.textContent = 'جارٍ النشر...';
+
+      try {
+        const { error } = await window.supabaseClient.from('reviews').insert({
+          product_id: productId,
+          user_id: window.currentUser.id,
+          rating,
+          comment: comment || null
+        });
+        if (error) throw error;
+        toast('شكرًا لتقييمك! 🌟', '✓');
+        window.__pendingRating = 0;
+        loadProductReviews(productId);
+      } catch (err) {
+        const msg = err?.message || '';
+        if (/row-level security|policy/i.test(msg)) {
+          toast('فقط المشترون يمكنهم التقييم — اطلب المنتج أولاً', '⚠');
+        } else if (/duplicate|unique/i.test(msg)) {
+          toast('قمت بتقييم هذا المنتج بالفعل', '⚠');
+        } else {
+          toast(msg || 'تعذّر نشر التقييم', '⚠');
+        }
+      } finally {
+        btn.disabled = false;
+        btn.textContent = originalText;
+      }
+    }
+
+    async function deleteMyReview(reviewId) {
+      if (!confirm('هل تريد حذف تقييمك؟')) return;
+      const { error } = await window.supabaseClient.from('reviews').delete().eq('id', reviewId);
+      if (error) { toast(error.message, '⚠'); return; }
+      toast('تم حذف التقييم', '✓');
+      if (window.__currentReviewProductId) loadProductReviews(window.__currentReviewProductId);
+    }
+
+    async function markHelpful(reviewId, btn) {
+      if (!window.currentUser) { toast('سجّل دخولك للتفاعل', '⚠'); return; }
+      try {
+        const { data, error } = await window.supabaseClient.rpc('mark_review_helpful', { review_id: reviewId });
+        if (error) throw error;
+        btn.classList.add('is-marked');
+        const span = btn.querySelector('span:last-child');
+        if (data && span) span.textContent = `(${data})`;
+      } catch (err) {
+        toast(err?.message || 'تعذّر التفاعل', '⚠');
+      }
+    }
+
+    // Auto-load reviews whenever the product view is opened
+    window.addEventListener('hashchange', () => {
+      const m = location.hash.match(/^#product\/(.+)$/);
+      if (m) setTimeout(() => loadProductReviews(m[1]), 200);
+    });
+    window.addEventListener('load', () => {
+      const m = location.hash.match(/^#product\/(.+)$/);
+      if (m) setTimeout(() => loadProductReviews(m[1]), 400);
+    });
 
     // 10. Tilt cards on mouse move (desktop only, subtle)
     if (!__reduceMotion && window.matchMedia('(min-width: 1024px)').matches) {
