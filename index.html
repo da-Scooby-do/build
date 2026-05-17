@@ -3484,9 +3484,152 @@ p {
   padding: 36px;
   max-width: 440px;
   width: 100%;
+  max-height: 92vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
   box-shadow: var(--shadow-lg);
   position: relative;
   animation: fade-up .35s ease-out;
+  scrollbar-width: thin;
+  scrollbar-color: var(--gray-200) transparent;
+}
+.modal::-webkit-scrollbar { width: 6px; }
+.modal::-webkit-scrollbar-thumb { background: var(--gray-200); border-radius: 6px; }
+.modal::-webkit-scrollbar-thumb:hover { background: var(--gray-300); }
+
+/* Make modal-backdrop scroll properly on mobile */
+.modal-backdrop {
+  align-items: flex-start;
+  padding: 20px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.modal-backdrop .modal {
+  margin: auto 0;
+}
+@media (min-height: 700px) {
+  .modal-backdrop { align-items: center; }
+}
+
+/* Pro modal style (used on product/supplier editors) */
+.modal.modal-pro {
+  padding: 0;
+  max-width: 620px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.modal-pro .modal-header {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: var(--white);
+  padding: 22px 28px 16px;
+  border-bottom: 1px solid var(--gray-150);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.modal-pro .modal-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--navy-900);
+  font-family: var(--font-display);
+}
+.modal-pro .modal-header .close-x {
+  position: static;
+  flex-shrink: 0;
+}
+.modal-pro .modal-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding: 22px 28px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--gray-200) transparent;
+}
+.modal-pro .modal-body::-webkit-scrollbar { width: 6px; }
+.modal-pro .modal-body::-webkit-scrollbar-thumb { background: var(--gray-200); border-radius: 6px; }
+.modal-pro .modal-footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  background: var(--white);
+  padding: 16px 28px 22px;
+  border-top: 1px solid var(--gray-150);
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  box-shadow: 0 -4px 12px rgba(0,0,0,.04);
+}
+.modal-pro .modal-footer .btn { min-width: 110px; }
+.modal-pro .form-grid {
+  display: grid;
+  gap: 14px;
+}
+.modal-pro .form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+@media (max-width: 520px) {
+  .modal-pro .form-grid-2 { grid-template-columns: 1fr; }
+  .modal-pro .modal-header,
+  .modal-pro .modal-body,
+  .modal-pro .modal-footer { padding-left: 18px; padding-right: 18px; }
+}
+.modal-pro .fld label {
+  display: block;
+  font-weight: 600;
+  font-size: .85rem;
+  color: var(--navy-900);
+  margin-bottom: 6px;
+}
+.modal-pro .fld input,
+.modal-pro .fld select,
+.modal-pro .fld textarea {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1.5px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  font-size: .95rem;
+  background: var(--white);
+  color: var(--navy-900);
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+.modal-pro .fld input:focus,
+.modal-pro .fld select:focus,
+.modal-pro .fld textarea:focus {
+  border-color: var(--amber-400);
+  outline: 0;
+  box-shadow: 0 0 0 3px rgba(245,165,36,.18);
+}
+.modal-pro .fld textarea { resize: vertical; min-height: 80px; }
+.modal-pro .section-divider {
+  font-size: .78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--gray-500);
+  margin: 8px 0 -4px;
+  padding-top: 8px;
+}
+
+[data-theme="dark"] .modal-pro .modal-header,
+[data-theme="dark"] .modal-pro .modal-body,
+[data-theme="dark"] .modal-pro .modal-footer { background: #0f1a2e; }
+[data-theme="dark"] .modal-pro .modal-header,
+[data-theme="dark"] .modal-pro .modal-footer { border-color: #243557; }
+[data-theme="dark"] .modal-pro .fld input,
+[data-theme="dark"] .modal-pro .fld select,
+[data-theme="dark"] .modal-pro .fld textarea {
+  background: #0a1322; color: var(--ink); border-color: #243557;
 }
 
 .modal h2 {
@@ -5321,56 +5464,96 @@ p {
 
   <!-- Product editor modal -->
   <div class="modal-backdrop" id="productModal" onclick="if(event.target===this)closeProductEditor()">
-    <div class="modal" style="max-width:560px;">
-      <button class="close-x" onclick="closeProductEditor()">✕</button>
-      <h2 id="productModalTitle">إضافة منتج جديد</h2>
-      <form id="productForm" onsubmit="saveProduct(event)" style="display:grid; gap:12px;">
+    <form class="modal modal-pro" id="productForm" onsubmit="saveProduct(event)">
+      <div class="modal-header">
+        <h2 id="productModalTitle">إضافة منتج جديد</h2>
+        <button type="button" class="close-x" onclick="closeProductEditor()" aria-label="إغلاق">✕</button>
+      </div>
+      <div class="modal-body">
         <input type="hidden" name="id" />
-        <div class="fld"><label>اسم المنتج (عربي) *</label><input type="text" name="name_ar" required></div>
-        <div class="fld"><label>التصنيف *</label><select name="category_id" id="prodCategorySelect" required><option value="">اختر تصنيفًا</option></select></div>
-        <div class="fld"><label>المورد *</label><select name="supplier_id" id="prodSupplierSelect" required><option value="">اختر موردًا</option></select></div>
-        <div class="fld"><label>المدينة</label><select name="city_code" id="prodCitySelect"><option value="">اختر مدينة</option></select></div>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-          <div class="fld"><label>السعر (ر.س) *</label><input type="number" name="price" step="0.01" min="0" required></div>
-          <div class="fld"><label>الوحدة *</label><input type="text" name="unit_ar" placeholder="م³، طن، كيس" required></div>
+
+        <div class="section-divider">المعلومات الأساسية</div>
+        <div class="form-grid">
+          <div class="fld"><label>اسم المنتج (عربي) *</label><input type="text" name="name_ar" required></div>
+          <div class="form-grid-2">
+            <div class="fld"><label>التصنيف *</label><select name="category_id" id="prodCategorySelect" required><option value="">اختر تصنيفًا</option></select></div>
+            <div class="fld"><label>المورد *</label><select name="supplier_id" id="prodSupplierSelect" required><option value="">اختر موردًا</option></select></div>
+          </div>
         </div>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-          <div class="fld"><label>الكمية المتوفرة</label><input type="number" name="stock_quantity" min="0"></div>
-          <div class="fld"><label>الحد الأدنى للطلب</label><input type="number" name="min_order_quantity" min="1" value="1"></div>
+
+        <div class="section-divider">السعر والمخزون</div>
+        <div class="form-grid">
+          <div class="form-grid-2">
+            <div class="fld"><label>السعر (ر.س) *</label><input type="number" name="price" step="0.01" min="0" required></div>
+            <div class="fld"><label>الوحدة *</label><input type="text" name="unit_ar" placeholder="م³، طن، كيس" required></div>
+          </div>
+          <div class="form-grid-2">
+            <div class="fld"><label>الكمية المتوفرة</label><input type="number" name="stock_quantity" min="0"></div>
+            <div class="fld"><label>الحد الأدنى للطلب</label><input type="number" name="min_order_quantity" min="1" value="1"></div>
+          </div>
+          <div class="fld"><label>المدينة</label><select name="city_code" id="prodCitySelect"><option value="">اختر مدينة</option></select></div>
         </div>
-        <div class="fld"><label>وسم (مثل: فوري، معتمد SASO)</label><input type="text" name="tag_ar"></div>
-        <div class="fld"><label>رابط الصورة الرئيسية</label><input type="url" name="main_image" placeholder="https://..."></div>
-        <div class="fld"><label>الوصف</label><textarea name="description_ar" rows="3"></textarea></div>
-        <div style="display:flex; gap:10px; margin-top:6px;">
-          <button type="submit" class="btn btn-amber btn-block">حفظ المنتج</button>
-          <button type="button" class="btn btn-ghost" onclick="closeProductEditor()">إلغاء</button>
+
+        <div class="section-divider">المظهر والتفاصيل</div>
+        <div class="form-grid">
+          <div class="fld"><label>وسم (مثل: فوري، معتمد SASO)</label><input type="text" name="tag_ar" placeholder="اختياري"></div>
+          <div class="fld"><label>رابط الصورة الرئيسية</label><input type="url" name="main_image" placeholder="https://..."></div>
+          <div class="fld"><label>الوصف</label><textarea name="description_ar" rows="3" placeholder="وصف قصير عن المنتج"></textarea></div>
         </div>
-      </form>
-    </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="closeProductEditor()">إلغاء</button>
+        <button type="submit" class="btn btn-amber">💾 حفظ المنتج</button>
+      </div>
+    </form>
   </div>
 
   <!-- Supplier editor modal -->
   <div class="modal-backdrop" id="supplierModal" onclick="if(event.target===this)closeSupplierEditor()">
-    <div class="modal" style="max-width:520px;">
-      <button class="close-x" onclick="closeSupplierEditor()">✕</button>
-      <h2 id="supplierModalTitle">إضافة مورد جديد</h2>
-      <form id="supplierForm" onsubmit="saveSupplier(event)" style="display:grid; gap:12px;">
+    <form class="modal modal-pro" id="supplierForm" onsubmit="saveSupplier(event)">
+      <div class="modal-header">
+        <h2 id="supplierModalTitle">إضافة مورد جديد</h2>
+        <button type="button" class="close-x" onclick="closeSupplierEditor()" aria-label="إغلاق">✕</button>
+      </div>
+      <div class="modal-body">
         <input type="hidden" name="id" />
-        <div class="fld"><label>المعرّف (مثل s11) *</label><input type="text" name="new_id" pattern="s[0-9]+" placeholder="s11" required></div>
-        <div class="fld"><label>اسم المورد (عربي) *</label><input type="text" name="name_ar" required></div>
-        <div class="fld"><label>السجل التجاري</label><input type="text" name="cr_number" pattern="[0-9]{10}" placeholder="١٠ أرقام"></div>
-        <div class="fld"><label>الرقم الضريبي (VAT)</label><input type="text" name="vat_number" pattern="[0-9]{15}" placeholder="١٥ رقم"></div>
-        <div class="fld"><label>رقم الجوال</label><input type="tel" name="phone" placeholder="+9665xxxxxxxx"></div>
-        <div class="fld"><label>البريد الإلكتروني</label><input type="email" name="email"></div>
-        <div class="fld"><label>سنة التأسيس</label><input type="number" name="established_year" min="1900" max="2030"></div>
-        <div class="fld"><label>وصف المورد</label><textarea name="description_ar" rows="2"></textarea></div>
-        <label style="display:flex; gap:8px; align-items:center;"><input type="checkbox" name="is_verified"> مورد موثّق</label>
-        <div style="display:flex; gap:10px; margin-top:6px;">
-          <button type="submit" class="btn btn-amber btn-block">حفظ المورد</button>
-          <button type="button" class="btn btn-ghost" onclick="closeSupplierEditor()">إلغاء</button>
+
+        <div class="section-divider">معلومات المورد</div>
+        <div class="form-grid">
+          <div class="form-grid-2">
+            <div class="fld"><label>المعرّف (مثل s11) *</label><input type="text" name="new_id" pattern="s[0-9]+" placeholder="s11" required></div>
+            <div class="fld"><label>اسم المورد (عربي) *</label><input type="text" name="name_ar" required></div>
+          </div>
+          <div class="fld"><label>وصف المورد</label><textarea name="description_ar" rows="2" placeholder="نبذة قصيرة عن المورد"></textarea></div>
         </div>
-      </form>
-    </div>
+
+        <div class="section-divider">معلومات قانونية</div>
+        <div class="form-grid">
+          <div class="form-grid-2">
+            <div class="fld"><label>السجل التجاري</label><input type="text" name="cr_number" pattern="[0-9]{10}" placeholder="١٠ أرقام"></div>
+            <div class="fld"><label>الرقم الضريبي (VAT)</label><input type="text" name="vat_number" pattern="[0-9]{15}" placeholder="١٥ رقم"></div>
+          </div>
+          <div class="fld"><label>سنة التأسيس</label><input type="number" name="established_year" min="1900" max="2030" placeholder="مثل: ١٩٩٥"></div>
+        </div>
+
+        <div class="section-divider">التواصل</div>
+        <div class="form-grid">
+          <div class="form-grid-2">
+            <div class="fld"><label>رقم الجوال</label><input type="tel" name="phone" placeholder="+9665xxxxxxxx"></div>
+            <div class="fld"><label>البريد الإلكتروني</label><input type="email" name="email" placeholder="info@supplier.sa"></div>
+          </div>
+        </div>
+
+        <label style="display:flex; gap:10px; align-items:center; margin-top:14px; padding:12px 14px; background:var(--gray-50); border:1px solid var(--gray-150); border-radius:var(--radius-md); cursor:pointer;">
+          <input type="checkbox" name="is_verified" style="width:18px; height:18px; cursor:pointer;">
+          <span style="font-weight:600; color:var(--navy-900);">✅ مورد موثّق (Verified)</span>
+        </label>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="closeSupplierEditor()">إلغاء</button>
+        <button type="submit" class="btn btn-amber">💾 حفظ المورد</button>
+      </div>
+    </form>
   </div>
 
   <section class="view" id="view-policy">
