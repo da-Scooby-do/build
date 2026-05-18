@@ -4603,10 +4603,185 @@ p {
   /* Hide RFQ supplier responses from public */
   body:not(.is-admin) .rfq-responses-public { display: none !important; }
 
+  /* ============================================================
+     ADDRESSES — saved delivery locations
+     ============================================================ */
+  .address-card {
+    background: var(--white);
+    border: 1.5px solid var(--gray-150);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+    position: relative;
+  }
+  [data-theme="dark"] .address-card {
+    background: #0f1a2e;
+    border-color: #243557;
+  }
+  .address-card.is-default {
+    border-color: var(--amber-400);
+    background: linear-gradient(135deg, rgba(245,165,36,.04), rgba(245,165,36,.01)), var(--white);
+  }
+  [data-theme="dark"] .address-card.is-default {
+    background: linear-gradient(135deg, rgba(245,165,36,.08), rgba(245,165,36,.02)), #0f1a2e;
+  }
+  .address-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(15,26,46,.1);
+    border-color: var(--amber-400);
+  }
+  .address-card .label-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--gray-100);
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: .82rem;
+    font-weight: 700;
+    color: var(--navy-900);
+    width: fit-content;
+  }
+  [data-theme="dark"] .address-card .label-pill {
+    background: #1c2c4a;
+    color: var(--ink);
+  }
+  .address-card.is-default .label-pill {
+    background: var(--amber-400);
+    color: #3b1e00;
+  }
+  .address-card .recipient {
+    font-weight: 700;
+    color: var(--navy-900);
+    font-size: 1.05rem;
+  }
+  .address-card .addr-line {
+    color: var(--gray-700);
+    font-size: .92rem;
+    line-height: 1.6;
+  }
+  .address-card .meta {
+    color: var(--gray-500);
+    font-size: .82rem;
+  }
+  .address-card .actions {
+    display: flex;
+    gap: 6px;
+    margin-top: auto;
+    padding-top: 10px;
+    border-top: 1px solid var(--gray-150);
+    flex-wrap: wrap;
+  }
+  [data-theme="dark"] .address-card .actions { border-color: #243557; }
+  .address-card .actions button {
+    flex: 1;
+    min-width: 80px;
+    padding: 8px 10px;
+    font-size: .85rem;
+    border-radius: var(--radius-md);
+    background: transparent;
+    border: 1px solid var(--gray-200);
+    color: var(--navy-900);
+    cursor: pointer;
+    transition: all .2s ease;
+  }
+  [data-theme="dark"] .address-card .actions button {
+    color: var(--ink);
+    border-color: #2d4170;
+  }
+  .address-card .actions button:hover {
+    background: var(--gray-50);
+    border-color: var(--amber-400);
+  }
+  [data-theme="dark"] .address-card .actions button:hover {
+    background: #1c2c4a;
+  }
+  .address-card .actions button.danger:hover {
+    background: rgba(217,51,51,.08);
+    border-color: #d33;
+    color: #d33;
+  }
+  .address-card .default-star {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    color: var(--amber-400);
+    font-size: 1.2rem;
+  }
+
+  /* Label chips in form */
+  .addr-chip {
+    padding: 8px 14px;
+    background: var(--white);
+    border: 1.5px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    font-size: .88rem;
+    cursor: pointer;
+    color: var(--navy-900);
+    transition: all .2s ease;
+    font-family: inherit;
+  }
+  .addr-chip:hover {
+    border-color: var(--amber-400);
+    background: rgba(245,165,36,.05);
+  }
+  .addr-chip.is-selected {
+    border-color: var(--amber-400);
+    background: var(--amber-400);
+    color: #3b1e00;
+    font-weight: 700;
+  }
+  [data-theme="dark"] .addr-chip {
+    background: #0a1322;
+    border-color: #243557;
+    color: var(--ink);
+  }
+
+  /* Leaflet override — ensure map shows correctly inside modal */
+  #addressMap.has-map .leaflet-container {
+    width: 100% !important;
+    height: 100% !important;
+  }
+  .leaflet-container {
+    font-family: inherit !important;
+  }
+  .leaflet-control-attribution {
+    font-size: 10px;
+  }
+
+  /* Empty state */
+  .addresses-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--gray-500);
+    background: var(--gray-50);
+    border: 2px dashed var(--gray-200);
+    border-radius: var(--radius-lg);
+  }
+  [data-theme="dark"] .addresses-empty {
+    background: #0c1628;
+    border-color: #243557;
+  }
+  .addresses-empty .icon {
+    font-size: 3.5rem;
+    margin-bottom: 12px;
+    opacity: .6;
+  }
+
   </style>
 
   <!-- Supabase JS SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Leaflet (free map library — OpenStreetMap, no API key needed) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 </head>
 
 <body>
@@ -5181,6 +5356,124 @@ p {
   <!-- ============================================================
      VIEW: WISHLIST
      ============================================================ -->
+  <!-- ============================================================
+       VIEW: MY ADDRESSES (delivery locations)
+       ============================================================ -->
+  <section class="view" id="view-addresses">
+    <section class="page-intro">
+      <div class="container">
+        <nav class="breadcrumb">
+          <a href="#home" data-link>الرئيسية</a>
+          <span class="sep">›</span>
+          <span class="current">عناويني</span>
+        </nav>
+        <div class="title-row">
+          <h1>عناويني المحفوظة 📍</h1>
+          <p class="sub">احفظ مواقع التوصيل المختلفة (المنزل، العمل، مواقع المشاريع) — لتوصيل أسرع وأدق.</p>
+        </div>
+      </div>
+    </section>
+    <section class="catalog-shell" style="padding-top:0;">
+      <div class="container">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+          <h3 style="margin:0;">عناوينك</h3>
+          <button class="btn btn-amber" onclick="openAddressEditor()">+ إضافة عنوان جديد</button>
+        </div>
+        <div id="addressesList" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:16px;">
+          <div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--gray-500);">جارٍ التحميل...</div>
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <!-- Address editor modal -->
+  <div class="modal-backdrop" id="addressModal" onclick="if(event.target===this)closeAddressEditor()">
+    <form class="modal modal-pro" id="addressForm" onsubmit="saveAddress(event)" style="max-width:680px;">
+      <div class="modal-header">
+        <h2 id="addressModalTitle">إضافة عنوان توصيل</h2>
+        <button type="button" class="close-x" onclick="closeAddressEditor()" aria-label="إغلاق">✕</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" name="id" />
+        <input type="hidden" name="latitude" />
+        <input type="hidden" name="longitude" />
+
+        <div class="section-divider">📍 الموقع على الخريطة</div>
+        <div class="form-grid">
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button type="button" class="btn btn-amber" onclick="useMyLocation()" style="display:flex; align-items:center; gap:8px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M12 1v3M12 20v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M1 12h3M20 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/>
+              </svg>
+              <span>استخدم موقعي الحالي</span>
+            </button>
+            <button type="button" class="btn btn-ghost" onclick="centerMapOnSaudi()">
+              عرض الخريطة
+            </button>
+          </div>
+          <div id="addressMap" style="height:320px; border-radius:var(--radius-lg); border:1px solid var(--gray-200); background:var(--gray-100); overflow:hidden; position:relative;">
+            <div id="addressMapPlaceholder" style="position:absolute; inset:0; display:grid; place-items:center; color:var(--gray-500); pointer-events:none; text-align:center; padding:20px;">
+              <div>
+                <div style="font-size:2rem; margin-bottom:8px;">🗺️</div>
+                <div style="font-weight:600;">انقر "عرض الخريطة" لتحديد موقعك</div>
+                <div style="font-size:.85rem; margin-top:4px;">أو اضغط "استخدم موقعي الحالي"</div>
+              </div>
+            </div>
+          </div>
+          <p id="addressCoords" style="font-size:.82rem; color:var(--gray-500); margin:0; text-align:center;">لم يتم تحديد إحداثيات</p>
+        </div>
+
+        <div class="section-divider">معلومات العنوان</div>
+        <div class="form-grid">
+          <div class="fld">
+            <label>تسمية العنوان</label>
+            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+              <button type="button" class="addr-chip" onclick="setAddrLabel('🏠 المنزل')">🏠 المنزل</button>
+              <button type="button" class="addr-chip" onclick="setAddrLabel('🏢 العمل')">🏢 العمل</button>
+              <button type="button" class="addr-chip" onclick="setAddrLabel('🏗️ موقع المشروع')">🏗️ موقع المشروع</button>
+              <button type="button" class="addr-chip" onclick="setAddrLabel('')">آخر</button>
+            </div>
+            <input type="text" name="label" placeholder="مثال: المنزل، موقع المشروع..." style="margin-top:8px;">
+          </div>
+          <div class="form-grid-2">
+            <div class="fld"><label>اسم المستلم *</label><input type="text" name="recipient_name" required></div>
+            <div class="fld"><label>رقم الجوال *</label><input type="tel" name="phone" required placeholder="+9665xxxxxxxx"></div>
+          </div>
+        </div>
+
+        <div class="section-divider">العنوان الوطني السعودي</div>
+        <div class="form-grid">
+          <div class="form-grid-2">
+            <div class="fld"><label>رقم المبنى</label><input type="text" name="building_number" pattern="[0-9]{4}" placeholder="٤ أرقام"></div>
+            <div class="fld"><label>الرقم الإضافي</label><input type="text" name="additional_number" pattern="[0-9]{4}" placeholder="٤ أرقام"></div>
+          </div>
+          <div class="fld"><label>اسم الشارع</label><input type="text" name="street_name" placeholder="مثال: شارع الملك فهد"></div>
+          <div class="form-grid-2">
+            <div class="fld"><label>الحي</label><input type="text" name="district" placeholder="مثال: حي النخيل"></div>
+            <div class="fld"><label>الرمز البريدي</label><input type="text" name="postal_code" pattern="[0-9]{5}" placeholder="٥ أرقام"></div>
+          </div>
+          <div class="fld">
+            <label>المدينة *</label>
+            <select name="city_code" id="addrCitySelect" required>
+              <option value="">اختر مدينة</option>
+            </select>
+          </div>
+          <div class="fld"><label>ملاحظات للمندوب (اختياري)</label><textarea name="notes" rows="2" placeholder="مثال: المبنى البيج بجانب المسجد"></textarea></div>
+        </div>
+
+        <label style="display:flex; gap:10px; align-items:center; margin-top:14px; padding:12px 14px; background:var(--gray-50); border:1px solid var(--gray-150); border-radius:var(--radius-md); cursor:pointer;">
+          <input type="checkbox" name="is_default" style="width:18px; height:18px; cursor:pointer;">
+          <span style="font-weight:600; color:var(--navy-900);">⭐ اجعل هذا العنوان الافتراضي</span>
+        </label>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="closeAddressEditor()">إلغاء</button>
+        <button type="submit" class="btn btn-amber">💾 حفظ العنوان</button>
+      </div>
+    </form>
+  </div>
+
   <section class="view" id="view-wishlist">
     <section class="page-intro">
       <div class="container">
@@ -6258,6 +6551,9 @@ p {
             : '';
           chip.innerHTML = `
             ${adminBadge}
+            <a href="#addresses" data-link class="btn btn-ghost" style="padding:8px 12px; font-size:.85rem; display:flex; align-items:center; gap:6px;" title="عناويني">
+              <span>📍</span><span>عناويني</span>
+            </a>
             <button class="btn btn-ghost" style="display:flex; align-items:center; gap:8px; padding:8px 12px;">
               <span>👤</span><span>${name}</span>
             </button>
@@ -6806,6 +7102,333 @@ p {
         }, { passive: true });
       }
     }
+
+    /* ============================================================
+       ADDRESSES — saved delivery locations
+       ============================================================ */
+    window.__addressMap = null;
+    window.__addressMarker = null;
+
+    // City coordinates for default map centering
+    const SAUDI_CITIES = {
+      RUH: { lat: 24.7136, lng: 46.6753, name_ar: 'الرياض' },
+      JED: { lat: 21.4858, lng: 39.1925, name_ar: 'جدة' },
+      DAM: { lat: 26.4207, lng: 50.0888, name_ar: 'الدمام' },
+      MED: { lat: 24.4709, lng: 39.6109, name_ar: 'المدينة المنورة' },
+      MEC: { lat: 21.3891, lng: 39.8579, name_ar: 'مكة المكرمة' },
+      TAB: { lat: 28.3838, lng: 36.5550, name_ar: 'تبوك' },
+      ABH: { lat: 18.2164, lng: 42.5053, name_ar: 'أبها' },
+      TAI: { lat: 21.4858, lng: 40.4830, name_ar: 'الطائف' },
+      BUR: { lat: 26.3260, lng: 43.9750, name_ar: 'بريدة' },
+      HAI: { lat: 27.5219, lng: 41.7000, name_ar: 'حائل' },
+    };
+    const SAUDI_CENTER = [23.8859, 45.0792];
+
+    async function loadMyAddresses() {
+      const container = document.getElementById('addressesList');
+      if (!container) return;
+      if (!window.currentUser) {
+        container.innerHTML = `
+          <div class="addresses-empty">
+            <div class="icon">🔒</div>
+            <p style="font-weight:700; margin:0 0 8px;">سجّل دخولك لإدارة عناوينك</p>
+            <button class="btn btn-amber" style="margin-top:14px;" onclick="openAuth('login')">تسجيل الدخول</button>
+          </div>`;
+        return;
+      }
+      if (!window.supabaseClient) return;
+
+      const { data, error } = await window.supabaseClient
+        .from('addresses')
+        .select('*, cities(name_ar)')
+        .eq('user_id', window.currentUser.id)
+        .order('is_default', { ascending: false })
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        container.innerHTML = `<div class="addresses-empty">خطأ: ${error.message}</div>`;
+        return;
+      }
+      if (!data?.length) {
+        container.innerHTML = `
+          <div class="addresses-empty">
+            <div class="icon">📍</div>
+            <p style="font-weight:700; margin:0 0 8px;">لا توجد عناوين محفوظة بعد</p>
+            <p style="margin:0 0 18px;">أضف موقع التوصيل الأول لتسهيل طلباتك القادمة.</p>
+            <button class="btn btn-amber" onclick="openAddressEditor()">+ إضافة عنوان</button>
+          </div>`;
+        return;
+      }
+      container.innerHTML = data.map(a => `
+        <div class="address-card ${a.is_default ? 'is-default' : ''}">
+          ${a.is_default ? '<span class="default-star">⭐</span>' : ''}
+          <div class="label-pill">${escapeHtml(a.label || '📍 عنوان')}</div>
+          <div class="recipient">${escapeHtml(a.recipient_name)}</div>
+          <div class="addr-line">
+            ${[a.street_name, a.district, a.cities?.name_ar].filter(Boolean).map(escapeHtml).join(' • ')}
+          </div>
+          ${a.building_number || a.postal_code ? `
+            <div class="meta">
+              ${a.building_number ? `مبنى: ${a.building_number}` : ''}
+              ${a.additional_number ? ` • إضافي: ${a.additional_number}` : ''}
+              ${a.postal_code ? ` • ${a.postal_code}` : ''}
+            </div>` : ''}
+          <div class="meta">📞 ${escapeHtml(a.phone)}</div>
+          ${a.latitude && a.longitude ? `
+            <div class="meta">📍 ${parseFloat(a.latitude).toFixed(4)}, ${parseFloat(a.longitude).toFixed(4)}</div>` : ''}
+          ${a.notes ? `<div class="meta" style="font-style:italic;">"${escapeHtml(a.notes)}"</div>` : ''}
+          <div class="actions">
+            ${!a.is_default ? `<button onclick="makeAddressDefault(${a.id})">⭐ افتراضي</button>` : ''}
+            <button onclick='openAddressEditor(${JSON.stringify(a).replace(/'/g,"&#39;")})'>✏️ تعديل</button>
+            <button class="danger" onclick="deleteAddress(${a.id})">🗑️ حذف</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function openAddressEditor(address) {
+      if (!window.currentUser) { openAuth('login'); return; }
+      const modal = document.getElementById('addressModal');
+      const form = document.getElementById('addressForm');
+      form.reset();
+      document.getElementById('addressModalTitle').textContent = address ? 'تعديل العنوان' : 'إضافة عنوان توصيل';
+      document.getElementById('addressCoords').textContent = 'لم يتم تحديد إحداثيات';
+      document.getElementById('addressMap').classList.remove('has-map');
+      document.getElementById('addressMapPlaceholder').style.display = 'grid';
+
+      // Populate cities
+      try {
+        const { data: cities } = await window.supabaseClient.from('cities').select('code, name_ar').order('name_ar');
+        const sel = form.city_code;
+        sel.innerHTML = '<option value="">اختر مدينة</option>' + (cities || []).map(c => `<option value="${c.code}">${c.name_ar}</option>`).join('');
+      } catch {}
+
+      if (address && typeof address === 'object') {
+        form.id.value = address.id;
+        for (const k of ['label','recipient_name','phone','building_number','street_name','district','postal_code','additional_number','notes','latitude','longitude']) {
+          if (form[k]) form[k].value = address[k] || '';
+        }
+        if (address.city_code) form.city_code.value = address.city_code;
+        form.is_default.checked = !!address.is_default;
+        if (address.latitude && address.longitude) {
+          document.getElementById('addressCoords').textContent = `📍 ${address.latitude}, ${address.longitude}`;
+          setTimeout(() => renderAddressMap(parseFloat(address.latitude), parseFloat(address.longitude)), 250);
+        }
+      }
+      modal.classList.add('open');
+    }
+    function closeAddressEditor() {
+      document.getElementById('addressModal').classList.remove('open');
+      // Tear down map so it re-initializes properly next open
+      if (window.__addressMap) {
+        try { window.__addressMap.remove(); } catch {}
+        window.__addressMap = null;
+        window.__addressMarker = null;
+      }
+    }
+
+    function setAddrLabel(label) {
+      const input = document.querySelector('#addressForm input[name="label"]');
+      if (input) input.value = label;
+      document.querySelectorAll('.addr-chip').forEach(c => {
+        c.classList.toggle('is-selected', c.textContent.trim() === label.trim());
+      });
+    }
+
+    function renderAddressMap(lat, lng) {
+      const mapDiv = document.getElementById('addressMap');
+      document.getElementById('addressMapPlaceholder').style.display = 'none';
+      mapDiv.classList.add('has-map');
+
+      // Initialize Leaflet if not already
+      if (!window.__addressMap) {
+        window.__addressMap = L.map('addressMap', {
+          center: [lat, lng],
+          zoom: 14,
+          scrollWheelZoom: true
+        });
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19,
+          attribution: '© OpenStreetMap'
+        }).addTo(window.__addressMap);
+        // Click to set marker
+        window.__addressMap.on('click', (e) => {
+          updateMarker(e.latlng.lat, e.latlng.lng);
+        });
+      } else {
+        window.__addressMap.setView([lat, lng], 14);
+      }
+      // Place marker
+      updateMarker(lat, lng);
+
+      // Fix sizing
+      setTimeout(() => window.__addressMap?.invalidateSize(), 100);
+    }
+
+    function updateMarker(lat, lng) {
+      if (!window.__addressMap) return;
+      if (window.__addressMarker) {
+        window.__addressMarker.setLatLng([lat, lng]);
+      } else {
+        window.__addressMarker = L.marker([lat, lng], { draggable: true }).addTo(window.__addressMap);
+        window.__addressMarker.on('dragend', () => {
+          const p = window.__addressMarker.getLatLng();
+          setCoords(p.lat, p.lng);
+        });
+      }
+      setCoords(lat, lng);
+    }
+
+    function setCoords(lat, lng) {
+      const form = document.getElementById('addressForm');
+      form.latitude.value = lat.toFixed(7);
+      form.longitude.value = lng.toFixed(7);
+      document.getElementById('addressCoords').textContent = `📍 ${lat.toFixed(5)}, ${lng.toFixed(5)} — اسحب الدبوس لتعديل الموقع`;
+    }
+
+    function centerMapOnSaudi() {
+      // Try to use selected city if any
+      const cityCode = document.querySelector('#addressForm select[name="city_code"]')?.value;
+      const c = cityCode ? SAUDI_CITIES[cityCode] : null;
+      if (c) {
+        renderAddressMap(c.lat, c.lng);
+      } else {
+        // Center on Saudi Arabia at low zoom
+        const mapDiv = document.getElementById('addressMap');
+        document.getElementById('addressMapPlaceholder').style.display = 'none';
+        mapDiv.classList.add('has-map');
+        if (!window.__addressMap) {
+          window.__addressMap = L.map('addressMap', { center: SAUDI_CENTER, zoom: 5, scrollWheelZoom: true });
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' }).addTo(window.__addressMap);
+          window.__addressMap.on('click', (e) => updateMarker(e.latlng.lat, e.latlng.lng));
+        } else {
+          window.__addressMap.setView(SAUDI_CENTER, 5);
+        }
+        setTimeout(() => window.__addressMap?.invalidateSize(), 100);
+      }
+    }
+
+    function useMyLocation() {
+      if (!navigator.geolocation) {
+        toast('المتصفح لا يدعم تحديد الموقع', '⚠'); return;
+      }
+      toast('جارٍ تحديد موقعك...', '📍');
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const { latitude, longitude } = pos.coords;
+          renderAddressMap(latitude, longitude);
+          // Auto-pick the nearest Saudi city
+          let nearest = null;
+          let minDist = Infinity;
+          for (const [code, c] of Object.entries(SAUDI_CITIES)) {
+            const d = Math.hypot(c.lat - latitude, c.lng - longitude);
+            if (d < minDist) { minDist = d; nearest = code; }
+          }
+          const sel = document.querySelector('#addressForm select[name="city_code"]');
+          if (sel && nearest && !sel.value) sel.value = nearest;
+          toast('تم تحديد موقعك', '✓');
+        },
+        (err) => {
+          const msg = err.code === 1 ? 'يجب السماح بالوصول إلى الموقع من إعدادات المتصفح' :
+                      err.code === 2 ? 'تعذّر تحديد الموقع' :
+                      'انتهت مهلة تحديد الموقع';
+          toast(msg, '⚠');
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      );
+    }
+
+    async function saveAddress(e) {
+      e.preventDefault();
+      const f = e.target;
+      if (!window.currentUser) { toast('يجب تسجيل الدخول', '⚠'); return; }
+
+      const data = {
+        user_id: window.currentUser.id,
+        label: f.label.value.trim() || null,
+        recipient_name: f.recipient_name.value.trim(),
+        phone: f.phone.value.trim(),
+        building_number: f.building_number.value.trim() || null,
+        street_name: f.street_name.value.trim() || null,
+        district: f.district.value.trim() || null,
+        city_code: f.city_code.value || null,
+        postal_code: f.postal_code.value.trim() || null,
+        additional_number: f.additional_number.value.trim() || null,
+        notes: f.notes.value.trim() || null,
+        latitude: f.latitude.value ? parseFloat(f.latitude.value) : null,
+        longitude: f.longitude.value ? parseFloat(f.longitude.value) : null,
+        is_default: f.is_default.checked
+      };
+
+      const btn = f.querySelector('button[type="submit"]');
+      btn.disabled = true;
+      const originalText = btn.textContent;
+      btn.textContent = 'جارٍ الحفظ...';
+
+      try {
+        let result;
+        if (f.id.value) {
+          result = await window.supabaseClient.from('addresses').update(data).eq('id', f.id.value);
+        } else {
+          result = await window.supabaseClient.from('addresses').insert(data);
+        }
+        if (result.error) throw result.error;
+
+        // If marked default, clear other defaults
+        if (data.is_default) {
+          await window.supabaseClient.from('addresses')
+            .update({ is_default: false })
+            .neq('id', f.id.value || -1)
+            .eq('user_id', window.currentUser.id);
+          // Re-set on the newly-saved row if it was an insert
+          if (!f.id.value) {
+            await window.supabaseClient.from('addresses')
+              .update({ is_default: true })
+              .eq('user_id', window.currentUser.id)
+              .order('created_at', { ascending: false })
+              .limit(1);
+          }
+        }
+
+        toast(f.id.value ? 'تم تحديث العنوان' : 'تم إضافة العنوان', '✓');
+        closeAddressEditor();
+        loadMyAddresses();
+      } catch (err) {
+        toast(err?.message || 'تعذّر الحفظ', '⚠');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = originalText;
+      }
+    }
+
+    async function deleteAddress(id) {
+      if (!confirm('هل تريد حذف هذا العنوان؟')) return;
+      const { error } = await window.supabaseClient.from('addresses').delete().eq('id', id);
+      if (error) { toast(error.message, '⚠'); return; }
+      toast('تم حذف العنوان', '✓');
+      loadMyAddresses();
+    }
+
+    async function makeAddressDefault(id) {
+      // Clear all defaults, then set this one
+      await window.supabaseClient.from('addresses')
+        .update({ is_default: false })
+        .eq('user_id', window.currentUser.id);
+      const { error } = await window.supabaseClient.from('addresses')
+        .update({ is_default: true })
+        .eq('id', id);
+      if (error) { toast(error.message, '⚠'); return; }
+      toast('تم تعيين العنوان الافتراضي ⭐', '✓');
+      loadMyAddresses();
+    }
+
+    // Load addresses when #addresses route is visited
+    window.addEventListener('hashchange', () => {
+      if (location.hash === '#addresses') setTimeout(loadMyAddresses, 100);
+    });
+    window.addEventListener('load', () => {
+      if (location.hash === '#addresses') setTimeout(loadMyAddresses, 300);
+    });
 
     /* ============================================================
        REVIEWS & RATINGS
