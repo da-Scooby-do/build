@@ -5523,24 +5523,19 @@ p {
           </div>
         </div>
 
-        <div class="section-divider">العنوان الوطني السعودي</div>
+        <div class="section-divider">تفاصيل العنوان</div>
         <div class="form-grid">
-          <div class="form-grid-2">
-            <div class="fld"><label>رقم المبنى</label><input type="text" name="building_number" pattern="[0-9]{4}" placeholder="٤ أرقام"></div>
-            <div class="fld"><label>الرقم الإضافي</label><input type="text" name="additional_number" pattern="[0-9]{4}" placeholder="٤ أرقام"></div>
-          </div>
           <div class="fld"><label>اسم الشارع</label><input type="text" name="street_name" placeholder="مثال: شارع الملك فهد"></div>
           <div class="form-grid-2">
             <div class="fld"><label>الحي</label><input type="text" name="district" placeholder="مثال: حي النخيل"></div>
-            <div class="fld"><label>الرمز البريدي</label><input type="text" name="postal_code" pattern="[0-9]{5}" placeholder="٥ أرقام"></div>
+            <div class="fld">
+              <label>المدينة *</label>
+              <select name="city_code" id="addrCitySelect" required>
+                <option value="">اختر مدينة</option>
+              </select>
+            </div>
           </div>
-          <div class="fld">
-            <label>المدينة *</label>
-            <select name="city_code" id="addrCitySelect" required>
-              <option value="">اختر مدينة</option>
-            </select>
-          </div>
-          <div class="fld"><label>ملاحظات للمندوب (اختياري)</label><textarea name="notes" rows="2" placeholder="مثال: المبنى البيج بجانب المسجد"></textarea></div>
+          <div class="fld"><label>ملاحظات للمندوب (اختياري)</label><textarea name="notes" rows="2" placeholder="مثال: المبنى البيج بجانب المسجد، الطابق الثالث، شقة ١٢..."></textarea></div>
         </div>
 
         <label style="display:flex; gap:10px; align-items:center; margin-top:14px; padding:12px 14px; background:var(--gray-50); border:1px solid var(--gray-150); border-radius:var(--radius-md); cursor:pointer;">
@@ -7248,12 +7243,6 @@ p {
           <div class="addr-line">
             ${[a.street_name, a.district, a.cities?.name_ar].filter(Boolean).map(escapeHtml).join(' • ')}
           </div>
-          ${a.building_number || a.postal_code ? `
-            <div class="meta">
-              ${a.building_number ? `مبنى: ${a.building_number}` : ''}
-              ${a.additional_number ? ` • إضافي: ${a.additional_number}` : ''}
-              ${a.postal_code ? ` • ${a.postal_code}` : ''}
-            </div>` : ''}
           <div class="meta">📞 ${escapeHtml(a.phone)}</div>
           ${a.latitude && a.longitude ? `
             <div class="meta">📍 ${parseFloat(a.latitude).toFixed(4)}, ${parseFloat(a.longitude).toFixed(4)}</div>` : ''}
@@ -7286,7 +7275,7 @@ p {
 
       if (address && typeof address === 'object') {
         form.id.value = address.id;
-        for (const k of ['label','recipient_name','phone','building_number','street_name','district','postal_code','additional_number','notes','latitude','longitude']) {
+        for (const k of ['label','recipient_name','phone','street_name','district','notes','latitude','longitude']) {
           if (form[k]) form[k].value = address[k] || '';
         }
         if (address.city_code) form.city_code.value = address.city_code;
@@ -7490,7 +7479,6 @@ p {
         if (form) {
           if (!form.street_name.value && (a.road || a.pedestrian)) form.street_name.value = a.road || a.pedestrian;
           if (!form.district.value && (a.suburb || a.neighbourhood)) form.district.value = a.suburb || a.neighbourhood;
-          if (!form.postal_code.value && a.postcode) form.postal_code.value = a.postcode;
 
           // Match to a Saudi city
           const cityNameAr = a.city || a.town || a.village || a.state_district || '';
@@ -7559,12 +7547,9 @@ p {
         label: f.label.value.trim() || null,
         recipient_name: f.recipient_name.value.trim(),
         phone: f.phone.value.trim(),
-        building_number: f.building_number.value.trim() || null,
         street_name: f.street_name.value.trim() || null,
         district: f.district.value.trim() || null,
         city_code: f.city_code.value || null,
-        postal_code: f.postal_code.value.trim() || null,
-        additional_number: f.additional_number.value.trim() || null,
         notes: f.notes.value.trim() || null,
         latitude: f.latitude.value ? parseFloat(f.latitude.value) : null,
         longitude: f.longitude.value ? parseFloat(f.longitude.value) : null,
