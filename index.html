@@ -7422,12 +7422,48 @@ p {
       loadMyAddresses();
     }
 
-    // Load addresses when #addresses route is visited
+    // Hook addresses route into the SPA router (same pattern as admin)
+    const __prevGoForAddresses = window.go;
+    window.go = function(hash) {
+      const result = __prevGoForAddresses ? __prevGoForAddresses(hash) : null;
+      const addrView = document.getElementById('view-addresses');
+      if (!addrView) return result;
+      if (hash === '#addresses') {
+        document.querySelectorAll('.view').forEach(v => {
+          if (v.id !== 'view-addresses') {
+            v.classList.remove('active');
+            v.style.display = '';
+          }
+        });
+        addrView.style.display = 'block';
+        addrView.classList.add('active');
+        loadMyAddresses();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        addrView.style.display = '';
+        addrView.classList.remove('active');
+      }
+      return result;
+    };
+
+    // Direct event handler — make sure clicking the link works even if the
+    // original SPA router didn't pick it up
+    document.addEventListener('click', (e) => {
+      const a = e.target.closest('a[href="#addresses"]');
+      if (!a) return;
+      e.preventDefault();
+      if (location.hash !== '#addresses') {
+        location.hash = '#addresses';
+      } else {
+        window.go('#addresses');
+      }
+    });
+
     window.addEventListener('hashchange', () => {
-      if (location.hash === '#addresses') setTimeout(loadMyAddresses, 100);
+      if (location.hash === '#addresses') window.go('#addresses');
     });
     window.addEventListener('load', () => {
-      if (location.hash === '#addresses') setTimeout(loadMyAddresses, 300);
+      if (location.hash === '#addresses') setTimeout(() => window.go('#addresses'), 300);
     });
 
     /* ============================================================
