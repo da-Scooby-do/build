@@ -4582,6 +4582,27 @@ p {
   }
   .rating-inline .star { color: var(--amber-400); }
 
+  /* ============================================================
+     RESELLER MODEL — hide all supplier references from public.
+     Suppliers are managed internally by the owner (admin panel only).
+     ============================================================ */
+
+  /* Hide the entire supplier profile view from public — even if URL is hit */
+  body:not(.is-admin) #view-supplier { display: none !important; }
+
+  /* Hide any element with the "supplier-public" class on customer view */
+  body:not(.is-admin) .supplier-public,
+  body:not(.is-admin) .supplier-name-tag,
+  body:not(.is-admin) .supplier-link,
+  body:not(.is-admin) [data-supplier-info] { display: none !important; }
+
+  /* Hide the "register as supplier" button if it appears anywhere */
+  body:not(.is-admin) [onclick*="signup as supplier"],
+  body:not(.is-admin) .supplier-signup-cta { display: none !important; }
+
+  /* Hide RFQ supplier responses from public */
+  body:not(.is-admin) .rfq-responses-public { display: none !important; }
+
   </style>
 
   <!-- Supabase JS SDK -->
@@ -4705,9 +4726,8 @@ p {
           </svg>
           الأكثر ثقة في المملكة — أكثر من ١٫٢٠٠ مورد معتمد
         </span>
-        <h1 class="reveal d1">وصل المقاول <em>بالمورد</em>:<br />ابحث، قارن، واطلب الآن!</h1>
-        <p class="lead reveal d2">منصة بناء تُسهّل عليك الحصول على مواد البناء والمعدات من أفضل الموردين في جميع مناطق
-          المملكة — بأسعار شفافة وتسليم مضمون.</p>
+        <h1 class="reveal d1">مواد البناء <em>وصلت لك</em>:<br />اطلب، استرح، نوصلها لموقعك!</h1>
+        <p class="lead reveal d2">بِناء توفّر لك جميع مواد البناء والمعدات — نختار أفضل المصادر، نتفاوض على الأسعار، ونوصلها مباشرة إلى موقع مشروعك في جميع مناطق المملكة.</p>
 
         <form class="search-card reveal d3" id="heroSearch">
           <div class="field">
@@ -4803,8 +4823,8 @@ p {
         <div class="section-head">
           <div>
             <div class="kicker">فئات المنتجات</div>
-            <h2>استكشف المنتجات والموردين</h2>
-            <p class="sub">جميع مواد البناء التي يحتاجها مشروعك، من موردين موثوقين في مختلف مناطق المملكة.</p>
+            <h2>استكشف المنتجات</h2>
+            <p class="sub">جميع مواد البناء التي يحتاجها مشروعك — بأسعار شفافة وتوصيل مضمون لجميع مناطق المملكة.</p>
           </div>
           <a href="#catalog" data-link class="btn btn-ghost">عرض الكل ←</a>
         </div>
@@ -4907,7 +4927,7 @@ p {
         <div class="rfq-banner">
           <div>
             <h4>كميات كبيرة لمشروعك؟ احصل على عرض سعر مخصّص</h4>
-            <p>قدّم طلب عرض سعر بالجملة لمشاريع التطوير والمقاولات — يتواصل معك أكثر من مورد خلال ساعات.</p>
+            <p>قدّم طلب عرض سعر بالجملة لمشاريع التطوير والمقاولات — سنرد عليك بأفضل سعر خلال ساعات.</p>
           </div>
           <a href="#rfq" data-link class="btn btn-amber">طلب عرض سعر</a>
         </div>
@@ -4920,8 +4940,7 @@ p {
           <div>
             <div class="kicker">كيف تعمل المنصة</div>
             <h2>من الطلب إلى التسليم في ٣ خطوات</h2>
-            <p class="sub">بناء يقوم بدور الوسيط الموثوق بين المقاول والمورد — نضمن لك الجودة، الشفافية، والتسليم في
-              الوقت المحدد.</p>
+            <p class="sub">نهتم بكل شيء من البحث عن المواد إلى توصيلها لموقعك — أنت فقط تطلب، ونحن نتولى الباقي.</p>
           </div>
         </div>
         <div class="steps">
@@ -4931,8 +4950,8 @@ p {
                 <circle cx="11" cy="11" r="8" />
                 <line x1="21" y1="21" x2="16.65" y2="16.65" />
               </svg></div>
-            <h3>ابحث وقارن</h3>
-            <p>اختر المادة، المدينة، وتاريخ التسليم. اعرض الموردين المعتمدين وقارن الأسعار والتقييمات بشفافية تامة.</p>
+            <h3>اختر منتجك</h3>
+            <p>تصفّح الكتالوج، اختر المواد والكميات التي تحتاجها، وحدّد موقع وتاريخ التوصيل.</p>
           </div>
           <div class="step-card">
             <div class="icon-box"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -4953,41 +4972,83 @@ p {
                 <circle cx="18.5" cy="18.5" r="2.5" />
               </svg></div>
             <h3>استلم في موقعك</h3>
-            <p>يصل المورد إلى موقع مشروعك في الوقت المتفق عليه. تتبّع الشحنة من لوحتك، وقيّم التجربة.</p>
+            <p>نوصل المواد إلى موقع مشروعك في الوقت المتفق عليه. تتبّع الشحنة من حسابك، وقيّم التجربة.</p>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="section" id="suppliers">
+    <!-- "Why choose us" — replaces the public suppliers section.
+         Suppliers are managed internally by the owner only. -->
+    <section class="section" id="why-us">
       <div class="container">
         <div class="section-head">
           <div>
-            <div class="kicker">الموردون المعتمدون</div>
-            <h2>شركاء الجودة لدينا</h2>
-            <p class="sub">نعمل مع أكبر مصانع ومستودعات مواد البناء في المملكة — جميعهم مع سجل تجاري ساري وشهادة جودة.
-            </p>
+            <div class="kicker">لماذا بِناء؟</div>
+            <h2>نوصل لك أفضل المواد بأفضل الأسعار</h2>
+            <p class="sub">نحن نختار لك أفضل مصانع المملكة، نتفاوض على الأسعار، ونوصل المواد إلى موقعك مباشرة — دون أي تعقيدات.</p>
           </div>
         </div>
-        <div id="suppliersHomeGrid"
-          style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:16px;"></div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:20px;">
+          <div class="step-card" style="text-align:center; padding:32px 24px;">
+            <div class="icon-box" style="margin:0 auto 18px;">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 12l2 2 4-4"/>
+                <path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"/>
+              </svg>
+            </div>
+            <h3>جودة مضمونة</h3>
+            <p>جميع المواد من مصانع معتمدة بشهادات SASO وسجلات تجارية سارية.</p>
+          </div>
+          <div class="step-card" style="text-align:center; padding:32px 24px;">
+            <div class="icon-box" style="margin:0 auto 18px;">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 1v22"/>
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+              </svg>
+            </div>
+            <h3>أسعار تنافسية</h3>
+            <p>نتفاوض على أفضل الأسعار بسبب كميات الشراء الكبيرة — وفّر حتى ٢٠٪.</p>
+          </div>
+          <div class="step-card" style="text-align:center; padding:32px 24px;">
+            <div class="icon-box" style="margin:0 auto 18px;">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="1" y="3" width="15" height="13" rx="2"/>
+                <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/>
+                <circle cx="5.5" cy="18.5" r="2.5"/>
+                <circle cx="18.5" cy="18.5" r="2.5"/>
+              </svg>
+            </div>
+            <h3>توصيل لموقعك</h3>
+            <p>نوصل المواد إلى موقع مشروعك في الوقت المتفق عليه — في جميع مناطق المملكة.</p>
+          </div>
+          <div class="step-card" style="text-align:center; padding:32px 24px;">
+            <div class="icon-box" style="margin:0 auto 18px;">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+              </svg>
+            </div>
+            <h3>دعم متواصل</h3>
+            <p>فريقنا متاح ٧ أيام بالأسبوع للإجابة على استفساراتك ومتابعة طلباتك.</p>
+          </div>
+        </div>
       </div>
     </section>
 
     <section class="cta-band">
       <div class="container">
         <div>
-          <h2>هل أنت مورد؟ انضم إلى شبكة بناء.</h2>
-          <p>اعرض منتجاتك لآلاف المقاولين، وأدِر طلباتك بلوحة تحكم احترافية.</p>
+          <h2>تحتاج كميات كبيرة لمشروعك؟</h2>
+          <p>اطلب عرض سعر مخصص لمشروعك وسنرد عليك خلال ٢٤ ساعة بأفضل الأسعار.</p>
         </div>
-        <button class="btn btn-amber" onclick="openAuth('signup')">
-          سجّل كمورد
+        <a href="#rfq" data-link class="btn btn-amber">
+          اطلب عرض سعر
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
             stroke-linecap="round" stroke-linejoin="round">
             <line x1="19" y1="12" x2="5" y2="12" />
             <polyline points="12 19 5 12 12 5" />
           </svg>
-        </button>
+        </a>
       </div>
     </section>
   </section>
@@ -5004,9 +5065,8 @@ p {
           <span class="current">كتالوج المنتجات</span>
         </nav>
         <div class="title-row">
-          <h1>جميع المنتجات والموردين</h1>
-          <p class="sub">تصفّح أكثر من ٢٫٤٠٠ منتج من أفضل موردي مواد البناء — مع فلترة متقدمة حسب المدينة، السعر،
-            والتقييم.</p>
+          <h1>كتالوج المنتجات</h1>
+          <p class="sub">تصفّح أكثر من ٢٫٤٠٠ منتج من مواد البناء — مع فلترة متقدمة حسب المدينة، السعر، والتقييم. نوصلها مباشرة إلى موقعك.</p>
         </div>
       </div>
     </section>
@@ -5165,7 +5225,7 @@ p {
         </nav>
         <div class="title-row">
           <h1>طلب عرض سعر مخصّص</h1>
-          <p class="sub">للكميات الكبيرة أو المتطلبات الخاصة — أرسل تفاصيل مشروعك واحصل على عروض من أكثر من مورد خلال ٢٤
+          <p class="sub">للكميات الكبيرة أو المتطلبات الخاصة — أرسل تفاصيل مشروعك وسنرد عليك بعرض سعر مخصص خلال ٢٤
             ساعة.</p>
         </div>
       </div>
@@ -5283,7 +5343,7 @@ p {
             </span>
             طلب توريد خرسانة جاهزة
           </h1>
-          <p class="sub">اتبع الخطوات الثلاث لإتمام طلبك — ستحصل على عرض فوري من الموردين المعتمدين حسب موقعك.</p>
+          <p class="sub">اتبع الخطوات الثلاث لإتمام طلبك — ستحصل على تأكيد فوري وأفضل الأسعار من بِناء.</p>
         </div>
       </div>
     </section>
@@ -5582,7 +5642,7 @@ p {
             </svg>
           </div>
           <h2 style="margin-bottom: 8px;">تم استلام طلبك بنجاح!</h2>
-          <p style="color: var(--gray-600); margin: 0;">سيتواصل معك مورد معتمد خلال ١٥ دقيقة لتأكيد التفاصيل وموعد
+          <p style="color: var(--gray-600); margin: 0;">سيتواصل معك فريق بِناء خلال ١٥ دقيقة لتأكيد التفاصيل وموعد
             التسليم.</p>
           <div class="order-ref">رقم الطلب: <span id="orderRef">BENA-0000</span></div>
 
@@ -5910,25 +5970,25 @@ p {
           <ul>
             <li>تواصل مع خدمة العملاء عبر الواتساب على ٩٢٠٠٠٢٣٦٢ خلال ٤٨ ساعة من الاستلام.</li>
             <li>أرفق صورًا توضح العيب أو المشكلة.</li>
-            <li>سيتواصل معك المورد خلال ٢٤ ساعة لإكمال إجراءات الاسترداد.</li>
+            <li>سيتواصل معك فريق بِناء خلال ٢٤ ساعة لإكمال إجراءات الاسترداد.</li>
             <li>يتم إرجاع المبلغ خلال ٧–١٤ يوم عمل إلى نفس وسيلة الدفع الأصلية.</li>
           </ul>
 
           <h2>الضمان وشهادات الجودة</h2>
-          <p>جميع موردينا حاصلون على سجل تجاري ساري وشهادات SASO للمواد المُلزمة. نوفّر شهادات اختبار مختبرية للخرسانة
+          <p>جميع المواد التي نوفّرها مطابقة لمواصفات SASO، ونصدر شهادات اختبار مختبرية للخرسانة
             والحديد عند الطلب، وضمان مصنع للمنتجات الكهربائية والصحية.</p>
 
           <h2>الشروط والأحكام</h2>
-          <p>باستخدامك منصة بِناء، فإنك توافق على أن تكون المنصة وسيطًا تجاريًا بين المشتري والمورد، وأن العقد التجاري
+          <p>باستخدامك منصة بِناء، فإنك توافق على أن العقد التجاري
             الفعلي يتم بين الطرفين مباشرة بعد إتمام الطلب. تتحمل المنصة مسؤولية ضمان الجودة وحماية المدفوعات، ولكن لا
             تتحمل أي ضرر مباشر ناتج عن سوء الاستخدام أو الظروف القاهرة.</p>
 
           <h2>الأسئلة الشائعة</h2>
           <p><b>هل تشمل الأسعار التوصيل؟</b><br />التوصيل يُحتسب بشكل منفصل لكل مورد ويظهر بوضوح في صفحة الدفع.</p>
-          <p><b>هل أستطيع تتبع شحنتي؟</b><br />نعم، ستصلك رسالة SMS وواتساب فيها رابط تتبع مباشر مع المورد.</p>
+          <p><b>هل أستطيع تتبع شحنتي؟</b><br />نعم، ستصلك رسالة SMS وواتساب فيها رابط تتبع مباشر للشحنة.</p>
           <p><b>هل تدعمون الدفع الآجل (BNPL)؟</b><br />نعم — نقبل تابي وتمارا للطلبات تحت ٥٠٫٠٠٠ ر.س لتقسيط الدفع على ٤
             دفعات.</p>
-          <p><b>كم تستغرق الموافقة على الموردين الجدد؟</b><br />٣–٥ أيام عمل بعد التحقق من السجل التجاري وشهادات الجودة.
+          <p><b>كم يستغرق التوصيل؟</b><br />عادةً من ٢٤ إلى ٧٢ ساعة حسب المنتج والموقع. بعض المواد متوفّرة للتوصيل في نفس اليوم.
           </p>
         </div>
       </div>
@@ -6208,11 +6268,9 @@ p {
 
         if (window.isAdmin) {
           console.log('[bena] Logged in as ADMIN');
-          // Auto-redirect admins to dashboard on login
-          if (location.hash !== '#admin' && !location.hash.startsWith('#admin')) {
-            // Don't force redirect, just make the button visible. Comment line below to auto-redirect:
-            // location.hash = '#admin';
-          }
+          document.body.classList.add('is-admin');
+        } else {
+          document.body.classList.remove('is-admin');
         }
 
         // Re-render whatever page they're on (in case admin features need to appear)
@@ -6220,6 +6278,7 @@ p {
       } else {
         document.querySelectorAll('.auth-buttons .btn').forEach(btn => btn.style.display = '');
         document.getElementById('userChip')?.remove();
+        document.body.classList.remove('is-admin');
       }
     };
 
