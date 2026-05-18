@@ -4752,6 +4752,68 @@ p {
     font-size: 10px;
   }
 
+  /* Location search dropdown */
+  #locationResults {
+    position: absolute;
+    top: 100%;
+    inset-inline-start: 0;
+    inset-inline-end: 0;
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    max-height: 280px;
+    overflow-y: auto;
+    z-index: 100;
+    margin-top: 4px;
+  }
+  [data-theme="dark"] #locationResults {
+    background: #0f1a2e;
+    border-color: #243557;
+  }
+  .loc-result {
+    padding: 12px 16px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--gray-100);
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    transition: background .15s ease;
+  }
+  [data-theme="dark"] .loc-result { border-color: #1c2c4a; }
+  .loc-result:last-child { border-bottom: 0; }
+  .loc-result:hover {
+    background: rgba(245,165,36,.08);
+  }
+  .loc-result .icon {
+    flex-shrink: 0;
+    color: var(--amber-500);
+    margin-top: 2px;
+  }
+  .loc-result .text {
+    flex: 1;
+    min-width: 0;
+  }
+  .loc-result .main {
+    font-weight: 600;
+    color: var(--navy-900);
+    margin-bottom: 2px;
+    word-wrap: break-word;
+  }
+  [data-theme="dark"] .loc-result .main { color: var(--ink); }
+  .loc-result .sub {
+    color: var(--gray-500);
+    font-size: .82rem;
+    word-wrap: break-word;
+  }
+  .loc-result-loading,
+  .loc-result-empty {
+    padding: 16px;
+    text-align: center;
+    color: var(--gray-500);
+    font-size: .9rem;
+  }
+
   /* Empty state */
   .addresses-empty {
     grid-column: 1 / -1;
@@ -5400,17 +5462,36 @@ p {
 
         <div class="section-divider">📍 الموقع على الخريطة</div>
         <div class="form-grid">
+          <!-- Search box -->
+          <div style="position:relative;">
+            <div style="display:flex; gap:8px;">
+              <div style="position:relative; flex:1;">
+                <svg style="position:absolute; top:50%; transform:translateY(-50%); inset-inline-start:14px; color:var(--gray-500); pointer-events:none;"
+                  width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="11" cy="11" r="8"/>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+                <input type="text" id="locationSearch"
+                  placeholder="ابحث عن موقع — مثال: حي الملز الرياض، شارع التحلية جدة..."
+                  oninput="onLocationSearch(this.value)"
+                  onfocus="if(this.value)onLocationSearch(this.value)"
+                  style="padding-inline-start:42px; width:100%;">
+              </div>
+              <button type="button" class="btn btn-amber" onclick="useMyLocation()" style="display:flex; align-items:center; gap:6px; white-space:nowrap;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="3"/>
+                  <path d="M12 1v3M12 20v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M1 12h3M20 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/>
+                </svg>
+                <span>موقعي</span>
+              </button>
+            </div>
+            <div id="locationResults" style="display:none;"></div>
+          </div>
           <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            <button type="button" class="btn btn-amber" onclick="useMyLocation()" style="display:flex; align-items:center; gap:8px;">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="3"/>
-                <path d="M12 1v3M12 20v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M1 12h3M20 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/>
-              </svg>
-              <span>استخدم موقعي الحالي</span>
+            <button type="button" class="btn btn-ghost" onclick="centerMapOnSaudi()" style="font-size:.85rem;">
+              🗺️ عرض الخريطة
             </button>
-            <button type="button" class="btn btn-ghost" onclick="centerMapOnSaudi()">
-              عرض الخريطة
-            </button>
+            <span style="color:var(--gray-500); font-size:.82rem; align-self:center;">أو انقر على الخريطة لتحديد الموقع يدويًا</span>
           </div>
           <div id="addressMap" style="height:320px; border-radius:var(--radius-lg); border:1px solid var(--gray-200); background:var(--gray-100); overflow:hidden; position:relative;">
             <div id="addressMapPlaceholder" style="position:absolute; inset:0; display:grid; place-items:center; color:var(--gray-500); pointer-events:none; text-align:center; padding:20px;">
@@ -7307,6 +7388,136 @@ p {
         setTimeout(() => window.__addressMap?.invalidateSize(), 100);
       }
     }
+
+    /* Location search using Nominatim (OpenStreetMap geocoding — free, no API key) */
+    let __locSearchTimer = null;
+    let __locSearchSeq = 0;
+
+    function onLocationSearch(query) {
+      query = (query || '').trim();
+      const resultsBox = document.getElementById('locationResults');
+      if (!resultsBox) return;
+      clearTimeout(__locSearchTimer);
+      if (query.length < 2) {
+        resultsBox.style.display = 'none';
+        resultsBox.innerHTML = '';
+        return;
+      }
+      resultsBox.style.display = 'block';
+      resultsBox.innerHTML = '<div class="loc-result-loading">🔍 جارٍ البحث...</div>';
+      // Debounce — wait 350ms after typing stops
+      __locSearchTimer = setTimeout(() => searchLocations(query), 350);
+    }
+
+    async function searchLocations(query) {
+      const mySeq = ++__locSearchSeq;
+      const resultsBox = document.getElementById('locationResults');
+      try {
+        // Nominatim API — restricted to Saudi Arabia with Arabic results
+        const url = new URL('https://nominatim.openstreetmap.org/search');
+        url.searchParams.set('q', query);
+        url.searchParams.set('format', 'json');
+        url.searchParams.set('countrycodes', 'sa');
+        url.searchParams.set('limit', '8');
+        url.searchParams.set('addressdetails', '1');
+        url.searchParams.set('accept-language', 'ar,en');
+
+        const res = await fetch(url.toString(), {
+          headers: { 'Accept-Language': 'ar,en' }
+        });
+        if (!res.ok) throw new Error('search failed');
+        const data = await res.json();
+
+        // Only render if this is still the latest search
+        if (mySeq !== __locSearchSeq) return;
+
+        if (!data.length) {
+          resultsBox.innerHTML = '<div class="loc-result-empty">لم يتم العثور على نتائج — جرّب كلمات أخرى</div>';
+          return;
+        }
+
+        resultsBox.innerHTML = data.map(item => {
+          const main = formatLocationMain(item);
+          const sub = formatLocationSub(item);
+          return `
+            <div class="loc-result" onclick="pickLocation(${parseFloat(item.lat)}, ${parseFloat(item.lon)}, '${escapeHtml(main).replace(/'/g,"&#39;")}', ${JSON.stringify(item.address || {}).replace(/"/g,'&quot;')})">
+              <span class="icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                </svg>
+              </span>
+              <div class="text">
+                <div class="main">${escapeHtml(main)}</div>
+                <div class="sub">${escapeHtml(sub)}</div>
+              </div>
+            </div>`;
+        }).join('');
+      } catch (err) {
+        if (mySeq !== __locSearchSeq) return;
+        resultsBox.innerHTML = '<div class="loc-result-empty">تعذّر البحث — حاول مجددًا</div>';
+      }
+    }
+
+    function formatLocationMain(item) {
+      const a = item.address || {};
+      // Prioritize neighborhood/road/city
+      return a.neighbourhood || a.suburb || a.road || a.amenity || a.city || a.town || a.village || (item.display_name || '').split(',')[0];
+    }
+    function formatLocationSub(item) {
+      const a = item.address || {};
+      const parts = [
+        a.neighbourhood && a.suburb && a.suburb,
+        a.city || a.town || a.village,
+        a.state,
+        a.country
+      ].filter(Boolean);
+      return [...new Set(parts)].join('، ');
+    }
+
+    function pickLocation(lat, lng, label, addressDetails) {
+      const resultsBox = document.getElementById('locationResults');
+      const searchInput = document.getElementById('locationSearch');
+      if (resultsBox) { resultsBox.style.display = 'none'; resultsBox.innerHTML = ''; }
+      if (searchInput) searchInput.value = label;
+
+      // Render map at this location
+      renderAddressMap(lat, lng);
+
+      // Try to auto-fill form fields from the geocoding result
+      try {
+        const a = addressDetails || {};
+        const form = document.getElementById('addressForm');
+        if (form) {
+          if (!form.street_name.value && (a.road || a.pedestrian)) form.street_name.value = a.road || a.pedestrian;
+          if (!form.district.value && (a.suburb || a.neighbourhood)) form.district.value = a.suburb || a.neighbourhood;
+          if (!form.postal_code.value && a.postcode) form.postal_code.value = a.postcode;
+
+          // Match to a Saudi city
+          const cityNameAr = a.city || a.town || a.village || a.state_district || '';
+          if (!form.city_code.value && cityNameAr) {
+            const sel = form.city_code;
+            for (const opt of sel.options) {
+              if (opt.textContent && cityNameAr.includes(opt.textContent.trim())) {
+                sel.value = opt.value;
+                break;
+              }
+            }
+          }
+        }
+      } catch {}
+
+      toast('تم تحديد الموقع 📍', '✓');
+    }
+
+    // Close search dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      const resultsBox = document.getElementById('locationResults');
+      const searchInput = document.getElementById('locationSearch');
+      if (!resultsBox || !searchInput) return;
+      if (!resultsBox.contains(e.target) && e.target !== searchInput) {
+        resultsBox.style.display = 'none';
+      }
+    });
 
     function useMyLocation() {
       if (!navigator.geolocation) {
