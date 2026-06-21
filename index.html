@@ -4932,6 +4932,109 @@ p {
     [data-theme="dark"] body {
       background: #060f1f !important;
     }
+
+    /* ===== Sitewide launch banner ===== */
+    .launch-banner {
+      background: linear-gradient(90deg, #0a1830 0%, #14233f 50%, #1b2d4f 100%);
+      color: #fff;
+      padding: 10px 0;
+      text-align: center;
+      font-size: .92rem;
+      border-bottom: 2px solid var(--gold-400);
+      position: sticky;
+      top: 0;
+      z-index: 1100;
+      box-shadow: 0 2px 8px rgba(0,0,0,.18);
+    }
+    .launch-banner a {
+      transition: background .15s, transform .15s;
+    }
+    .launch-banner a:hover {
+      background: rgba(212,165,99,.45) !important;
+      transform: translateY(-1px);
+    }
+    @media (max-width: 640px) {
+      .launch-banner { font-size: .82rem; padding: 8px 0; }
+      .launch-banner span:nth-child(2) { display: none; }
+    }
+
+    /* ===== DARK MODE — keep new gold palette readable ===== */
+    [data-theme="dark"] {
+      --cream-50: #0a1322;
+      --cream-100: #0f1a2e;
+      --cream-200: #16243d;
+    }
+    [data-theme="dark"] .section[id="about"],
+    [data-theme="dark"] #about {
+      background: #0a1322 !important;
+    }
+    [data-theme="dark"] #suppliers-directory {
+      background: linear-gradient(180deg, #0a1322 0%, #060f1f 100%) !important;
+    }
+    [data-theme="dark"] #suppliers-directory h2,
+    [data-theme="dark"] #suppliers-directory .sub {
+      color: #e8eef8 !important;
+    }
+    [data-theme="dark"] #suppliers-directory .kicker {
+      color: var(--gold-400) !important;
+    }
+    [data-theme="dark"] #dirTabs button {
+      background: #14233f !important;
+      color: #e8eef8 !important;
+      border-color: rgba(212,165,99,.35) !important;
+    }
+    [data-theme="dark"] #dirTabs button[onclick*="${active}"] {
+      background: var(--gold-500) !important;
+      color: #fff !important;
+    }
+    [data-theme="dark"] #dirContent article {
+      background: #0f1a2e !important;
+      border-color: rgba(212,165,99,.22) !important;
+    }
+    [data-theme="dark"] #dirContent article h4 {
+      color: #f3f6fc !important;
+    }
+    [data-theme="dark"] #dirContent article > div:nth-child(2) {
+      color: #b3c2dc !important;
+    }
+    [data-theme="dark"] #dirContent article > div[style*="background:#f6f1e8"] {
+      background: #243557 !important;
+      color: #e8eef8 !important;
+    }
+    [data-theme="dark"] .countdown .cd-box {
+      background: rgba(15,26,46,.95) !important;
+      border-color: rgba(212,165,99,.45) !important;
+    }
+    [data-theme="dark"] .countdown .cd-box div:first-child {
+      color: var(--gold-400) !important;
+    }
+    [data-theme="dark"] .countdown .cd-box div:last-child {
+      color: #b3c2dc !important;
+    }
+    [data-theme="dark"] .stat-num { color: #f3f6fc !important; }
+    [data-theme="dark"] .stat-num span { color: var(--gold-400) !important; }
+    [data-theme="dark"] .step-card .icon-box {
+      background: linear-gradient(135deg, var(--gold-500), #8c6224) !important;
+    }
+    [data-theme="dark"] .kicker {
+      color: var(--gold-400) !important;
+    }
+    [data-theme="dark"] .launch-banner {
+      background: linear-gradient(90deg, #060f1f 0%, #0a1322 50%, #0f1a2e 100%);
+      border-bottom-color: var(--gold-500);
+    }
+    [data-theme="dark"] .top-bar,
+    [data-theme="dark"] .main-nav {
+      background: #0a1322 !important;
+      border-color: rgba(212,165,99,.15) !important;
+    }
+    [data-theme="dark"] .main-nav a {
+      color: #d0d9eb !important;
+    }
+    [data-theme="dark"] .main-nav a:hover,
+    [data-theme="dark"] .main-nav a.active {
+      color: var(--gold-400) !important;
+    }
   </style>
 
   <!-- Supabase JS SDK -->
@@ -4949,6 +5052,15 @@ p {
   <!-- ============================================================
      HEADER
      ============================================================ -->
+  <!-- ===== Sitewide launch banner ===== -->
+  <div class="launch-banner" id="launchBanner" role="status" aria-live="polite">
+    <div class="container" style="display:flex; align-items:center; justify-content:center; gap:14px; flex-wrap:wrap; padding:0 16px;">
+      <span style="font-weight:700;">🎉 الافتتاح الرسمي ١ نوفمبر ٢٠٢٦</span>
+      <span style="opacity:.85; font-size:.86rem;">— استقبال الطلبات بدأ مبكرًا</span>
+      <a href="#rfq" data-link style="background:rgba(212,165,99,.25); color:#fff; padding:5px 14px; border-radius:999px; text-decoration:none; font-weight:700; font-size:.84rem; border:1px solid rgba(212,165,99,.55);">اطلب الآن ←</a>
+    </div>
+  </div>
+
   <header class="site-header">
     <div class="top-bar">
       <div class="container">
@@ -4993,14 +5105,14 @@ p {
             <span>المفضلة</span>
             <span class="badge hidden" id="wishBadge">0</span>
           </a>
-          <a href="#cart" data-link class="cart-btn" aria-label="عربة التسوق">
+          <a href="#cart" data-link class="cart-btn" aria-label="صفحة الطلب">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
               stroke-linecap="round" stroke-linejoin="round">
               <circle cx="9" cy="21" r="1" />
               <circle cx="20" cy="21" r="1" />
               <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
             </svg>
-            <span>عربتي</span>
+            <span>صفحة الطلب</span>
             <span class="badge hidden" id="cartBadge">0</span>
           </a>
           <button class="btn btn-ghost" onclick="openAuth('signup')">إنشاء حساب</button>
@@ -5024,12 +5136,11 @@ p {
         </button>
         <ul>
           <li><a href="#home" data-link class="active">الرئيسية</a></li>
-          <li><a href="#catalog" data-link>الكتالوج</a></li>
-          <li><a href="#concrete" data-link>الخرسانة</a></li>
-          <li><a href="#catalog" data-link data-filter="حديد">الحديد</a></li>
-          <li><a href="#catalog" data-link data-filter="معدات">المعدات</a></li>
-          <li><a href="#rfq" data-link>طلب عرض سعر بالجملة</a></li>
-          <li><a href="#about" data-link>من نحن</a></li>
+          <li><a href="#suppliers-directory" data-link>موردونا في المدينة</a></li>
+          <li><a href="#about" data-link>كيف نعمل</a></li>
+          <li><a href="#rfq" data-link>اطلب عرض سعر</a></li>
+          <li><a href="#cart" data-link>صفحة الطلب</a></li>
+          <li><a href="#policy" data-link>الشروط والسياسة</a></li>
         </ul>
       </div>
     </nav>
@@ -5038,12 +5149,11 @@ p {
     <div class="mobile-nav-drawer" id="mobileNav">
       <ul>
         <li><a href="#home" data-link onclick="toggleMobileNav()">الرئيسية</a></li>
-        <li><a href="#catalog" data-link onclick="toggleMobileNav()">الكتالوج</a></li>
-        <li><a href="#concrete" data-link onclick="toggleMobileNav()">الخرسانة</a></li>
-        <li><a href="#catalog" data-link data-filter="حديد" onclick="toggleMobileNav()">الحديد</a></li>
-        <li><a href="#catalog" data-link data-filter="معدات" onclick="toggleMobileNav()">المعدات</a></li>
-        <li><a href="#rfq" data-link onclick="toggleMobileNav()">طلب عرض سعر بالجملة</a></li>
-        <li><a href="#about" data-link onclick="toggleMobileNav()">من نحن</a></li>
+        <li><a href="#suppliers-directory" data-link onclick="toggleMobileNav()">موردونا في المدينة</a></li>
+        <li><a href="#about" data-link onclick="toggleMobileNav()">كيف نعمل</a></li>
+        <li><a href="#rfq" data-link onclick="toggleMobileNav()">اطلب عرض سعر</a></li>
+        <li><a href="#cart" data-link onclick="toggleMobileNav()">صفحة الطلب</a></li>
+        <li><a href="#policy" data-link onclick="toggleMobileNav()">الشروط والسياسة</a></li>
       </ul>
     </div>
   </header>
@@ -8315,7 +8425,7 @@ p {
         </div>
       </a>
       <div style="display:flex; gap:6px; padding: 0 var(--card-pad,16px) 14px;">
-        <button class="btn btn-amber" style="flex:1;" onclick="addToCart('${p.id}')">أضف للسلة</button>
+        <button class="btn btn-amber" style="flex:1;" onclick="addToCart('${p.id}')">أضف للطلب</button>
         <a class="wa-btn" href="${waLink(sup.phone, waMsg)}" target="_blank" rel="noopener" onclick="event.stopPropagation();" aria-label="اطلب عبر واتساب">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24z"/></svg>
           واتساب
@@ -9470,21 +9580,116 @@ p {
       toast('تم تسجيل الخروج');
     }
 
-    // RFQ submit hook (if function exists, augment it; otherwise expose)
+    // RFQ submit hook — writes to Supabase rfqs so admin sees it immediately
     async function apiSubmitRFQ(payload) {
-      if (API.isOnline()) {
-        try { return await API.rfq(payload); } catch (e) { console.warn('rfq', e); }
+      if (window.supabaseClient) {
+        try {
+          let rfqNumber;
+          try {
+            const { data: gen } = await window.supabaseClient.rpc('generate_rfq_number');
+            rfqNumber = gen || ('RFQ-' + Date.now().toString().slice(-8));
+          } catch { rfqNumber = 'RFQ-' + Date.now().toString().slice(-8); }
+
+          const description =
+            `📋 الفئة: ${payload.category || '-'}\n` +
+            `📦 الكمية: ${payload.qty || '-'}\n` +
+            `👤 الاسم: ${payload.contactName || '-'}\n` +
+            `📞 الجوال: ${payload.phone || '-'}\n` +
+            `✉️ البريد: ${payload.email || '-'}\n` +
+            `🏙️ المدينة: ${payload.city || '-'}\n` +
+            `📅 المطلوب بحلول: ${payload.neededBy || '-'}\n\n` +
+            `📝 التفاصيل: ${payload.details || '-'}`;
+          const ins = {
+            rfq_number: rfqNumber,
+            user_id: window.currentUser?.id || null,
+            project_name: payload.company || payload.contactName || 'طلب عام',
+            description,
+            status: 'open',
+          };
+          const { data, error } = await window.supabaseClient.from('rfqs').insert(ins).select().single();
+          if (error) throw error;
+          return { id: data?.id, rfqNumber, status: 'received' };
+        } catch (e) { console.warn('rfq save failed', e); }
       }
       return { id: 'local-' + Date.now(), status: 'received' };
     }
 
-    // Order placement hook
+    // Order placement hook — writes to Supabase orders + order_items
     async function apiPlaceOrder(orderPayload) {
-      if (API.isOnline()) {
-        try { return await API.placeOrder(orderPayload); } catch (e) { console.warn('order', e); }
+      if (window.supabaseClient) {
+        try {
+          let orderNo;
+          try {
+            const { data: gen } = await window.supabaseClient.rpc('generate_order_number');
+            orderNo = gen || ('MEDAD-' + Date.now().toString().slice(-8));
+          } catch { orderNo = 'MEDAD-' + Date.now().toString().slice(-8); }
+
+          const validPays = ['mada','visa','mastercard','apple_pay','stc_pay','tabby','tamara','bank_transfer','cod'];
+          const payment_method = validPays.includes(orderPayload.payMethod) ? orderPayload.payMethod : 'mada';
+
+          const customer_notes =
+            `👤 ${orderPayload.customer || '-'} | 📞 ${orderPayload.phone || '-'}\n` +
+            `🏙️ ${orderPayload.city || '-'} • ${orderPayload.district || '-'}\n` +
+            `🏢 المبنى: ${orderPayload.building || '-'} | الرمز البريدي: ${orderPayload.postal || '-'}\n` +
+            `📝 ملاحظات: ${orderPayload.extra || '-'}`;
+
+          const orderRow = {
+            order_number: orderNo,
+            user_id: window.currentUser?.id || null,
+            status: 'pending',
+            payment_status: 'pending',
+            subtotal: orderPayload.subtotal || 0,
+            vat_amount: orderPayload.vat || 0,
+            delivery_fee: orderPayload.shipping || 0,
+            total: orderPayload.total || 0,
+            payment_method,
+            customer_notes,
+          };
+          const { data: order, error } = await window.supabaseClient
+            .from('orders').insert(orderRow).select().single();
+          if (error) throw error;
+
+          if (order && Array.isArray(orderPayload.items) && orderPayload.items.length) {
+            const items = orderPayload.items.map(it => ({
+              order_id: order.id,
+              product_id: it.id || null,
+              supplier_id: it.supplierId || null,
+              product_name_snapshot: it.name || 'منتج',
+              unit_snapshot: it.unit || null,
+              quantity: it.qty || 1,
+              unit_price: it.price || 0,
+              subtotal: (it.qty || 1) * (it.price || 0),
+            }));
+            await window.supabaseClient.from('order_items').insert(items);
+          }
+          return { orderNo, status: 'pending' };
+        } catch (e) { console.warn('order save failed', e); }
       }
       return { orderNo: 'MEDAD-' + Date.now().toString().slice(-8), status: 'confirmed' };
     }
+
+    /* ===== Admin realtime: customer orders + RFQs surface instantly ===== */
+    window.__adminRealtimeSetup = false;
+    function setupAdminRealtime() {
+      if (window.__adminRealtimeSetup || !window.supabaseClient || !window.isAdmin) return;
+      window.__adminRealtimeSetup = true;
+      try {
+        window.__adminChannel = window.supabaseClient
+          .channel('admin-live-orders')
+          .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, () => {
+            if (typeof toast === 'function') toast('🔔 طلب جديد وصل!', '🔔');
+            try { if (typeof loadAdminOrders === 'function') loadAdminOrders(); } catch{}
+            try { if (typeof loadAdminDashboard === 'function') loadAdminDashboard(); } catch{}
+          })
+          .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'rfqs' }, () => {
+            if (typeof toast === 'function') toast('🔔 طلب عرض سعر جديد!', '🔔');
+            try { if (typeof loadAdminOrders === 'function') loadAdminOrders(); } catch{}
+          })
+          .subscribe(status => console.log('[admin realtime]', status));
+      } catch (e) { console.warn('realtime setup failed', e); window.__adminRealtimeSetup = false; }
+    }
+    // Poll until admin status is determined, then subscribe once
+    setInterval(setupAdminRealtime, 3000);
 
     window.API = API;
     window.apiSubmitRFQ = apiSubmitRFQ;
