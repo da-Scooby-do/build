@@ -6067,44 +6067,19 @@ p {
         <nav class="breadcrumb">
           <a href="#home" data-link>الرئيسية</a>
           <span class="sep">›</span>
-          <span class="current">عربة التسوق</span>
+          <span class="current">صفحة الطلب</span>
         </nav>
         <div class="title-row">
-          <h1>عربة التسوق</h1>
-          <p class="sub">راجع طلباتك وأكمل الدفع — كل مورد سيقوم بشحن منتجاته بشكل مستقل.</p>
+          <h1>صفحة الطلب</h1>
+          <p class="sub">تابع طلباتك مع فريق مداد — من لحظة الاستلام إلى التسليم في موقعك.</p>
         </div>
       </div>
     </section>
 
     <section class="order-shell">
       <div class="container">
-        <div class="cart-grid">
-          <div class="cart-list" id="cartList"></div>
-
-          <aside class="summary-card">
-            <h3><span class="head-label">ملخص الفاتورة</span></h3>
-            <div class="product-name" id="cartItemCount">٠ منتج</div>
-            <div class="sum-row"><span>المجموع الفرعي</span><span id="cartSubtotal">٠ ر.س</span></div>
-            <div class="sum-row"><span>رسوم التوصيل (لكل مورد)</span><span id="cartShipping">٠ ر.س</span></div>
-            <div class="sum-row"><span>ضريبة القيمة المضافة (١٥٪)</span><span id="cartVat">٠ ر.س</span></div>
-            <div class="sum-row total"><span>الإجمالي</span><span id="cartTotal">٠ ر.س</span></div>
-
-            <div style="margin-top:16px;">
-              <div style="font-weight:700; color:var(--navy-900); margin-bottom:8px; font-size:.92rem;">طريقة الدفع
-              </div>
-              <div class="pay-grid" id="payGrid"></div>
-              <div class="bnpl-note hidden" id="bnplNote"></div>
-            </div>
-
-            <button class="btn btn-amber" style="margin-top:14px;" onclick="checkout()">
-              إتمام الدفع
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
-                stroke-linecap="round" stroke-linejoin="round">
-                <line x1="19" y1="12" x2="5" y2="12" />
-                <polyline points="12 19 5 12 12 5" />
-              </svg>
-            </button>
-          </aside>
+        <div id="ordersHost">
+          <div style="text-align:center; padding:60px 20px; color:var(--gray-500);">جارٍ التحميل…</div>
         </div>
       </div>
     </section>
@@ -8625,72 +8600,153 @@ p {
     function selectPay(id) { state.payMethod = id; renderPayMethods(); }
 
     function renderCart() {
-      const list = $('#cartList');
-      if (!state.cart.length) {
-        list.innerHTML = `
-      <div class="empty-state">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-        <h3>عربتك فارغة</h3>
-        <p>ابدأ بتصفح الكتالوج لإضافة منتجات.</p>
-        <a href="#catalog" data-link class="btn btn-amber" style="margin-top:14px;">تصفّح الكتالوج</a>
-      </div>`;
-      } else {
-        // Group by supplier
-        const groups = {};
-        state.cart.forEach(c => {
-          if (!groups[c.supplierId]) groups[c.supplierId] = [];
-          groups[c.supplierId].push(c);
-        });
-        list.innerHTML = Object.entries(groups).map(([sid, items]) => {
-          const sup = getSupplier(sid);
-          return `
-        <div class="supplier-group">
-          <div class="group-head">
-            <div class="name">
-              <span style="font-size:1.4rem;">${sup.logo}</span>
-              <a href="#supplier/${sid}" data-link style="color:inherit; text-decoration:none;">${sup.name}</a>
+      // Brokerage redesign: cart page is now the customer order tracker.
+      const host = $('#ordersHost');
+      if (!host) return;
+
+      // Not logged in
+      if (!window.currentUser) {
+        host.innerHTML = `
+          <div style="background:var(--white); border:1px solid rgba(212,165,99,.25); border-radius:14px; padding:50px 24px; text-align:center; box-shadow:0 4px 14px rgba(8,21,42,.05);">
+            <div style="font-size:3rem; margin-bottom:14px;">🔒</div>
+            <h3 style="margin:0 0 8px; font-family:var(--font-display); color:var(--navy-900);">سجّل دخولك لعرض طلباتك</h3>
+            <p style="color:var(--gray-600); margin:0 0 22px;">بعد تسجيل الدخول ستظهر هنا جميع طلباتك مع حالتها الحالية ومراحل تنفيذها لحظة بلحظة.</p>
+            <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+              <button class="btn btn-amber" onclick="openAuth('login')">تسجيل الدخول</button>
+              <a href="#rfq" data-link class="btn btn-ghost">اطلب عرض سعر</a>
             </div>
-            <div class="delivery">شحن مستقل • <b>${sup.deliveryDays}</b></div>
-          </div>
-          ${items.map(c => `
-            <div class="cart-item">
-              <div class="thumb" style="background-image:url('${c.img}');"></div>
-              <div class="info">
-                <h4>${c.name}</h4>
-                <p>${sar(c.price)} / ${c.unit}</p>
-              </div>
-              <div class="qty-wrap">
-                <div class="qty-stepper">
-                  <button onclick="changeQty('${c.id}', -1)" aria-label="إنقاص">−</button>
-                  <input type="number" value="${c.qty}" min="1" onchange="setQty('${c.id}', this.value)" />
-                  <button onclick="changeQty('${c.id}', 1)" aria-label="زيادة">+</button>
-                </div>
-              </div>
-              <div class="price">
-                ${sar(c.price * c.qty)}
-                <button onclick="removeItem('${c.id}')" style="display:block; color:var(--danger); font-size:.82rem; margin-top:4px; text-decoration:underline; background:none; border:0; cursor:pointer;">إزالة</button>
-              </div>
-            </div>
-          `).join('')}
-        </div>
-      `;
-        }).join('');
+          </div>`;
+        return;
       }
 
-      const subtotal = state.cart.reduce((s, c) => s + c.price * c.qty, 0);
-      const supplierIds = new Set(state.cart.map(c => c.supplierId));
-      const shipping = subtotal > 0 ? Math.min(250 * supplierIds.size, Math.round(subtotal * 0.02 * supplierIds.size)) : 0;
-      const vat = (subtotal + shipping) * 0.15;
-      const total = subtotal + shipping + vat;
-      const itemCount = state.cart.reduce((s, c) => s + c.qty, 0);
+      if (!window.supabaseClient) {
+        host.innerHTML = `<div style="text-align:center; padding:60px 20px; color:var(--gray-500);">جارٍ تحميل النظام…</div>`;
+        return;
+      }
 
-      $('#cartItemCount').textContent = `${fmt(itemCount)} منتج`;
-      $('#cartSubtotal').textContent = sar(subtotal);
-      $('#cartShipping').textContent = sar(shipping);
-      $('#cartVat').textContent = sar(vat.toFixed(2));
-      $('#cartTotal').textContent = sar(total.toFixed(2));
-      renderPayMethods();
+      host.innerHTML = `<div style="text-align:center; padding:60px 20px; color:var(--gray-500);">جارٍ تحميل طلباتك…</div>`;
+
+      window.supabaseClient
+        .from('orders')
+        .select('id, order_number, status, total, customer_notes, created_at, updated_at')
+        .eq('user_id', window.currentUser.id)
+        .order('created_at', { ascending: false })
+        .limit(50)
+        .then(({ data, error }) => {
+          if (error) {
+            host.innerHTML = `<div style="background:#fde8e8; color:#d33; padding:18px 24px; border-radius:12px; text-align:center;">تعذّر تحميل الطلبات: ${error.message}</div>`;
+            return;
+          }
+          if (!data || !data.length) {
+            host.innerHTML = `
+              <div style="background:var(--white); border:1px solid rgba(212,165,99,.25); border-radius:14px; padding:50px 24px; text-align:center; box-shadow:0 4px 14px rgba(8,21,42,.05);">
+                <div style="font-size:3rem; margin-bottom:14px;">📦</div>
+                <h3 style="margin:0 0 8px; font-family:var(--font-display); color:var(--navy-900);">لا توجد طلبات بعد</h3>
+                <p style="color:var(--gray-600); margin:0 0 22px;">قم بإرسال طلبك الأول واحصل على عرض سعر كامل من فريقنا خلال ٢٤ ساعة.</p>
+                <a href="#rfq" data-link class="btn btn-amber">اطلب عرض سعر الآن</a>
+              </div>`;
+            return;
+          }
+
+          const statusMap = {
+            pending:   { label:'استلمنا طلبك',  step:1, color:'#d4a563' },
+            confirmed: { label:'قيد التأكيد',    step:2, color:'#5b8def' },
+            preparing: { label:'قيد التحضير',    step:3, color:'#7c5cff' },
+            shipped:   { label:'تم الشحن',       step:4, color:'#22a06b' },
+            delivered: { label:'تم التسليم',     step:5, color:'#0e8a3e' },
+            cancelled: { label:'تم الإلغاء',     step:0, color:'#d33'    },
+            refunded:  { label:'تم الاسترداد',   step:0, color:'#888'    },
+          };
+          const stepLabels = ['استلمنا الطلب','قيد التأكيد','قيد التحضير','تم الشحن','تم التسليم'];
+          const toAR = s => String(s).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
+
+          host.innerHTML = data.map(o => {
+            const meta = statusMap[o.status] || statusMap.pending;
+            const isStopped = o.status === 'cancelled' || o.status === 'refunded';
+            const dt = new Date(o.created_at).toLocaleDateString('ar-SA');
+            const tm = new Date(o.created_at).toLocaleTimeString('ar-SA', { hour:'2-digit', minute:'2-digit' });
+            const notesHTML = (o.customer_notes || '').split('\n').map(line =>
+              line.trim() ? `<div style="margin:3px 0;">${escapeHtml(line)}</div>` : ''
+            ).join('');
+            const totalLine = (o.total && parseFloat(o.total) > 0)
+              ? `<div style="display:inline-flex; align-items:center; gap:8px; background:linear-gradient(135deg, #d4a563, #b88a3f); color:#fff; padding:9px 18px; border-radius:10px; font-weight:700;">💰 الإجمالي: ${toAR(parseFloat(o.total).toFixed(2))} ر.س</div>`
+              : `<div style="display:inline-flex; align-items:center; gap:8px; background:#f6f1e8; color:var(--navy-900); padding:9px 16px; border-radius:10px; font-weight:600; font-size:.88rem;">⏳ بانتظار عرض السعر من فريقنا</div>`;
+
+            let pipelineHTML;
+            if (isStopped) {
+              pipelineHTML = `<div style="background:#fde8e8; color:#d33; padding:14px 18px; border-radius:10px; text-align:center; font-weight:700; margin:18px 0;">⚠ ${meta.label}</div>`;
+            } else {
+              pipelineHTML = `
+                <div style="display:flex; gap:0; margin:22px 0 18px; position:relative;">
+                  ${stepLabels.map((s, i) => {
+                    const stepNum = i + 1;
+                    const isActive = stepNum <= meta.step;
+                    const isCurrent = stepNum === meta.step;
+                    const lineColor = stepNum <= meta.step ? meta.color : '#e5e7eb';
+                    return `
+                      <div style="flex:1; text-align:center; position:relative; padding-top:36px; min-width:0;">
+                        ${i > 0 ? `<div style="position:absolute; top:15px; right:50%; left:-50%; height:3px; background:${lineColor}; z-index:0;"></div>` : ''}
+                        <div style="position:absolute; top:0; left:50%; transform:translateX(-50%); width:30px; height:30px; border-radius:50%; background:${isActive ? meta.color : '#e5e7eb'}; color:#fff; display:grid; place-items:center; font-weight:800; font-size:.85rem; box-shadow:${isCurrent ? '0 0 0 6px ' + meta.color + '33' : 'none'}; z-index:1;">${isActive ? '✓' : toAR(stepNum)}</div>
+                        <div style="font-size:.76rem; color:${isActive ? 'var(--navy-900)' : 'var(--gray-500)'}; font-weight:${isCurrent ? '700' : '500'}; margin-top:8px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${s}</div>
+                      </div>`;
+                  }).join('')}
+                </div>`;
+            }
+
+            const waMsg = `مرحبًا، أستفسر عن طلبي رقم ${o.order_number} في منصة مداد`;
+            return `
+              <article style="background:var(--white); border:1px solid rgba(212,165,99,.25); border-radius:14px; padding:22px 24px; margin-bottom:18px; box-shadow:0 4px 14px rgba(8,21,42,.05);">
+                <header style="display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:12px; padding-bottom:14px; border-bottom:1px dashed rgba(212,165,99,.3);">
+                  <div>
+                    <div style="font-family:var(--font-display); font-weight:800; color:var(--navy-900); font-size:1.1rem;">طلب رقم ${o.order_number}</div>
+                    <div style="color:var(--gray-500); font-size:.85rem; margin-top:4px;">📅 ${dt} • ${tm}</div>
+                  </div>
+                  <div style="background:${meta.color}; color:#fff; padding:7px 16px; border-radius:999px; font-weight:700; font-size:.86rem;">${meta.label}</div>
+                </header>
+
+                ${pipelineHTML}
+
+                <div style="background:#faf6f0; border:1px solid rgba(212,165,99,.18); border-radius:10px; padding:14px 18px; margin:14px 0; color:var(--gray-700); font-size:.9rem; line-height:1.7;">
+                  ${notesHTML || '<div style="color:var(--gray-500);">—</div>'}
+                </div>
+
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+                  ${totalLine}
+                  <a href="https://wa.me/966920002362?text=${encodeURIComponent(waMsg)}" target="_blank" rel="noopener" style="display:inline-flex; align-items:center; gap:6px; background:#25D366; color:#fff; padding:10px 18px; border-radius:10px; text-decoration:none; font-weight:700; font-size:.9rem;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24z"/></svg>
+                    تواصل عبر واتساب
+                  </a>
+                </div>
+              </article>`;
+          }).join('');
+        });
     }
+
+    /* ===== Live updates: customer sees status changes the moment admin moves them ===== */
+    window.__userOrdersRealtimeSetup = false;
+    function setupUserOrdersRealtime() {
+      if (window.__userOrdersRealtimeSetup || !window.supabaseClient || !window.currentUser) return;
+      window.__userOrdersRealtimeSetup = true;
+      try {
+        window.__userOrdersChannel = window.supabaseClient
+          .channel('my-orders-' + window.currentUser.id)
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'orders', filter: 'user_id=eq.' + window.currentUser.id }, (payload) => {
+            if (payload.eventType === 'UPDATE' && typeof toast === 'function') toast('✨ تم تحديث حالة طلبك', '✨');
+            const v = document.getElementById('view-cart');
+            if (v && v.classList.contains('active')) renderCart();
+          })
+          .subscribe();
+      } catch (e) { console.warn('user-orders realtime failed', e); window.__userOrdersRealtimeSetup = false; }
+    }
+    // Reset flag on sign-out so a new user re-subscribes
+    setInterval(() => {
+      if (!window.currentUser && window.__userOrdersRealtimeSetup && window.__userOrdersChannel) {
+        try { window.supabaseClient.removeChannel(window.__userOrdersChannel); } catch{}
+        window.__userOrdersRealtimeSetup = false;
+        window.__userOrdersChannel = null;
+      }
+      setupUserOrdersRealtime();
+    }, 3000);
 
     function changeQty(id, delta) { const item = state.cart.find(c => c.id === id); if (!item) return; item.qty = Math.max(1, item.qty + delta); updateCartBadge(); persist(); renderCart(); }
     function setQty(id, v) { const item = state.cart.find(c => c.id === id); if (!item) return; item.qty = Math.max(1, parseInt(v) || 1); updateCartBadge(); persist(); renderCart(); }
