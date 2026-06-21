@@ -9376,36 +9376,82 @@ p {
       toast('تم تسجيل الخروج');
     }
 
-    // RFQ submit hook — writes to Supabase rfqs so admin sees it immediately
+    // Customer request hook — writes a pending ORDER (brokerage model).
+    // The RFQ form is now the primary entry point; each submission becomes
+    // a pending order so it surfaces in the admin "الطلبات الأخيرة" tab and
+    // the realtime channel fires instantly.
     async function apiSubmitRFQ(payload) {
       if (window.supabaseClient) {
         try {
-          let rfqNumber;
+          // 1) Generate a clean order number via the RPC
+          let orderNo;
           try {
-            const { data: gen } = await window.supabaseClient.rpc('generate_rfq_number');
-            rfqNumber = gen || ('RFQ-' + Date.now().toString().slice(-8));
-          } catch { rfqNumber = 'RFQ-' + Date.now().toString().slice(-8); }
+            const { data: gen } = await window.supabaseClient.rpc('generate_order_number');
+            orderNo = gen || ('MEDAD-' + Date.now().toString().slice(-8));
+          } catch { orderNo = 'MEDAD-' + Date.now().toString().slice(-8); }
 
-          const description =
+          // 2) Pack the request details into customer_notes so the admin sees
+          //    everything in the order row without needing another tab
+          const customer_notes =
             `📋 الفئة: ${payload.category || '-'}\n` +
             `📦 الكمية: ${payload.qty || '-'}\n` +
             `👤 الاسم: ${payload.contactName || '-'}\n` +
             `📞 الجوال: ${payload.phone || '-'}\n` +
             `✉️ البريد: ${payload.email || '-'}\n` +
             `🏙️ المدينة: ${payload.city || '-'}\n` +
+            `🏢 الجهة: ${payload.company || '-'}\n` +
             `📅 المطلوب بحلول: ${payload.neededBy || '-'}\n\n` +
             `📝 التفاصيل: ${payload.details || '-'}`;
-          const ins = {
-            rfq_number: rfqNumber,
+
+          // 3) Insert as a pending order with totals=0 (admin fills them in
+          //    once they have negotiated price + quantity from suppliers)
+          const orderRow = {
+            order_number: orderNo,
             user_id: window.currentUser?.id || null,
-            project_name: payload.company || payload.contactName || 'طلب عام',
-            description,
-            status: 'open',
+            status: 'pending',
+            payment_status: 'pending',
+            subtotal: 0,
+            vat_amount: 0,
+            delivery_fee: 0,
+            total: 0,
+            payment_method: null,
+            customer_notes,
           };
-          const { data, error } = await window.supabaseClient.from('rfqs').insert(ins).select().single();
+          const { data: order, error } = await window.supabaseClient
+            .from('orders').insert(orderRow).select().single();
           if (error) throw error;
-          return { id: data?.id, rfqNumber, status: 'received' };
-        } catch (e) { console.warn('rfq save failed', e); }
+
+          // 4) One synthetic order_item describing the requested material
+          if (order) {
+            try {
+              await window.supabaseClient.from('order_items').insert({
+                order_id: order.id,
+                product_name_snapshot: `${payload.category || 'طلب عام'} — ${payload.qty || ''}`.trim(),
+                quantity: 1,
+                unit_price: 0,
+                subtotal: 0,
+              });
+            } catch {/* order_items insert is best-effort */}
+          }
+
+          // 5) Mirror into rfqs for record-keeping (best-effort, non-blocking)
+          try {
+            let rfqNumber;
+            try {
+              const { data: g } = await window.supabaseClient.rpc('generate_rfq_number');
+              rfqNumber = g || ('RFQ-' + Date.now().toString().slice(-8));
+            } catch { rfqNumber = 'RFQ-' + Date.now().toString().slice(-8); }
+            await window.supabaseClient.from('rfqs').insert({
+              rfq_number: rfqNumber,
+              user_id: window.currentUser?.id || null,
+              project_name: payload.company || payload.contactName || 'طلب عام',
+              description: customer_notes,
+              status: 'open',
+            });
+          } catch {/* rfqs mirror is optional */}
+
+          return { id: order?.id, orderNo, status: 'pending' };
+        } catch (e) { console.warn('customer request save failed', e); }
       }
       return { id: 'local-' + Date.now(), status: 'received' };
     }
