@@ -4836,6 +4836,104 @@ p {
 
   </style>
 
+  <!-- ===== WARM SAUDI PREMIUM palette override (Nov 2026 redesign) ===== -->
+  <style>
+    :root {
+      /* warm sand/desert background tones */
+      --cream-50: #fbf7f0;
+      --cream-100: #f6f0e3;
+      --cream-200: #ede2cb;
+      --sand-300: #d4c19a;
+      /* gold accent (warmer than amber) */
+      --gold-400: #d4a563;
+      --gold-500: #c08e3f;
+      --gold-600: #a4762e;
+      /* deeper navy for premium feel */
+      --navy-deep: #0a1830;
+    }
+    [data-theme="light"], html:not([data-theme="dark"]) body {
+      background: var(--cream-50);
+    }
+    /* warm the hero gradient */
+    .hero {
+      background: linear-gradient(135deg, #0a1830 0%, #14233f 50%, #1b2d4f 100%) !important;
+      position: relative;
+    }
+    .hero::after {
+      background: radial-gradient(ellipse at top right, rgba(212,165,99,.18), transparent 60%) !important;
+    }
+    .hero-eyebrow {
+      background: linear-gradient(135deg, rgba(212,165,99,.22), rgba(192,142,63,.15)) !important;
+      border: 1px solid rgba(212,165,99,.45) !important;
+      color: #f6e9d0 !important;
+    }
+    .hero h1 em {
+      color: var(--gold-400) !important;
+      background: none !important;
+      -webkit-text-fill-color: var(--gold-400) !important;
+    }
+    /* amber → warm gold */
+    .btn-amber {
+      background: linear-gradient(135deg, var(--gold-400), var(--gold-600)) !important;
+      color: #fff !important;
+      box-shadow: 0 6px 16px rgba(164,118,46,.30) !important;
+    }
+    .btn-amber:hover {
+      background: linear-gradient(135deg, var(--gold-500), #8c6224) !important;
+      transform: translateY(-1px);
+      box-shadow: 0 10px 22px rgba(164,118,46,.36) !important;
+    }
+    .kicker {
+      color: var(--gold-600) !important;
+    }
+    /* section backgrounds — soft cream */
+    .section:not(.hero):not(.cta-band) {
+      background: transparent;
+    }
+    #about, .section[id="about"] {
+      background: var(--cream-100) !important;
+    }
+    .cta-band {
+      background: linear-gradient(135deg, #0a1830 0%, #14233f 100%) !important;
+      position: relative;
+    }
+    .cta-band::after {
+      content: "";
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at bottom left, rgba(212,165,99,.18), transparent 60%);
+      pointer-events: none;
+    }
+    .stat-num {
+      color: var(--navy-deep) !important;
+    }
+    .stat-num span {
+      color: var(--gold-500) !important;
+    }
+    /* cards on cream — keep crisp white */
+    .step-card, .product-card, .cat-tile, .auth-card {
+      border-color: rgba(212,165,99,.20) !important;
+    }
+    .step-card:hover, .product-card:hover, .cat-tile:hover {
+      border-color: rgba(212,165,99,.55) !important;
+    }
+    .step-card .icon-box {
+      background: linear-gradient(135deg, var(--gold-400), var(--gold-600)) !important;
+      color: #fff !important;
+    }
+    /* footer */
+    footer, .site-footer {
+      background: var(--navy-deep) !important;
+    }
+    /* top bar lift on cream */
+    .top-bar {
+      box-shadow: 0 2px 14px rgba(10,24,48,.06);
+    }
+    /* fix dark-mode body to stay warm-ish dark */
+    [data-theme="dark"] body {
+      background: #060f1f !important;
+    }
+  </style>
+
   <!-- Supabase JS SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -4961,74 +5059,44 @@ p {
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 2l2.39 7.36H22l-6.19 4.5L18.18 22 12 17.27 5.82 22l2.37-8.14L2 9.36h7.61z" />
           </svg>
-          الأكثر ثقة في المملكة — أكثر من ١٫٢٠٠ مورد معتمد
+          🎉 الافتتاح الرسمي ١ نوفمبر ٢٠٢٦ — استقبال الطلبات بدأ مبكرًا
         </span>
-        <h1 class="reveal d1">مواد البناء <em>وصلت لك</em>:<br />اطلب، استرح، نوصلها لموقعك!</h1>
-        <p class="lead reveal d2">مداد للبناء والخدمات اللوجستية توفّر لك جميع مواد البناء والمعدات — نختار أفضل المصادر، نتفاوض على الأسعار، ونوصلها مباشرة إلى موقع مشروعك في جميع مناطق المملكة.</p>
+        <h1 class="reveal d1">احتياجك من <em>مواد البناء</em><br/>في المدينة المنورة — اطلب ونحن ننفّذ.</h1>
+        <p class="lead reveal d2">أرسل لنا احتياجك — النوع، الكمية، وموعد التسليم — ونتواصل بالنيابة عنك مع أكثر من ٦٠ مصنعاً ومورّداً معتمداً في المدينة المنورة، نتفاوض على أفضل سعر، ونوافيك بعرض كامل: السعر، الكمية المتوفرة، ووقت التسليم.</p>
 
-        <form class="search-card reveal d3" id="heroSearch">
-          <div class="field">
-            <label for="material">اختر المادة</label>
-            <div class="ctrl">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                stroke-linejoin="round">
-                <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                <path d="M2 17l10 5 10-5" />
-                <path d="M2 12l10 5 10-5" />
-              </svg>
-              <select id="material">
-                <option value="">جميع المنتجات…</option>
-                <option value="خرسانة">خرسانة جاهزة</option>
-                <option value="طوب">طوب أحمر وأسمنتي</option>
-                <option value="حديد">حديد تسليح</option>
-                <option value="أخشاب">أخشاب ومعدات نجارة</option>
-                <option value="أبواب">أبواب وشبابيك</option>
-                <option value="معدات">معدات ثقيلة</option>
-              </select>
-            </div>
+        <div class="countdown reveal d3" id="launchCountdown" aria-label="عدّاد الافتتاح الرسمي" style="display:flex; gap:14px; flex-wrap:wrap; margin-top:32px; justify-content:flex-end;">
+          <div class="cd-box" style="background:rgba(255,255,255,.97); padding:18px 22px; border-radius:14px; min-width:96px; text-align:center; box-shadow:0 8px 22px rgba(8,21,42,.18); border:1px solid rgba(212,165,99,.35);">
+            <div style="font-family:var(--font-display); font-weight:800; font-size:2.4rem; line-height:1; color:var(--navy-900);" data-cd="d">--</div>
+            <div style="font-size:.82rem; color:var(--gray-600); margin-top:6px; font-weight:600;">يوم</div>
           </div>
-          <div class="field">
-            <label for="city">المدينة / الحي</label>
-            <div class="ctrl">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                stroke-linejoin="round">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                <circle cx="12" cy="10" r="3" />
-              </svg>
-              <select id="city">
-                <option value="">اختر الحي…</option>
-                <option>الرياض</option>
-                <option>جدة</option>
-                <option>مكة المكرمة</option>
-                <option>المدينة المنورة</option>
-                <option>الدمام</option>
-                <option>الخبر</option>
-                <option>الطائف</option>
-              </select>
-            </div>
+          <div class="cd-box" style="background:rgba(255,255,255,.97); padding:18px 22px; border-radius:14px; min-width:96px; text-align:center; box-shadow:0 8px 22px rgba(8,21,42,.18); border:1px solid rgba(212,165,99,.35);">
+            <div style="font-family:var(--font-display); font-weight:800; font-size:2.4rem; line-height:1; color:var(--navy-900);" data-cd="h">--</div>
+            <div style="font-size:.82rem; color:var(--gray-600); margin-top:6px; font-weight:600;">ساعة</div>
           </div>
-          <div class="field">
-            <label for="date">التاريخ والوقت المطلوب</label>
-            <div class="ctrl">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                stroke-linejoin="round">
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                <line x1="16" y1="2" x2="16" y2="6" />
-                <line x1="8" y1="2" x2="8" y2="6" />
-                <line x1="3" y1="10" x2="21" y2="10" />
-              </svg>
-              <input type="datetime-local" id="date" />
-            </div>
+          <div class="cd-box" style="background:rgba(255,255,255,.97); padding:18px 22px; border-radius:14px; min-width:96px; text-align:center; box-shadow:0 8px 22px rgba(8,21,42,.18); border:1px solid rgba(212,165,99,.35);">
+            <div style="font-family:var(--font-display); font-weight:800; font-size:2.4rem; line-height:1; color:var(--navy-900);" data-cd="m">--</div>
+            <div style="font-size:.82rem; color:var(--gray-600); margin-top:6px; font-weight:600;">دقيقة</div>
           </div>
-          <button type="submit" class="btn btn-amber">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-              stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="11" cy="11" r="8" />
-              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          <div class="cd-box" style="background:rgba(255,255,255,.97); padding:18px 22px; border-radius:14px; min-width:96px; text-align:center; box-shadow:0 8px 22px rgba(8,21,42,.18); border:1px solid rgba(212,165,99,.35);">
+            <div style="font-family:var(--font-display); font-weight:800; font-size:2.4rem; line-height:1; color:var(--navy-900);" data-cd="s">--</div>
+            <div style="font-size:.82rem; color:var(--gray-600); margin-top:6px; font-weight:600;">ثانية</div>
+          </div>
+        </div>
+
+        <div class="hero-ctas reveal d4" style="display:flex; gap:14px; flex-wrap:wrap; margin-top:34px;">
+          <a href="#rfq" data-link class="btn btn-amber" style="padding:15px 30px; font-size:1.05rem; gap:10px; align-items:center; display:inline-flex;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="12" y1="18" x2="12" y2="12"/>
+              <line x1="9" y1="15" x2="15" y2="15"/>
             </svg>
-            ابدأ البحث
-          </button>
-        </form>
+            اطلب عرض سعر الآن
+          </a>
+          <a href="#suppliers-directory" data-link class="btn btn-ghost" style="padding:15px 30px; font-size:1.02rem; color:#fff; border:1px solid rgba(255,255,255,.45);">
+            تصفّح موردينا في المدينة المنورة
+          </a>
+        </div>
       </div>
     </section>
 
@@ -5036,24 +5104,172 @@ p {
       <div class="container">
         <div class="stats-strip-home">
           <div>
-            <div class="stat-num">١٫٢٠٠+</div>
-            <div class="stat-label">مورد معتمد</div>
+            <div class="stat-num">٦٠+</div>
+            <div class="stat-label">مورد ومصنع في المدينة</div>
           </div>
           <div>
-            <div class="stat-num">٤٥٫٠٠٠+</div>
-            <div class="stat-label">طلب منفّذ</div>
+            <div class="stat-num">٦ <span style="color:var(--amber-500);">فئات</span></div>
+            <div class="stat-label">رمل • حديد • خرسانة • طوب • عزل • مواد بناء</div>
           </div>
           <div>
-            <div class="stat-num">١٣ <span style="color:var(--amber-500);">منطقة</span></div>
-            <div class="stat-label">تغطية كاملة للمملكة</div>
+            <div class="stat-num">٢٤ <span style="color:var(--amber-500);">ساعة</span></div>
+            <div class="stat-label">متوسط زمن الرد على الطلبات</div>
           </div>
           <div>
-            <div class="stat-num">٤٫٨ <span style="color:var(--amber-500);">★</span></div>
-            <div class="stat-label">متوسط تقييم الخدمة</div>
+            <div class="stat-num">٠١ <span style="color:var(--amber-500);">نوفمبر</span></div>
+            <div class="stat-label">الافتتاح الرسمي ٢٠٢٦</div>
           </div>
         </div>
       </div>
     </section>
+
+    <!-- =====================================================
+         MEDINA SUPPLIER DIRECTORY
+         ===================================================== -->
+    <section class="section" id="suppliers-directory" style="background:linear-gradient(180deg, #faf6f0 0%, #ffffff 100%); padding-block:80px;">
+      <div class="container">
+        <div class="section-head" style="margin-bottom:30px; flex-direction:column; align-items:flex-start;">
+          <div>
+            <div class="kicker">دليل الموردين</div>
+            <h2>موردونا المعتمدون في المدينة المنورة</h2>
+            <p class="sub">شراكاتنا مع أكثر من ٦٠ مصنعاً ومورّداً معتمداً في المدينة المنورة، موزّعين على ٦ فئات رئيسية. اختر الفئة لعرض القائمة الكاملة.</p>
+          </div>
+        </div>
+
+        <div id="dirTabs" style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:28px; padding-bottom:14px; border-bottom:1px solid rgba(212,165,99,.25);"></div>
+
+        <div id="dirContent"></div>
+      </div>
+    </section>
+
+    <script>
+      (function(){
+        const DIR = {
+          'الرمل والبحص': [
+            { name:'شركة المردوف للمقاولات والكسارات', area:'الدائري الثالث', phone:'0148420420' },
+            { name:'مورد رمل أبيض وأحمر بالمدينة', area:'متعدد المواقع', phone:'0507414446' },
+            { name:'كسارة ومصنع شواهق طيبة للبحص والرمل', area:'المدينة الصناعية', phone:'تواصل معنا' },
+            { name:'مجموعة العيوني للبحص ومواد الطرق', area:'طريق ينبع القديم', phone:'تواصل معنا' },
+            { name:'مورد رمل تيماء وبدر', area:'طريق الهجرة — مخرج الفرّيش', phone:'تواصل معنا' },
+            { name:'شركة ومصنع وادي ريدان (الرمل والبحص)', area:'طريق المطار', phone:'تواصل معنا' },
+            { name:'شركة ومصنع خالد السهلي (رمل بحص بركاني)', area:'طريق الهجرة', phone:'تواصل معنا' },
+            { name:'شركة ومصنع خالد ريدان (موصا بركاني)', area:'طريق الهجرة', phone:'تواصل معنا' },
+            { name:'شركة ومصنع شواهي البصزال', area:'طريق المطار', phone:'تواصل معنا' },
+          ],
+          'الحديد': [
+            { name:'شركة الراجحي للصناعات الحديدية', area:'المدينة الصناعية', phone:'تواصل معنا' },
+            { name:'مؤسسة السديري لمواد البناء', area:'طريق خالد بن الوليد', phone:'تواصل معنا' },
+            { name:'شركة الفوزان لمواد البناء', area:'طريق المطار', phone:'تواصل معنا' },
+            { name:'شركة المهيدب لمواد البناء', area:'طريق المطار', phone:'تواصل معنا' },
+            { name:'مصنع الحديد الوطني', area:'طريق الهجرة', phone:'تواصل معنا' },
+            { name:'مؤسسة ركاز المدينة', area:'طريق المطار', phone:'تواصل معنا' },
+            { name:'مجموعة العزل العربي', area:'طريق المطار', phone:'تواصل معنا' },
+            { name:'مجموعة البناء الحديثة', area:'طريق المطار', phone:'تواصل معنا' },
+          ],
+          'الخرسانة الجاهزة': [
+            { name:'شركة سافامي للخرسانة الجاهزة', area:'المدينة الصناعية', phone:'تواصل معنا' },
+            { name:'مصنع آركو للخرسانة', area:'طريق تبوك', phone:'تواصل معنا' },
+            { name:'شركة ثري طيبة (بيتوميكس)', area:'المدينة الصناعية', phone:'تواصل معنا' },
+            { name:'شركة مساعد الجهني للخرسانة', area:'طريق الهجرة', phone:'تواصل معنا' },
+            { name:'شركة تطوير المتميزة', area:'المدينة الصناعية', phone:'تواصل معنا' },
+            { name:'الترجمي لقسم الخرسانة والمعدات', area:'شوران', phone:'تواصل معنا' },
+            { name:'شركة الوصال المدينة', area:'المدينة الصناعية', phone:'تواصل معنا' },
+            { name:'شركة المعال العربي', area:'طريق الهجرة', phone:'تواصل معنا' },
+          ],
+          'مواد البناء': [
+            { name:'شركة المهيدب لمواد البناء', area:'طريق المطار', phone:'تواصل معنا' },
+            { name:'شركة الفوزان لمواد البناء', area:'طريق المطار', phone:'تواصل معنا' },
+            { name:'شركة ومصنع وادي ريدان للمنتجات الأسمنتية', area:'طريق المطار', phone:'تواصل معنا' },
+            { name:'شركة ومصنع خالد السهلي للمنتجات البركانية', area:'طريق الهجرة', phone:'تواصل معنا' },
+            { name:'شركة مساعد الجهني للبلوك والخرسانة', area:'المدينة الصناعية', phone:'تواصل معنا' },
+            { name:'شركة آركو للخرسانة الجاهزة', area:'طريق تبوك', phone:'تواصل معنا' },
+            { name:'شركة ميار للمواد العازلة والخرسانة', area:'المدينة الصناعية', phone:'تواصل معنا' },
+            { name:'شركة المردوف للمقاولات — أدوات صحية، كهرباء، حديد', area:'الدائري الثالث', phone:'0148420420' },
+            { name:'مؤسسة السديري لمواد البناء — أدوات صحية، كهرباء، حديد', area:'طريق خالد بن الوليد', phone:'تواصل معنا' },
+            { name:'شركة البنيان للمواد الإنشائية — إسمنت، بلوك، حديد، بحص، رمل', area:'طريق خالد بن الوليد', phone:'تواصل معنا' },
+            { name:'شركة بوان للصناعات', area:'المدينة الصناعية', phone:'تواصل معنا' },
+          ],
+          'مواد العزل': [
+            { name:'شركة ميار للمواد العازلة والخرسانة', area:'المدينة الصناعية', phone:'تواصل معنا' },
+            { name:'مجموعة البناء الحديثة للمقاولات والعزل', area:'طريق المطار', phone:'تواصل معنا' },
+            { name:'مورد مواد العزل العربي', area:'طريق المطار', phone:'تواصل معنا' },
+            { name:'مؤسسة فهد سليمان للعزل المائي والحراري', area:'شوران', phone:'تواصل معنا' },
+            { name:'شركة عزل فوم بالمدينة', area:'متعدد المواقع', phone:'0559849441' },
+            { name:'شركة الفوزان لمواد البناء والعزل', area:'طريق المطار', phone:'تواصل معنا' },
+            { name:'مجموعة بن لادن — قطاع المواد والعزل', area:'طريق الهجرة', phone:'تواصل معنا' },
+          ],
+          'البلوك والطوب': [
+            { name:'مصنع المدينة للمنتجات الإسمنتية', area:'طريق تبوك', phone:'تواصل معنا' },
+            { name:'شركة سافامي للبلوك وبلاط الإنترلوك', area:'المدينة الصناعية', phone:'تواصل معنا' },
+            { name:'شركة مساعد الجهني للبلوك والخرسانة', area:'طريق الهجرة', phone:'تواصل معنا' },
+            { name:'مصنع خالد السهلي للمنتجات البركانية', area:'طريق الهجرة', phone:'تواصل معنا' },
+            { name:'مصنع ماجد الصاعدي', area:'المدينة الصناعية', phone:'تواصل معنا' },
+            { name:'شركة ومصنع وادي ريدان للمنتجات الإسمنتية', area:'طريق المطار', phone:'تواصل معنا' },
+            { name:'شركة الوصال المدينة', area:'طريق المطار', phone:'تواصل معنا' },
+            { name:'شركة المعال العربي', area:'طريق الهجرة', phone:'تواصل معنا' },
+          ],
+        };
+        const ICONS = { 'الرمل والبحص':'⛏️','الحديد':'🔩','الخرسانة الجاهزة':'🏗️','مواد البناء':'🏭','مواد العزل':'🛡️','البلوك والطوب':'🧱' };
+        const cats = Object.keys(DIR);
+        let active = cats[0];
+        const tabs = document.getElementById('dirTabs');
+        const content = document.getElementById('dirContent');
+        if (!tabs || !content) return;
+        function toAR(s){ return String(s).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]); }
+        function esc(s){ return String(s).replace(/'/g,"\\'"); }
+        function render(){
+          tabs.innerHTML = cats.map(c => `
+            <button onclick="window.__setDirCat('${esc(c)}')" style="display:flex; align-items:center; gap:8px; padding:11px 18px; background:${c===active?'var(--navy-900)':'#fff'}; color:${c===active?'#fff':'var(--navy-900)'}; border:1px solid ${c===active?'var(--navy-900)':'rgba(212,165,99,.4)'}; border-radius:999px; font-weight:700; font-size:.92rem; cursor:pointer; transition:all .2s; box-shadow:${c===active?'0 6px 16px rgba(8,21,42,.18)':'none'};">
+              <span style="font-size:1.1rem;">${ICONS[c]||'🏢'}</span>
+              <span>${c}</span>
+              <span style="opacity:.75; font-size:.82rem;">(${toAR(DIR[c].length)})</span>
+            </button>`).join('');
+          const items = DIR[active] || [];
+          content.innerHTML = `<div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(290px,1fr)); gap:16px;">${items.map(s => {
+            const isPhone = /^\d+$/.test(s.phone.replace(/\s/g,''));
+            return `<article style="background:#fff; border:1px solid rgba(212,165,99,.25); border-radius:14px; padding:18px 20px; display:flex; flex-direction:column; gap:10px; box-shadow:0 4px 12px rgba(8,21,42,.04); transition:transform .2s, box-shadow .2s, border-color .2s;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 12px 28px rgba(8,21,42,.10)'; this.style.borderColor='rgba(212,165,99,.6)'" onmouseout="this.style.transform=''; this.style.boxShadow='0 4px 12px rgba(8,21,42,.04)'; this.style.borderColor='rgba(212,165,99,.25)'">
+              <h4 style="margin:0; font-family:var(--font-display); color:var(--navy-900); font-size:1.02rem; line-height:1.45;">${s.name}</h4>
+              <div style="display:flex; align-items:center; gap:6px; color:var(--gray-600); font-size:.88rem;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span>${s.area}</span>
+              </div>
+              ${isPhone
+                ? `<a href="tel:${s.phone}" style="display:inline-flex; align-items:center; gap:8px; background:linear-gradient(135deg, #d4a563, #b88a3f); color:#fff; padding:9px 14px; border-radius:10px; text-decoration:none; font-weight:700; font-size:.92rem; margin-top:auto;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.98.98 0 0 0-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z"/></svg>
+                    ${toAR(s.phone)}
+                  </a>`
+                : `<div style="display:inline-flex; align-items:center; gap:8px; background:#f6f1e8; color:var(--navy-900); padding:9px 14px; border-radius:10px; font-weight:700; font-size:.88rem; margin-top:auto;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                    ${s.phone}
+                  </div>`}
+            </article>`;}).join('')}</div>`;
+        }
+        window.__setDirCat = function(c){ active = c; render(); };
+        render();
+
+        /* ===== LAUNCH COUNTDOWN to 1 Nov 2026 ===== */
+        const target = new Date('2026-11-01T00:00:00+03:00').getTime();
+        const cdRoot = document.getElementById('launchCountdown');
+        if (cdRoot){
+          function tick(){
+            const ms = target - Date.now();
+            if (ms <= 0){
+              cdRoot.innerHTML = '<div style="font-family:var(--font-display); font-size:1.6rem; color:#fff; font-weight:700; background:rgba(212,165,99,.35); padding:20px 32px; border-radius:14px;">🎉 تم الافتتاح الرسمي — ١ نوفمبر ٢٠٢٦</div>';
+              return;
+            }
+            const pad = n => String(n).padStart(2,'0');
+            const toARp = x => String(x).replace(/\d/g, n => '٠١٢٣٤٥٦٧٨٩'[n]);
+            const set = (k,v)=>{ const el = cdRoot.querySelector('[data-cd="'+k+'"]'); if (el) el.textContent = toARp(pad(v)); };
+            set('d', Math.floor(ms/86400000));
+            set('h', Math.floor(ms%86400000/3600000));
+            set('m', Math.floor(ms%3600000/60000));
+            set('s', Math.floor(ms%60000/1000));
+          }
+          tick();
+          setInterval(tick, 1000);
+        }
+      })();
+    </script>
 
     <section class="section" id="categories">
       <div class="container">
@@ -5175,41 +5391,39 @@ p {
       <div class="container">
         <div class="section-head" style="flex-direction:column; align-items:flex-start;">
           <div>
-            <div class="kicker">كيف تعمل المنصة</div>
-            <h2>من الطلب إلى التسليم في ٣ خطوات</h2>
-            <p class="sub">نهتم بكل شيء من البحث عن المواد إلى توصيلها لموقعك — أنت فقط تطلب، ونحن نتولى الباقي.</p>
+            <div class="kicker">كيف نعمل لخدمتك</div>
+            <h2>من احتياجك إلى موقعك في ٣ خطوات</h2>
+            <p class="sub">أنت ترسل، نحن نبحث ونتفاوض، ونعود لك بأفضل عرض. لا أنت بحاجة للاتصال بعشرات الموردين، ولا بحاجة لمقارنة الأسعار يدويًا.</p>
           </div>
         </div>
         <div class="steps">
           <div class="step-card">
             <div class="icon-box"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="9" y1="13" x2="15" y2="13"/>
+                <line x1="9" y1="17" x2="15" y2="17"/>
               </svg></div>
-            <h3>اختر منتجك</h3>
-            <p>تصفّح الكتالوج، اختر المواد والكميات التي تحتاجها، وحدّد موقع وتاريخ التوصيل.</p>
+            <h3>١. أرسل احتياجك</h3>
+            <p>املأ نموذج الطلب ببساطة: نوع المادة، الكمية المطلوبة، وموعد التسليم في موقعك. لا حاجة للتسجيل في البداية.</p>
           </div>
           <div class="step-card">
             <div class="icon-box"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M9 11l3 3L22 4" />
-                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
               </svg></div>
-            <h3>اطلب وادفع بأمان</h3>
-            <p>أرسل طلبك بكمياتك وتوقيتك. ندعم الدفع الآمن عبر مدى، Apple Pay، STC Pay، تابي وتمارا — مع ضمان استرداد
-              كامل.</p>
+            <h3>٢. نتفاوض مع الموردين</h3>
+            <p>فريقنا يتواصل مباشرة مع أكثر من ٦٠ مصنعاً ومورّداً في المدينة المنورة، يقارن الأسعار، ويتفاوض على أفضل عرض لك — خلال ٢٤ ساعة.</p>
           </div>
           <div class="step-card">
             <div class="icon-box"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M1 3h15v13H1z" />
-                <path d="M16 8h4l3 3v5h-7V8z" />
-                <circle cx="5.5" cy="18.5" r="2.5" />
-                <circle cx="18.5" cy="18.5" r="2.5" />
+                <path d="M9 11l3 3L22 4"/>
+                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
               </svg></div>
-            <h3>استلم في موقعك</h3>
-            <p>نوصل المواد إلى موقع مشروعك في الوقت المتفق عليه. تتبّع الشحنة من حسابك، وقيّم التجربة.</p>
+            <h3>٣. نوافيك بعرض كامل</h3>
+            <p>نرسل لك العرض النهائي: السعر، الكمية المتوفرة، ووقت التسليم. توافق → ننسّق التوصيل لموقعك في المدينة المنورة.</p>
           </div>
         </div>
       </div>
@@ -8031,7 +8245,7 @@ p {
       const [route, param] = raw.split('/');
       const views = ['home', 'catalog', 'product', 'supplier', 'wishlist', 'rfq', 'concrete', 'cart', 'confirm', 'policy'];
       let target = views.includes(route) ? route : 'home';
-      if (route === 'about' || route === 'suppliers') target = 'home';
+      if (route === 'about' || route === 'suppliers' || route === 'suppliers-directory') target = 'home';
 
       views.forEach(v => $('#view-' + v).classList.toggle('active', v === target));
       $$('[data-link]').forEach(a => {
@@ -8040,7 +8254,7 @@ p {
       });
 
       if (route === 'about') setTimeout(() => $('#about').scrollIntoView({ behavior: 'smooth' }), 50);
-      else if (route === 'suppliers') setTimeout(() => $('#suppliers').scrollIntoView({ behavior: 'smooth' }), 50);
+      else if (route === 'suppliers' || route === 'suppliers-directory') setTimeout(() => $('#suppliers-directory').scrollIntoView({ behavior: 'smooth' }), 50);
       else window.scrollTo({ top: 0, behavior: 'smooth' });
 
       if (target === 'cart') renderCart();
