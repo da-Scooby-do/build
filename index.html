@@ -5153,8 +5153,9 @@ p {
               </svg>
             </button>
             <div class="city-menu" id="cityMenu" role="menu">
-              <div class="city-menu-head">اختر مدينتك</div>
-              <button onclick="setCity('الرياض')" data-city="الرياض"><span>🏙️ الرياض</span><span class="count">٢١٥+</span></button>
+              <div class="city-menu-head">اختر المنطقة</div>
+              <button onclick="setCity('كل المملكة')" data-city="كل المملكة"><span>🇸🇦 كل المملكة</span><span class="count">٣٩١</span></button>
+              <button onclick="setCity('الرياض')" data-city="الرياض"><span>🏙️ الرياض</span><span class="count">٢٣٠</span></button>
               <button onclick="setCity('جدة')" data-city="جدة"><span>🌊 جدة</span><span class="count">١١٠</span></button>
               <button onclick="setCity('المدينة المنورة')" data-city="المدينة المنورة"><span>🕌 المدينة المنورة</span><span class="count">٥١</span></button>
             </div>
@@ -5215,7 +5216,7 @@ p {
         </button>
         <ul>
           <li><a href="#home" data-link class="active">الرئيسية</a></li>
-          <li><a href="#suppliers-directory" data-link>موردونا في المدينة</a></li>
+          <li><a href="#suppliers-directory" data-link>موردونا في المملكة</a></li>
           <li><a href="#about" data-link>كيف نعمل</a></li>
           <li><a href="#rfq" data-link>اطلب عرض سعر</a></li>
           <li><a href="#cart" data-link>صفحة الطلب</a></li>
@@ -5228,7 +5229,7 @@ p {
     <div class="mobile-nav-drawer" id="mobileNav">
       <ul>
         <li><a href="#home" data-link onclick="toggleMobileNav()">الرئيسية</a></li>
-        <li><a href="#suppliers-directory" data-link onclick="toggleMobileNav()">موردونا في المدينة</a></li>
+        <li><a href="#suppliers-directory" data-link onclick="toggleMobileNav()">موردونا في المملكة</a></li>
         <li><a href="#about" data-link onclick="toggleMobileNav()">كيف نعمل</a></li>
         <li><a href="#rfq" data-link onclick="toggleMobileNav()">اطلب عرض سعر</a></li>
         <li><a href="#cart" data-link onclick="toggleMobileNav()">صفحة الطلب</a></li>
@@ -5250,7 +5251,7 @@ p {
           </svg>
           🎉 الافتتاح الرسمي ١ نوفمبر ٢٠٢٦ — استقبال الطلبات بدأ مبكرًا
         </span>
-        <h1 class="reveal d1">احتياجك من <em>مواد البناء</em><br/>في المدينة المنورة — اطلب ونحن ننفّذ.</h1>
+        <h1 class="reveal d1">احتياجك من <em>مواد البناء</em><br/>في كل المملكة — اطلب ونحن ننفّذ.</h1>
         <p class="lead reveal d2">أرسل لنا احتياجك — النوع، الكمية، وموعد التسليم — ونتواصل بالنيابة عنك مع أكثر من ٣٧٥ مصنعاً ومورّداً معتمداً في الرياض، جدة، والمدينة المنورة، نتفاوض على أفضل سعر، ونوافيك بعرض كامل: السعر، الكمية المتوفرة، ووقت التسليم.</p>
 
         <div class="countdown reveal d3" id="launchCountdown" aria-label="عدّاد الافتتاح الرسمي" style="display:flex; gap:14px; flex-wrap:wrap; margin-top:32px; justify-content:flex-end;">
@@ -5283,7 +5284,7 @@ p {
             اطلب عرض سعر الآن
           </a>
           <a href="#suppliers-directory" data-link class="btn btn-ghost" style="padding:15px 30px; font-size:1.02rem; color:#fff; border:1px solid rgba(255,255,255,.45);">
-            تصفّح موردينا — ٣ مدن
+            تصفّح موردينا — كل المملكة
           </a>
         </div>
       </div>
@@ -5321,7 +5322,7 @@ p {
           <div>
             <div class="kicker">دليل الموردين</div>
             <h2 id="dirHead">موردونا المعتمدون في الرياض</h2>
-            <p class="sub">شراكاتنا مع أكثر من ٣٧٥ مصنعاً ومورّداً معتمداً في ٣ مدن: <b>الرياض</b>، <b>جدة</b>، و<b>المدينة المنورة</b>. اختر مدينتك من الزر الذهبي أعلى الصفحة، ثم اختر الفئة المطلوبة.</p>
+            <p class="sub">شراكاتنا مع أكثر من ٣٧٥ مصنعاً ومورّداً معتمداً في كل المملكة — اختر <b>كل المملكة</b> لعرضهم جميعاً، أو اختر مدينة بعينها (<b>الرياض</b>، <b>جدة</b>، <b>المدينة المنورة</b>) من الزر الذهبي أعلى الصفحة.</p>
           </div>
         </div>
 
@@ -5779,9 +5780,25 @@ p {
           },
         };
         const ICONS = { 'الرمل والبحص':'⛏️','الحديد':'🔩','الخرسانة الجاهزة':'🏗️','البلوك والإنترلوك':'🧱','الطوب الأحمر':'🟥','مواد العزل':'🛡️','الإسمنت':'⚪','الأخشاب ومواد البناء':'🏭','السباكة':'🚰','الكهرباء':'⚡' };
-        let activeCity = localStorage.getItem('medad_city') || 'الرياض';
-        if (!DIR_CITIES[activeCity]) activeCity = 'الرياض';
-        let activeCat = Object.keys(DIR_CITIES[activeCity])[0];
+        const ALL_LABEL = 'كل المملكة';
+        let activeCity = localStorage.getItem('medad_city') || ALL_LABEL;
+        if (activeCity !== ALL_LABEL && !DIR_CITIES[activeCity]) activeCity = ALL_LABEL;
+        // Build view for current city — either single-city or merged across all
+        function getActiveData(){
+          if (activeCity === ALL_LABEL) {
+            const merged = {};
+            for (const city of Object.keys(DIR_CITIES)) {
+              const cats = DIR_CITIES[city];
+              for (const cat of Object.keys(cats)) {
+                if (!merged[cat]) merged[cat] = [];
+                for (const s of cats[cat]) merged[cat].push({ ...s, _city: city });
+              }
+            }
+            return merged;
+          }
+          return DIR_CITIES[activeCity] || {};
+        }
+        let activeCat = Object.keys(getActiveData())[0];
         const tabs = document.getElementById('dirTabs');
         const content = document.getElementById('dirContent');
         const dirHead = document.getElementById('dirHead');
@@ -5791,21 +5808,26 @@ p {
         function toAR(s){ return String(s).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]); }
         function esc(s){ return String(s).replace(/'/g,"\\'"); }
         function render(){
-          const cats = Object.keys(DIR_CITIES[activeCity] || {});
+          const data = getActiveData();
+          const cats = Object.keys(data);
           if (!cats.includes(activeCat)) activeCat = cats[0];
-          const total = cats.reduce((s, c) => s + DIR_CITIES[activeCity][c].length, 0);
-          if (dirHead) dirHead.innerHTML = `موردونا المعتمدون في <span style="color:var(--gold-500);">${activeCity}</span> <span style="font-size:.65em; color:var(--gray-500); font-weight:500;">(${toAR(total)} مورد ومصنع)</span>`;
+          const total = cats.reduce((s, c) => s + data[c].length, 0);
+          const cityLabel = activeCity === ALL_LABEL ? 'جميع مناطق المملكة' : activeCity;
+          if (dirHead) dirHead.innerHTML = `موردونا المعتمدون في <span style="color:var(--gold-500);">${cityLabel}</span> <span style="font-size:.65em; color:var(--gray-500); font-weight:500;">(${toAR(total)} مورد ومصنع)</span>`;
           if (pillLabel) pillLabel.textContent = activeCity;
           if (cityMenu) cityMenu.querySelectorAll('button[data-city]').forEach(b => b.classList.toggle('active', b.dataset.city === activeCity));
           tabs.innerHTML = cats.map(c => `<button onclick="window.__setDirCat('${esc(c)}')" style="display:flex; align-items:center; gap:8px; padding:11px 18px; background:${c===activeCat?'var(--navy-900)':'#fff'}; color:${c===activeCat?'#fff':'var(--navy-900)'}; border:1px solid ${c===activeCat?'var(--navy-900)':'rgba(212,165,99,.4)'}; border-radius:999px; font-weight:700; font-size:.92rem; cursor:pointer; transition:all .2s; box-shadow:${c===activeCat?'0 6px 16px rgba(8,21,42,.18)':'none'};">
             <span style="font-size:1.1rem;">${ICONS[c]||'🏢'}</span>
             <span>${c}</span>
-            <span style="opacity:.75; font-size:.82rem;">(${toAR(DIR_CITIES[activeCity][c].length)})</span>
+            <span style="opacity:.75; font-size:.82rem;">(${toAR(data[c].length)})</span>
           </button>`).join('');
-          const items = DIR_CITIES[activeCity][activeCat] || [];
+          const items = data[activeCat] || [];
+          const cityBadges = { 'الرياض':'🏙️ الرياض', 'جدة':'🌊 جدة', 'المدينة المنورة':'🕌 المدينة المنورة' };
           content.innerHTML = `<div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(290px,1fr)); gap:16px;">${items.map(s => {
             const isPhone = /^\d+$/.test(String(s.phone).replace(/\s/g,''));
+            const cityBadge = s._city ? `<span style="display:inline-flex; align-items:center; gap:4px; background:#0a1830; color:#fff; padding:3px 9px; border-radius:999px; font-size:.72rem; font-weight:700; align-self:flex-start;">${cityBadges[s._city] || s._city}</span>` : '';
             return `<article style="background:#fff; border:1px solid rgba(212,165,99,.25); border-radius:14px; padding:18px 20px; display:flex; flex-direction:column; gap:10px; box-shadow:0 4px 12px rgba(8,21,42,.04); transition:transform .2s, box-shadow .2s, border-color .2s;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 12px 28px rgba(8,21,42,.10)'; this.style.borderColor='rgba(212,165,99,.6)'" onmouseout="this.style.transform=''; this.style.boxShadow='0 4px 12px rgba(8,21,42,.04)'; this.style.borderColor='rgba(212,165,99,.25)'">
+              ${cityBadge}
               <h4 style="margin:0; font-family:var(--font-display); color:var(--navy-900); font-size:1.02rem; line-height:1.45;">${s.name}</h4>
               <div style="display:flex; align-items:center; gap:6px; color:var(--gray-600); font-size:.88rem;">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
@@ -5824,9 +5846,9 @@ p {
         }
         window.__setDirCat = function(c){ activeCat = c; render(); };
         window.setCity = function(city){
-          if (!DIR_CITIES[city]) return;
+          if (city !== ALL_LABEL && !DIR_CITIES[city]) return;
           activeCity = city;
-          activeCat = Object.keys(DIR_CITIES[city])[0];
+          activeCat = Object.keys(getActiveData())[0];
           try { localStorage.setItem('medad_city', city); } catch{}
           render();
           if (cityMenu) cityMenu.classList.remove('open');
@@ -5900,7 +5922,7 @@ p {
                 <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
               </svg></div>
             <h3>٣. نوافيك بعرض كامل</h3>
-            <p>نرسل لك العرض النهائي: السعر، الكمية المتوفرة، ووقت التسليم. توافق → ننسّق التوصيل لموقعك في المدينة المنورة.</p>
+            <p>نرسل لك العرض النهائي: السعر، الكمية المتوفرة، ووقت التسليم. توافق → ننسّق التوصيل لموقعك في أي مدينة بالمملكة.</p>
           </div>
         </div>
       </div>
