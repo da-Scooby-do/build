@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>مداد للبناء والخدمات اللوجستية | منصة ربط المقاولين بموردي مواد البناء — المملكة العربية السعودية</title>
   <meta name="description"
     content="مداد للبناء والخدمات اللوجستية تربط المقاولين والأفراد بأفضل موردي مواد البناء في المملكة العربية السعودية." />
@@ -7828,12 +7828,29 @@ p {
           document.body.classList.remove('is-admin');
         }
 
+        // Realtime subscriptions — driven by auth state, no more polling intervals.
+        if (typeof setupUserOrdersRealtime === 'function') setupUserOrdersRealtime();
+        if (window.isAdmin && typeof setupAdminRealtime === 'function') setupAdminRealtime();
+
         // Re-render whatever page they're on (in case admin features need to appear)
         if (typeof renderRoute === 'function') renderRoute();
       } else {
         document.querySelectorAll('.auth-buttons .btn').forEach(btn => btn.style.display = '');
         document.getElementById('userChip')?.remove();
         document.body.classList.remove('is-admin');
+        // Tear down realtime channels on sign-out so a future user gets fresh subscriptions.
+        try {
+          if (window.__userOrdersChannel) {
+            window.supabaseClient?.removeChannel?.(window.__userOrdersChannel);
+            window.__userOrdersChannel = null;
+            window.__userOrdersRealtimeSetup = false;
+          }
+          if (window.__adminChannel) {
+            window.supabaseClient?.removeChannel?.(window.__adminChannel);
+            window.__adminChannel = null;
+            window.__adminRealtimeSetup = false;
+          }
+        } catch (e) { console.warn('realtime teardown failed', e); }
       }
     };
 
@@ -7893,6 +7910,20 @@ p {
 
     function refreshAdminData() { loadAdminDashboard(); toast('تم تحديث البيانات', '✓'); }
 
+    /* Admin table boilerplate: handles error + empty states.
+       Returns true if the caller should proceed to render rows. */
+    function adminTableGuard(tbody, data, error, { colspan, emptyMsg }) {
+      if (error) {
+        tbody.innerHTML = `<tr><td colspan="${colspan}" style="padding:20px; text-align:center; color:#d33;">${escapeHtml(error.message)}</td></tr>`;
+        return false;
+      }
+      if (!data?.length) {
+        tbody.innerHTML = `<tr><td colspan="${colspan}" style="padding:30px; text-align:center; color:var(--gray-500);">${escapeHtml(emptyMsg)}</td></tr>`;
+        return false;
+      }
+      return true;
+    }
+
     async function loadAdminOrders() {
       const tbody = document.getElementById('adminOrdersTbody');
       const { data, error } = await window.supabaseClient
@@ -7900,8 +7931,7 @@ p {
         .select('id, order_number, created_at, total, status, payment_status, user_id, profiles(full_name,email)')
         .order('created_at', { ascending: false })
         .limit(50);
-      if (error) { tbody.innerHTML = `<tr><td colspan="6" style="padding:20px; text-align:center; color:#d33;">خطأ: ${escapeHtml(error.message)}</td></tr>`; return; }
-      if (!data?.length) { tbody.innerHTML = '<tr><td colspan="6" style="padding:30px; text-align:center; color:var(--gray-500);">لا توجد طلبات بعد</td></tr>'; return; }
+      if (!adminTableGuard(tbody, data, error, { colspan: 6, emptyMsg: 'لا توجد طلبات بعد' })) return;
       const statusAr = {
         pending:'قيد الانتظار', confirmed:'مؤكد', preparing:'قيد التحضير',
         shipped:'تم الشحن', delivered:'تم التسليم', cancelled:'ملغي', refunded:'مسترجع'
@@ -7933,8 +7963,7 @@ p {
         .from('products')
         .select('id, name_ar, price, unit_ar, stock_quantity, main_image, city_code, category_id, categories(name_ar), cities(name_ar)')
         .order('created_at', { ascending: false });
-      if (error) { tbody.innerHTML = `<tr><td colspan="7" style="padding:20px; text-align:center; color:#d33;">${escapeHtml(error.message)}</td></tr>`; return; }
-      if (!data?.length) { tbody.innerHTML = '<tr><td colspan="7" style="padding:30px; text-align:center; color:var(--gray-500);">لا توجد منتجات</td></tr>'; return; }
+      if (!adminTableGuard(tbody, data, error, { colspan: 7, emptyMsg: 'لا توجد منتجات' })) return;
       tbody.innerHTML = data.map(p => `
         <tr style="border-top:1px solid var(--gray-150);">
           <td style="padding:8px;">${p.main_image ? `<img src="${escapeHtml(p.main_image)}" onerror="this.style.display='none'" style="width:48px; height:48px; object-fit:cover; border-radius:6px;">` : '—'}</td>
@@ -8028,8 +8057,7 @@ p {
     async function loadAdminSuppliers() {
       const tbody = document.getElementById('adminSuppliersTbody');
       const { data, error } = await window.supabaseClient.from('suppliers').select('*').order('name_ar');
-      if (error) { tbody.innerHTML = `<tr><td colspan="7" style="padding:20px; text-align:center; color:#d33;">${escapeHtml(error.message)}</td></tr>`; return; }
-      if (!data?.length) { tbody.innerHTML = '<tr><td colspan="7" style="padding:30px; text-align:center; color:var(--gray-500);">لا يوجد موردون</td></tr>'; return; }
+      if (!adminTableGuard(tbody, data, error, { colspan: 7, emptyMsg: 'لا يوجد موردون' })) return;
       tbody.innerHTML = data.map(s => `
         <tr style="border-top:1px solid var(--gray-150);">
           <td style="padding:12px; font-mono;">${escapeHtml(s.id)}</td>
@@ -8153,8 +8181,7 @@ p {
         .select('id, full_name, email, phone, user_type, created_at')
         .order('created_at', { ascending: false })
         .limit(100);
-      if (error) { tbody.innerHTML = `<tr><td colspan="5" style="padding:20px; text-align:center; color:#d33;">${escapeHtml(error.message)}</td></tr>`; return; }
-      if (!data?.length) { tbody.innerHTML = '<tr><td colspan="5" style="padding:30px; text-align:center; color:var(--gray-500);">لا يوجد عملاء بعد</td></tr>'; return; }
+      if (!adminTableGuard(tbody, data, error, { colspan: 5, emptyMsg: 'لا يوجد عملاء بعد' })) return;
       const typeAr = { customer:'عميل', contractor:'مقاول', business:'منشأة', supplier:'مورد', admin:'مالك' };
       tbody.innerHTML = data.map(p => `
         <tr style="border-top:1px solid var(--gray-150);">
@@ -9833,15 +9860,7 @@ p {
           .subscribe();
       } catch (e) { console.warn('user-orders realtime failed', e); window.__userOrdersRealtimeSetup = false; }
     }
-    // Reset flag on sign-out so a new user re-subscribes
-    setInterval(() => {
-      if (!window.currentUser && window.__userOrdersRealtimeSetup && window.__userOrdersChannel) {
-        try { window.supabaseClient.removeChannel(window.__userOrdersChannel); } catch{}
-        window.__userOrdersRealtimeSetup = false;
-        window.__userOrdersChannel = null;
-      }
-      setupUserOrdersRealtime();
-    }, 3000);
+    // (No polling interval — onAuthChange wires this up when the user signs in.)
 
     function changeQty(id, delta) { const item = state.cart.find(c => c.id === id); if (!item) return; item.qty = Math.max(1, item.qty + delta); updateCartBadge(); persist(); renderCart(); }
     function setQty(id, v) { const item = state.cart.find(c => c.id === id); if (!item) return; item.qty = Math.max(1, parseInt(v) || 1); updateCartBadge(); persist(); renderCart(); }
@@ -10419,14 +10438,15 @@ p {
               const { data: g } = await window.supabaseClient.rpc('generate_rfq_number');
               rfqNumber = g || ('RFQ-' + Date.now().toString().slice(-8));
             } catch { rfqNumber = 'RFQ-' + Date.now().toString().slice(-8); }
-            await window.supabaseClient.from('rfqs').insert({
+            const { error: rfqErr } = await window.supabaseClient.from('rfqs').insert({
               rfq_number: rfqNumber,
               user_id: window.currentUser?.id || null,
               project_name: payload.company || payload.contactName || 'طلب عام',
               description: customer_notes,
               status: 'open',
             });
-          } catch {/* rfqs mirror is optional */}
+            if (rfqErr) console.warn('rfqs mirror insert failed', rfqErr);
+          } catch (e) { console.warn('rfqs mirror exception', e); }
 
           return { id: order?.id, orderNo, status: 'pending' };
         } catch (e) { console.warn('customer request save failed', e); }
@@ -10508,8 +10528,7 @@ p {
           .subscribe(status => console.log('[admin realtime]', status));
       } catch (e) { console.warn('realtime setup failed', e); window.__adminRealtimeSetup = false; }
     }
-    // Poll until admin status is determined, then subscribe once
-    setInterval(setupAdminRealtime, 3000);
+    // (No polling interval — onAuthChange wires this up when an admin signs in.)
 
     window.apiSubmitRFQ = apiSubmitRFQ;
     window.apiPlaceOrder = apiPlaceOrder;
