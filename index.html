@@ -10354,185 +10354,6 @@ p {
       });
     }
 
-    /* ============================================================
-       API CLIENT — talks to Express backend if available
-       ============================================================ */
-    const API = (() => {
-      // Use same origin when served by backend; "" for relative
-      const base = '';
-      const tokenKey = 'bena_token';
-      const getToken = () => localStorage.getItem(tokenKey);
-      const setToken = (t) => t ? localStorage.setItem(tokenKey, t) : localStorage.removeItem(tokenKey);
-
-      async function req(path, opts = {}) {
-        const headers = { 'Content-Type': 'application/json', ...(opts.headers || {}) };
-        const t = getToken();
-        if (t) headers.Authorization = 'Bearer ' + t;
-        const r = await fetch(base + path, { ...opts, headers });
-        if (!r.ok) throw new Error(`API ${r.status}: ${await r.text()}`);
-        if (r.status === 204) return null;
-        return r.json();
-      }
-
-      // Detect if backend is reachable
-      let online = false;
-      async function ping() {
-        try {
-          const r = await fetch(base + '/api/health', { method: 'GET' });
-          online = r.ok;
-        } catch { online = false; }
-        return online;
-      }
-
-      return {
-        base, getToken, setToken,
-        isOnline: () => online,
-        ping,
-        products: (q = {}) => req('/api/products' + (Object.keys(q).length ? '?' + new URLSearchParams(q) : '')),
-        product: (id) => req('/api/products/' + encodeURIComponent(id)),
-        suppliers: () => req('/api/suppliers'),
-        supplier: (id) => req('/api/suppliers/' + encodeURIComponent(id)),
-        reviews: (pid) => req('/api/reviews/' + encodeURIComponent(pid)),
-        addReview: (productId, rating, body) => req('/api/reviews', { method: 'POST', body: JSON.stringify({ productId, rating, body }) }),
-        signup: (data) => req('/api/auth/signup', { method: 'POST', body: JSON.stringify(data) }),
-        login: (data) => req('/api/auth/login', { method: 'POST', body: JSON.stringify(data) }),
-        sendOTP: (phone) => req('/api/auth/otp/send', { method: 'POST', body: JSON.stringify({ phone }) }),
-        verifyOTP: (phone, code) => req('/api/auth/otp/verify', { method: 'POST', body: JSON.stringify({ phone, code }) }),
-        me: () => req('/api/auth/me'),
-        cart: () => req('/api/cart'),
-        cartAdd: (productId, qty = 1) => req('/api/cart', { method: 'POST', body: JSON.stringify({ productId, qty }) }),
-        cartUpdate: (productId, qty) => req('/api/cart/' + encodeURIComponent(productId), { method: 'PUT', body: JSON.stringify({ qty }) }),
-        cartRemove: (productId) => req('/api/cart/' + encodeURIComponent(productId), { method: 'DELETE' }),
-        cartClear: () => req('/api/cart', { method: 'DELETE' }),
-        wishlist: () => req('/api/wishlist'),
-        wishAdd: (productId) => req('/api/wishlist', { method: 'POST', body: JSON.stringify({ productId }) }),
-        wishRemove: (productId) => req('/api/wishlist/' + encodeURIComponent(productId), { method: 'DELETE' }),
-        placeOrder: (data) => req('/api/orders', { method: 'POST', body: JSON.stringify(data) }),
-        orders: () => req('/api/orders'),
-        rfq: (data) => req('/api/rfq', { method: 'POST', body: JSON.stringify(data) }),
-        meta: () => req('/api/meta'),
-      };
-    })();
-
-    /* ============================================================
-       HYDRATION — replace seed data with backend data when online
-       ============================================================ */
-    async function hydrateFromAPI() {
-      const ok = await API.ping();
-      if (!ok) {
-        console.info('Medad: backend offline, using static seed data.');
-        return false;
-      }
-      console.info('Medad: backend online — hydrating data from API.');
-      try {
-        const [suppliers, products] = await Promise.all([API.suppliers(), API.products()]);
-        SUPPLIERS = Object.fromEntries(suppliers.map(s => [s.id, s]));
-        PRODUCTS = products;
-        // Reviews: lazy-load per product on detail view (already exists), but pre-load p1-p3
-        const revs = await Promise.all(['p1', 'p2', 'p3'].map(id => API.reviews(id).catch(() => [])));
-        REVIEWS = { p1: revs[0], p2: revs[1], p3: revs[2] };
-
-        // Re-render visible views
-        renderFeatured();
-        renderSuppliersHome();
-        renderCatalogFilters();
-        renderCatalog();
-        return true;
-      } catch (e) {
-        console.warn('Medad: hydration failed', e);
-        return false;
-      }
-    }
-
-    // If logged in, sync cart + wishlist with server (server is source of truth)
-    async function hydrateUserData() {
-      if (!API.getToken()) return;
-      try {
-        const [cart, wish] = await Promise.all([API.cart().catch(() => null), API.wishlist().catch(() => null)]);
-        if (Array.isArray(cart)) {
-          state.cart = cart.map(c => ({ id: c.id, q: c.q }));
-          persist();
-          updateCartBadge();
-          if ($('#view-cart').classList.contains('active')) renderCart();
-        }
-        if (Array.isArray(wish)) {
-          state.wishlist = wish;
-          persist();
-          updateWishBadge();
-          if ($('#view-wishlist').classList.contains('active')) renderWishlist();
-        }
-      } catch (e) { console.warn('user data sync failed', e); }
-    }
-
-    /* ============================================================
-       API-BACKED HOOKS — patch existing actions to also persist server-side
-       ============================================================ */
-    const __origAddToCart = window.addToCart;
-    window.addToCart = function (productId, qty = 1) {
-      if (typeof __origAddToCart === 'function') __origAddToCart(productId, qty);
-      if (API.isOnline() && API.getToken()) API.cartAdd(productId, qty).catch(e => console.warn('cart sync', e));
-    };
-
-    const __origToggleWish = window.toggleWish;
-    window.toggleWish = function (productId) {
-      const wasIn = state.wishlist.includes(productId);
-      if (typeof __origToggleWish === 'function') __origToggleWish(productId);
-      if (API.isOnline() && API.getToken()) {
-        (wasIn ? API.wishRemove(productId) : API.wishAdd(productId)).catch(e => console.warn('wish sync', e));
-      }
-    };
-
-    const __origRemoveFromCart = window.removeFromCart;
-    window.removeFromCart = function (productId) {
-      if (typeof __origRemoveFromCart === 'function') __origRemoveFromCart(productId);
-      if (API.isOnline() && API.getToken()) API.cartRemove(productId).catch(() => { });
-    };
-
-    const __origUpdateCartQty = window.updateCartQty;
-    window.updateCartQty = function (productId, qty) {
-      if (typeof __origUpdateCartQty === 'function') __origUpdateCartQty(productId, qty);
-      if (API.isOnline() && API.getToken()) API.cartUpdate(productId, qty).catch(() => { });
-    };
-
-    // Auth helpers exposed to existing modal handlers
-    async function loginWithEmail(email, password) {
-      const res = await API.login({ email, password });
-      API.setToken(res.token);
-      state.user = res.user;
-      toast('تم تسجيل الدخول بنجاح');
-      await hydrateUserData();
-      if (typeof closeAuth === 'function') closeAuth();
-      return res;
-    }
-    async function signupWithEmail(name, email, phone, password) {
-      const res = await API.signup({ name, email, phone, password });
-      API.setToken(res.token);
-      state.user = res.user;
-      toast('تم إنشاء الحساب');
-      if (typeof closeAuth === 'function') closeAuth();
-      return res;
-    }
-    async function sendPhoneOTP(phone) {
-      const r = await API.sendOTP(phone);
-      // Dev-only: surface code in toast for testing without SMS gateway
-      if (r.devCode) toast('رمز التحقق التجريبي: ' + r.devCode, '🔐');
-      return r;
-    }
-    async function verifyPhoneOTP(phone, code) {
-      const r = await API.verifyOTP(phone, code);
-      API.setToken(r.token);
-      state.user = r.user;
-      toast('تم تسجيل الدخول');
-      await hydrateUserData();
-      if (typeof closeAuth === 'function') closeAuth();
-      return r;
-    }
-    function logout() {
-      API.setToken(null);
-      state.user = null;
-      toast('تم تسجيل الخروج');
-    }
-
     // Customer request hook — writes a pending ORDER (brokerage model).
     // The RFQ form is now the primary entry point; each submission becomes
     // a pending order so it surfaces in the admin "الطلبات الأخيرة" tab and
@@ -10690,14 +10511,8 @@ p {
     // Poll until admin status is determined, then subscribe once
     setInterval(setupAdminRealtime, 3000);
 
-    window.API = API;
     window.apiSubmitRFQ = apiSubmitRFQ;
     window.apiPlaceOrder = apiPlaceOrder;
-    window.loginWithEmail = loginWithEmail;
-    window.signupWithEmail = signupWithEmail;
-    window.sendPhoneOTP = sendPhoneOTP;
-    window.verifyPhoneOTP = verifyPhoneOTP;
-    window.logout = logout;
 
     /* ============================================================
        BOOT
@@ -10710,9 +10525,6 @@ p {
     updateCartBadge();
     updateWishBadge();
     go(location.hash || '#home');
-
-    // Asynchronously hydrate from backend if running on the server
-    hydrateFromAPI().then(ok => { if (ok) hydrateUserData(); });
   </script>
 
 </body>
