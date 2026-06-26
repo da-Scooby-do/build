@@ -5535,8 +5535,10 @@ p {
     }
   </style>
 
-  <!-- Supabase JS SDK -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Supabase JS SDK — pinned version + SRI (security: prevent CDN tampering) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"
+    integrity="sha384-0w2KAL2YHP6wKOkUDzkCDGgVvfmHnj02DHeQ6XcHOgTfFsGyonKOpShMH1x6nk9o"
+    crossorigin="anonymous"></script>
 
   <!-- Leaflet (free map library — OpenStreetMap, no API key needed) -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -7898,7 +7900,7 @@ p {
         .select('id, order_number, created_at, total, status, payment_status, user_id, profiles(full_name,email)')
         .order('created_at', { ascending: false })
         .limit(50);
-      if (error) { tbody.innerHTML = `<tr><td colspan="6" style="padding:20px; text-align:center; color:#d33;">خطأ: ${error.message}</td></tr>`; return; }
+      if (error) { tbody.innerHTML = `<tr><td colspan="6" style="padding:20px; text-align:center; color:#d33;">خطأ: ${escapeHtml(error.message)}</td></tr>`; return; }
       if (!data?.length) { tbody.innerHTML = '<tr><td colspan="6" style="padding:30px; text-align:center; color:var(--gray-500);">لا توجد طلبات بعد</td></tr>'; return; }
       const statusAr = {
         pending:'قيد الانتظار', confirmed:'مؤكد', preparing:'قيد التحضير',
@@ -7906,12 +7908,12 @@ p {
       };
       tbody.innerHTML = data.map(o => `
         <tr style="border-top:1px solid var(--gray-150);">
-          <td style="padding:12px; font-weight:600;">${o.order_number}</td>
-          <td style="padding:12px; color:var(--gray-600); font-size:.88rem;">${new Date(o.created_at).toLocaleDateString('ar-SA')}</td>
-          <td style="padding:12px;">${o.profiles?.full_name || o.profiles?.email || '—'}</td>
+          <td style="padding:12px; font-weight:600;">${escapeHtml(o.order_number)}</td>
+          <td style="padding:12px; color:var(--gray-600); font-size:.88rem;">${escapeHtml(new Date(o.created_at).toLocaleDateString('ar-SA'))}</td>
+          <td style="padding:12px;">${escapeHtml(o.profiles?.full_name || o.profiles?.email || '—')}</td>
           <td style="padding:12px; font-weight:700;">${arSAR(o.total)}</td>
-          <td style="padding:12px;"><span style="background:var(--gray-100); padding:4px 10px; border-radius:12px; font-size:.8rem;">${statusAr[o.status]||o.status}</span></td>
-          <td style="padding:12px;"><select onchange="updateOrderStatus('${o.id}', this.value)" style="padding:6px 10px; border:1px solid var(--gray-200); border-radius:6px; background:var(--white); font-size:.85rem;">
+          <td style="padding:12px;"><span style="background:var(--gray-100); padding:4px 10px; border-radius:12px; font-size:.8rem;">${escapeHtml(statusAr[o.status]||o.status)}</span></td>
+          <td style="padding:12px;"><select onchange="updateOrderStatus('${escapeHtml(o.id)}', this.value)" style="padding:6px 10px; border:1px solid var(--gray-200); border-radius:6px; background:var(--white); font-size:.85rem;">
             ${Object.entries(statusAr).map(([k,v]) => `<option value="${k}" ${k===o.status?'selected':''}>${v}</option>`).join('')}
           </select></td>
         </tr>
@@ -7931,19 +7933,19 @@ p {
         .from('products')
         .select('id, name_ar, price, unit_ar, stock_quantity, main_image, city_code, category_id, categories(name_ar), cities(name_ar)')
         .order('created_at', { ascending: false });
-      if (error) { tbody.innerHTML = `<tr><td colspan="7" style="padding:20px; text-align:center; color:#d33;">${error.message}</td></tr>`; return; }
+      if (error) { tbody.innerHTML = `<tr><td colspan="7" style="padding:20px; text-align:center; color:#d33;">${escapeHtml(error.message)}</td></tr>`; return; }
       if (!data?.length) { tbody.innerHTML = '<tr><td colspan="7" style="padding:30px; text-align:center; color:var(--gray-500);">لا توجد منتجات</td></tr>'; return; }
       tbody.innerHTML = data.map(p => `
         <tr style="border-top:1px solid var(--gray-150);">
-          <td style="padding:8px;">${p.main_image ? `<img src="${p.main_image}" style="width:48px; height:48px; object-fit:cover; border-radius:6px;">` : '—'}</td>
-          <td style="padding:12px; font-weight:600;">${p.name_ar}</td>
-          <td style="padding:12px; color:var(--gray-600); font-size:.85rem;">${p.categories?.name_ar || '—'}</td>
-          <td style="padding:12px; font-weight:700;">${arSAR(p.price)} / ${p.unit_ar||''}</td>
+          <td style="padding:8px;">${p.main_image ? `<img src="${escapeHtml(p.main_image)}" onerror="this.style.display='none'" style="width:48px; height:48px; object-fit:cover; border-radius:6px;">` : '—'}</td>
+          <td style="padding:12px; font-weight:600;">${escapeHtml(p.name_ar)}</td>
+          <td style="padding:12px; color:var(--gray-600); font-size:.85rem;">${escapeHtml(p.categories?.name_ar || '—')}</td>
+          <td style="padding:12px; font-weight:700;">${arSAR(p.price)} / ${escapeHtml(p.unit_ar||'')}</td>
           <td style="padding:12px;">${p.stock_quantity != null ? arEN(p.stock_quantity) : '—'}</td>
-          <td style="padding:12px; color:var(--gray-600); font-size:.85rem;">${p.cities?.name_ar || '—'}</td>
+          <td style="padding:12px; color:var(--gray-600); font-size:.85rem;">${escapeHtml(p.cities?.name_ar || '—')}</td>
           <td style="padding:12px; white-space:nowrap;">
-            <button class="btn btn-ghost" onclick='openProductEditor(${JSON.stringify(p).replace(/'/g,"&#39;")})' style="padding:6px 10px; font-size:.8rem;">✏️</button>
-            <button class="btn btn-ghost" onclick="deleteProduct('${p.id}', '${(p.name_ar||'').replace(/'/g,"\\'")}')" style="padding:6px 10px; font-size:.8rem; color:#d33;">🗑️</button>
+            <button class="btn btn-ghost" onclick='openProductEditor(${JSON.stringify(p).replace(/</g,"\\u003c").replace(/'/g,"&#39;")})' style="padding:6px 10px; font-size:.8rem;">✏️</button>
+            <button class="btn btn-ghost" onclick="deleteProduct('${escapeHtml(p.id)}', '${(p.name_ar||'').replace(/'/g,"\\'").replace(/</g,"&lt;")}')" style="padding:6px 10px; font-size:.8rem; color:#d33;">🗑️</button>
           </td>
         </tr>
       `).join('');
@@ -8026,19 +8028,19 @@ p {
     async function loadAdminSuppliers() {
       const tbody = document.getElementById('adminSuppliersTbody');
       const { data, error } = await window.supabaseClient.from('suppliers').select('*').order('name_ar');
-      if (error) { tbody.innerHTML = `<tr><td colspan="7" style="padding:20px; text-align:center; color:#d33;">${error.message}</td></tr>`; return; }
+      if (error) { tbody.innerHTML = `<tr><td colspan="7" style="padding:20px; text-align:center; color:#d33;">${escapeHtml(error.message)}</td></tr>`; return; }
       if (!data?.length) { tbody.innerHTML = '<tr><td colspan="7" style="padding:30px; text-align:center; color:var(--gray-500);">لا يوجد موردون</td></tr>'; return; }
       tbody.innerHTML = data.map(s => `
         <tr style="border-top:1px solid var(--gray-150);">
-          <td style="padding:12px; font-mono;">${s.id}</td>
-          <td style="padding:12px; font-weight:600;">${s.name_ar}</td>
-          <td style="padding:12px; color:var(--gray-600); font-size:.85rem;">${s.cr_number || '—'}</td>
-          <td style="padding:12px; color:var(--gray-600); font-size:.85rem;">${s.phone || '—'}</td>
-          <td style="padding:12px;">⭐ ${s.rating || '0'} (${arEN(s.review_count||0)})</td>
+          <td style="padding:12px; font-mono;">${escapeHtml(s.id)}</td>
+          <td style="padding:12px; font-weight:600;">${escapeHtml(s.name_ar)}</td>
+          <td style="padding:12px; color:var(--gray-600); font-size:.85rem;">${escapeHtml(s.cr_number || '—')}</td>
+          <td style="padding:12px; color:var(--gray-600); font-size:.85rem;">${escapeHtml(s.phone || '—')}</td>
+          <td style="padding:12px;">⭐ ${escapeHtml(s.rating || '0')} (${arEN(s.review_count||0)})</td>
           <td style="padding:12px;">${s.is_verified ? '✅' : '—'}</td>
           <td style="padding:12px; white-space:nowrap;">
-            <button class="btn btn-ghost" onclick='openSupplierEditor(${JSON.stringify(s).replace(/'/g,"&#39;")})' style="padding:6px 10px; font-size:.8rem;">✏️</button>
-            <button class="btn btn-ghost" onclick="deleteSupplier('${s.id}', '${(s.name_ar||'').replace(/'/g,"\\'")}')" style="padding:6px 10px; font-size:.8rem; color:#d33;">🗑️</button>
+            <button class="btn btn-ghost" onclick='openSupplierEditor(${JSON.stringify(s).replace(/</g,"\\u003c").replace(/'/g,"&#39;")})' style="padding:6px 10px; font-size:.8rem;">✏️</button>
+            <button class="btn btn-ghost" onclick="deleteSupplier('${escapeHtml(s.id)}', '${(s.name_ar||'').replace(/'/g,"\\'").replace(/</g,"&lt;")}')" style="padding:6px 10px; font-size:.8rem; color:#d33;">🗑️</button>
           </td>
         </tr>
       `).join('');
@@ -8151,16 +8153,16 @@ p {
         .select('id, full_name, email, phone, user_type, created_at')
         .order('created_at', { ascending: false })
         .limit(100);
-      if (error) { tbody.innerHTML = `<tr><td colspan="5" style="padding:20px; text-align:center; color:#d33;">${error.message}</td></tr>`; return; }
+      if (error) { tbody.innerHTML = `<tr><td colspan="5" style="padding:20px; text-align:center; color:#d33;">${escapeHtml(error.message)}</td></tr>`; return; }
       if (!data?.length) { tbody.innerHTML = '<tr><td colspan="5" style="padding:30px; text-align:center; color:var(--gray-500);">لا يوجد عملاء بعد</td></tr>'; return; }
       const typeAr = { customer:'عميل', contractor:'مقاول', business:'منشأة', supplier:'مورد', admin:'مالك' };
       tbody.innerHTML = data.map(p => `
         <tr style="border-top:1px solid var(--gray-150);">
-          <td style="padding:12px; font-weight:600;">${p.full_name || '—'}</td>
-          <td style="padding:12px; color:var(--gray-600); font-size:.85rem;">${p.email}</td>
-          <td style="padding:12px; color:var(--gray-600); font-size:.85rem;">${p.phone || '—'}</td>
-          <td style="padding:12px;"><span style="background:${p.user_type==='admin'?'#fef3c7':'var(--gray-100)'}; padding:4px 10px; border-radius:12px; font-size:.8rem;">${typeAr[p.user_type]||p.user_type}</span></td>
-          <td style="padding:12px; color:var(--gray-600); font-size:.85rem;">${new Date(p.created_at).toLocaleDateString('ar-SA')}</td>
+          <td style="padding:12px; font-weight:600;">${escapeHtml(p.full_name || '—')}</td>
+          <td style="padding:12px; color:var(--gray-600); font-size:.85rem;">${escapeHtml(p.email)}</td>
+          <td style="padding:12px; color:var(--gray-600); font-size:.85rem;">${escapeHtml(p.phone || '—')}</td>
+          <td style="padding:12px;"><span style="background:${p.user_type==='admin'?'#fef3c7':'var(--gray-100)'}; padding:4px 10px; border-radius:12px; font-size:.8rem;">${escapeHtml(typeAr[p.user_type]||p.user_type)}</span></td>
+          <td style="padding:12px; color:var(--gray-600); font-size:.85rem;">${escapeHtml(new Date(p.created_at).toLocaleDateString('ar-SA'))}</td>
         </tr>
       `).join('');
     }
@@ -10105,7 +10107,10 @@ p {
         else {
           if (__authMode === 'signup') {
             __pendingEmail = email;
-            localStorage.setItem('bena_pending_signup', JSON.stringify({ email, password, fullName, phone }));
+            // Security: NEVER store the password in localStorage (was a P0 audit finding).
+            // The dev fallback only remembers non-secret profile fields; if Supabase is
+            // unavailable the flow simply can't authenticate the user — which is correct.
+            localStorage.setItem('bena_pending_signup', JSON.stringify({ email, fullName, phone }));
             toast('وضع تجريبي — استخدم الرمز ٠٠٠٠٠٠ للتأكيد', '✉');
             showAuthStep2(email);
           } else {
@@ -10341,6 +10346,9 @@ p {
       return new Promise(resolve => {
         const s = document.createElement('script');
         s.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+        // Security: Subresource Integrity hash (sha384 of qrcode.min.js@1.0.0)
+        s.integrity = 'sha384-3zSEDfvllQohrq0PHL1fOXJuC/jSOO34H46t6UQfobFOmxE5BpjjaIJY5F2/bMnU';
+        s.crossOrigin = 'anonymous';
         s.onload = resolve;
         document.head.appendChild(s);
       });
