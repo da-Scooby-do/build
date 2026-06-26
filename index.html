@@ -5317,6 +5317,222 @@ p {
       .step-card { background: var(--white) !important; border: 1px solid rgba(212,165,99,.22) !important; }
       [data-theme="dark"] .step-card { background: #0f1a2e !important; }
     }
+
+    /* ============================================================
+       SAUDI MOBILE-FIRST REDESIGN
+       Bottom tab bar + service cards + list-view directory
+       ============================================================ */
+
+    /* ===== Mobile service cards section (hidden on desktop) ===== */
+    .mobile-services { display: none; }
+    .bottom-tab-bar { display: none; }
+
+    @media (max-width: 720px) {
+      /* === Saudi typography upgrade === */
+      body { font-size: 16.5px; line-height: 1.7; letter-spacing: 0; }
+      h1, h2, h3, h4 { letter-spacing: -.005em; }
+
+      /* === Top header simplification === */
+      /* hide noisy elements; keep logo + city pill + theme + login only */
+      .top-bar .auth-buttons .cart-btn { display: none !important; }
+      .top-bar .auth-buttons .btn-ghost,
+      .top-bar .auth-buttons button[onclick*="signup"] { display: none !important; }
+      .top-bar .auth-buttons { gap: 8px !important; }
+      .top-bar { padding: 12px 0 !important; }
+      .top-bar > .container { gap: 10px !important; }
+      .top-bar > .container > .logo .logo-mark { width: 38px !important; height: 38px !important; }
+
+      /* === Hide the action bar AND mobile-nav-drawer (bottom tabs replace them) === */
+      .mobile-action-bar { display: none !important; }
+      .mobile-nav-drawer { display: none !important; }
+      .hamburger { display: none !important; }
+
+      /* === Hide marketing sections on mobile (service cards handle this) === */
+      #about, .section[id="about"] { display: none !important; }
+      #why-us { display: none !important; }
+      /* Hide the hero search-card if present */
+      .hero-eyebrow { display: none !important; }
+      .hero p.lead { display: none !important; }
+
+      /* === Cleaner hero === */
+      .hero { padding: 40px 0 80px !important; }
+      .hero h1 {
+        font-size: clamp(1.9rem, 8vw, 2.5rem) !important;
+        line-height: 1.25 !important;
+        font-weight: 800;
+        margin-bottom: 28px !important;
+      }
+      .hero h1 br { display: none; }
+      .hero h1 em {
+        background: linear-gradient(135deg, var(--gold-400), var(--gold-500));
+        -webkit-background-clip: text; background-clip: text;
+        -webkit-text-fill-color: transparent; color: transparent;
+        font-style: normal;
+      }
+
+      /* Countdown — compact strip beneath the headline */
+      .countdown { gap: 6px !important; justify-content: center !important; margin-top: 14px !important; }
+      .countdown .cd-box {
+        min-width: 0 !important; flex: 1 1 0;
+        padding: 10px 6px !important;
+        background: rgba(255,255,255,.06) !important;
+        border-color: rgba(212,165,99,.35) !important;
+      }
+      .countdown .cd-box > div:first-child { font-size: 1.35rem !important; color: var(--gold-400) !important; }
+      .countdown .cd-box > div:last-child { font-size: .66rem !important; color: rgba(255,255,255,.7) !important; margin-top: 2px !important; }
+
+      /* Big single primary CTA — secondary CTA hidden (suppliers reached via bottom tab) */
+      .hero-ctas { flex-direction: column !important; gap: 12px !important; margin-top: 26px !important; }
+      .hero-ctas a.btn-ghost { display: none !important; }
+      .hero-ctas a.btn-amber {
+        width: 100%; justify-content: center;
+        padding: 18px 20px !important;
+        font-size: 1.05rem !important;
+        border-radius: 14px !important;
+        font-weight: 800 !important;
+        box-shadow: 0 10px 28px rgba(164,118,46,.45) !important;
+      }
+
+      /* === Mobile service cards (replaces how-it-works + why-us on phone) === */
+      .mobile-services { display: block; padding: 36px 0 24px; background: var(--cream-50); }
+      .ms-head { margin-bottom: 22px; }
+      .ms-kicker {
+        display: inline-block; font-size: .76rem; font-weight: 800;
+        color: var(--gold-600); letter-spacing: .1em; text-transform: uppercase;
+        margin-bottom: 6px;
+      }
+      .ms-head h2 {
+        font-size: 1.55rem !important; margin: 0 !important; line-height: 1.3;
+        font-family: var(--font-display); font-weight: 800;
+        color: var(--navy-deep);
+      }
+      .ms-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+      .ms-card {
+        display: grid;
+        grid-template-columns: 56px 1fr 16px;
+        align-items: center; gap: 16px;
+        padding: 18px 18px;
+        background: #fff;
+        border: 1px solid rgba(212,165,99,.22);
+        border-radius: 16px;
+        text-decoration: none; color: inherit;
+        box-shadow: 0 2px 10px rgba(8,21,42,.04);
+        transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+        min-height: 80px;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .ms-card:active { transform: scale(.985); box-shadow: 0 1px 4px rgba(8,21,42,.06); }
+      .ms-icon {
+        width: 56px; height: 56px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, rgba(212,165,99,.18), rgba(192,142,63,.10));
+        color: var(--gold-600);
+        display: grid; place-items: center;
+        border: 1px solid rgba(212,165,99,.25);
+      }
+      .ms-icon svg { width: 26px; height: 26px; }
+      .ms-body h3 { font-size: 1.08rem; margin: 0 0 3px; font-family: var(--font-display); font-weight: 800; color: var(--navy-deep); }
+      .ms-body p { font-size: .88rem; margin: 0; color: var(--gray-600); line-height: 1.45; }
+      .ms-arrow { width: 16px; height: 16px; color: var(--gold-500); flex-shrink: 0; }
+      .ms-card.ms-primary {
+        background: linear-gradient(135deg, var(--navy-deep), #14233f);
+        border-color: rgba(212,165,99,.4);
+        color: #fff;
+      }
+      .ms-card.ms-primary .ms-icon { background: linear-gradient(135deg, var(--gold-400), var(--gold-600)); color: #fff; border-color: transparent; }
+      .ms-card.ms-primary .ms-body h3 { color: #fff; }
+      .ms-card.ms-primary .ms-body p { color: rgba(255,255,255,.78); }
+      .ms-card.ms-primary .ms-arrow { color: var(--gold-400); }
+      .ms-card.ms-wa .ms-icon { background: #25D366; color: #fff; border-color: transparent; }
+
+      /* === List-view supplier directory (mobile) === */
+      #suppliers-directory { padding-block: 40px !important; }
+      #dirContent > div {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 10px !important;
+      }
+      #dirContent article {
+        padding: 16px 16px !important;
+        gap: 12px !important;
+        border-radius: 14px !important;
+        flex-direction: column !important;
+      }
+      #dirContent article h4 { font-size: 1rem !important; line-height: 1.4 !important; }
+      #dirContent article > div:first-of-type { font-size: .82rem !important; }
+      /* Replace phone block with action row: call + WhatsApp side by side */
+      #dirContent article a[href^="tel:"],
+      #dirContent article > div[style*="background:#f6f1e8"] {
+        flex: 1 !important;
+        justify-content: center !important;
+        padding: 12px 14px !important;
+        font-size: .95rem !important;
+        border-radius: 10px !important;
+      }
+      /* Inject WhatsApp button alongside call button via flex layout */
+      #dirContent article .action-row {
+        display: flex; gap: 10px; margin-top: auto;
+      }
+      #dirContent article .action-row > * { flex: 1; }
+      .sup-wa-btn {
+        display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        background: #25D366; color: #fff !important;
+        padding: 12px 14px; border-radius: 10px;
+        text-decoration: none; font-weight: 800; font-size: .92rem;
+        box-shadow: 0 4px 14px rgba(37,211,102,.35);
+      }
+      .sup-wa-btn svg { width: 16px; height: 16px; }
+
+      /* === Bottom tab bar === */
+      .bottom-tab-bar {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1.3fr 1fr 1fr;
+        position: fixed; bottom: 0; left: 0; right: 0;
+        background: rgba(255,255,255,.96);
+        backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+        border-top: 1px solid rgba(212,165,99,.25);
+        padding: 8px 4px calc(8px + env(safe-area-inset-bottom));
+        z-index: 1100;
+        box-shadow: 0 -6px 22px rgba(8,21,42,.08);
+      }
+      .bottom-tab-bar a {
+        display: flex; flex-direction: column; align-items: center;
+        gap: 4px; padding: 6px 4px;
+        color: var(--gray-500); text-decoration: none;
+        font-size: .68rem; font-weight: 700;
+        transition: color .15s;
+        -webkit-tap-highlight-color: transparent;
+        min-height: 48px;
+      }
+      .bottom-tab-bar a svg { width: 22px; height: 22px; stroke-width: 2; }
+      .bottom-tab-bar a.active { color: var(--navy-deep); }
+      .bottom-tab-bar a[data-tab="wa"] svg { color: #25D366; }
+      .bottom-tab-bar a.tab-primary {
+        background: linear-gradient(135deg, var(--gold-400), var(--gold-600));
+        color: #fff !important;
+        border-radius: 18px;
+        margin: -22px 6px 0;
+        padding: 12px 4px;
+        box-shadow: 0 8px 24px rgba(164,118,46,.55);
+        min-height: auto;
+      }
+      .bottom-tab-bar a.tab-primary svg { width: 26px; height: 26px; color: #fff; }
+      .bottom-tab-bar a.tab-primary span { font-size: .74rem; }
+
+      /* push the whole body up so bottom tab doesn't cover content */
+      body { padding-bottom: 88px !important; }
+      .cta-band { display: none !important; }
+      .wa-float { display: none !important; }
+
+      [data-theme="dark"] .bottom-tab-bar { background: rgba(10,19,34,.96); border-top-color: rgba(212,165,99,.3); }
+      [data-theme="dark"] .bottom-tab-bar a { color: #8fa3c8; }
+      [data-theme="dark"] .bottom-tab-bar a.active { color: var(--gold-400); }
+      [data-theme="dark"] .ms-card { background: #0f1a2e !important; border-color: rgba(212,165,99,.22) !important; }
+      [data-theme="dark"] .ms-body h3 { color: #e8eef8 !important; }
+      [data-theme="dark"] .ms-body p { color: #b3c2dc !important; }
+      [data-theme="dark"] .ms-head h2 { color: #f3f6fc !important; }
+      [data-theme="dark"] .mobile-services { background: #060f1f; }
+    }
   </style>
 
   <!-- Supabase JS SDK -->
@@ -5506,6 +5722,58 @@ p {
           </a>
           <a href="#suppliers-directory" data-link class="btn btn-ghost" style="padding:15px 30px; font-size:1.02rem; color:#fff; border:1px solid rgba(255,255,255,.45);">
             تصفّح موردينا — كل المملكة
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Mobile-only service cards (replaces how-it-works + why-us on phone) ===== -->
+    <section class="mobile-services" aria-label="خدماتنا">
+      <div class="container">
+        <div class="ms-head">
+          <span class="ms-kicker">خدماتنا</span>
+          <h2>ماذا تريد أن تفعل اليوم؟</h2>
+        </div>
+        <div class="ms-grid">
+          <a href="#rfq" data-link class="ms-card ms-primary">
+            <div class="ms-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+            </div>
+            <div class="ms-body">
+              <h3>اطلب احتياجك</h3>
+              <p>أرسل ما تحتاج، ونوافيك بأفضل سعر</p>
+            </div>
+            <svg class="ms-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          </a>
+          <a href="#suppliers-directory" data-link class="ms-card">
+            <div class="ms-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="7" height="16" rx="1"/><rect x="14" y="4" width="7" height="9" rx="1"/><rect x="14" y="15" width="7" height="5" rx="1"/></svg>
+            </div>
+            <div class="ms-body">
+              <h3>تصفّح موردينا</h3>
+              <p>٣٨٠+ مورد ومصنع في ٣ مدن</p>
+            </div>
+            <svg class="ms-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          </a>
+          <a href="#cart" data-link class="ms-card">
+            <div class="ms-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div class="ms-body">
+              <h3>تتبّع طلباتي</h3>
+              <p>تحديثات لحظية لحالة طلبك</p>
+            </div>
+            <svg class="ms-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          </a>
+          <a href="https://wa.me/966920002362?text=مرحبا%20أحتاج%20مساعدة" target="_blank" rel="noopener" class="ms-card ms-wa">
+            <div class="ms-icon">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24z"/></svg>
+            </div>
+            <div class="ms-body">
+              <h3>تواصل معنا</h3>
+              <p>فريقنا متاح ٧ أيام بالأسبوع</p>
+            </div>
+            <svg class="ms-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
           </a>
         </div>
       </div>
@@ -6051,15 +6319,21 @@ p {
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
                 <span>${s.area}</span>
               </div>
-              ${isPhone
-                ? `<a href="tel:${s.phone}" style="display:inline-flex; align-items:center; gap:8px; background:linear-gradient(135deg, #d4a563, #b88a3f); color:#fff; padding:9px 14px; border-radius:10px; text-decoration:none; font-weight:700; font-size:.92rem; margin-top:auto;">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.98.98 0 0 0-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z"/></svg>
-                    ${toAR(s.phone)}
-                  </a>`
-                : `<div style="display:inline-flex; align-items:center; gap:8px; background:#f6f1e8; color:var(--navy-900); padding:9px 14px; border-radius:10px; font-weight:700; font-size:.88rem; margin-top:auto;">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-                    ${s.phone}
-                  </div>`}
+              <div class="action-row" style="display:flex; gap:8px; margin-top:auto;">
+                ${isPhone
+                  ? `<a href="tel:${s.phone}" style="flex:1; display:inline-flex; align-items:center; justify-content:center; gap:8px; background:linear-gradient(135deg, #d4a563, #b88a3f); color:#fff; padding:11px 14px; border-radius:10px; text-decoration:none; font-weight:800; font-size:.94rem;">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.98.98 0 0 0-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z"/></svg>
+                      اتصل
+                    </a>`
+                  : `<a href="https://wa.me/966920002362?text=${encodeURIComponent('مرحبًا، أحتاج تواصل مع ' + s.name)}" target="_blank" rel="noopener" style="flex:1; display:inline-flex; align-items:center; justify-content:center; gap:8px; background:linear-gradient(135deg, #d4a563, #b88a3f); color:#fff; padding:11px 14px; border-radius:10px; text-decoration:none; font-weight:800; font-size:.92rem;">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                      تواصل عبر مداد
+                    </a>`}
+                <a href="https://wa.me/${isPhone ? '966' + s.phone.replace(/^0/,'') : '966920002362'}?text=${encodeURIComponent('مرحبًا، أحتاج ' + s.name)}" target="_blank" rel="noopener" class="sup-wa-btn" style="flex:1; display:inline-flex; align-items:center; justify-content:center; gap:8px; background:#25D366; color:#fff; padding:11px 14px; border-radius:10px; text-decoration:none; font-weight:800; font-size:.92rem; box-shadow:0 4px 14px rgba(37,211,102,.35);">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24z"/></svg>
+                  واتساب
+                </a>
+              </div>
             </article>`;}).join('')}</div>`;
           // "عرض المزيد" / "عرض أقل" toggle when more than INITIAL_CARDS suppliers exist in the category
           let moreBtnHTML = '';
@@ -7386,6 +7660,30 @@ p {
     </a>
   </div>
 
+  <!-- ===== Mobile bottom tab bar (Saudi-standard navigation) ===== -->
+  <nav class="bottom-tab-bar" id="bottomTabBar" aria-label="القائمة الرئيسية">
+    <a href="#home" data-link data-tab="home" aria-label="الرئيسية">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>الرئيسية</span>
+    </a>
+    <a href="#suppliers-directory" data-link data-tab="suppliers" aria-label="موردونا">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="7" height="16" rx="1"/><rect x="14" y="4" width="7" height="9" rx="1"/><rect x="14" y="15" width="7" height="5" rx="1"/></svg>
+      <span>موردونا</span>
+    </a>
+    <a href="#rfq" data-link data-tab="rfq" class="tab-primary" aria-label="اطلب عرض سعر">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+      <span>اطلب</span>
+    </a>
+    <a href="#cart" data-link data-tab="cart" aria-label="طلباتي">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
+      <span>طلباتي</span>
+    </a>
+    <a href="https://wa.me/966920002362?text=مرحبا%20أريد%20الاستفسار" target="_blank" rel="noopener" data-tab="wa" aria-label="واتساب">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24z"/></svg>
+      <span>واتساب</span>
+    </a>
+  </nav>
+
   <!-- Mobile accordion behaviour for step cards (active only on ≤ 720px) -->
   <script>
     (function(){
@@ -7396,7 +7694,6 @@ p {
           card.__accBound = true;
           card.addEventListener('click', () => {
             if (!mq.matches) return;
-            // Close siblings within the same .steps or grid for cleaner one-open-at-a-time feel
             const parent = card.parentElement;
             if (parent) parent.querySelectorAll('.step-card.expanded').forEach(other => {
               if (other !== card) other.classList.remove('expanded');
@@ -7407,6 +7704,18 @@ p {
       }
       if (document.readyState !== 'loading') bindAccordions();
       else document.addEventListener('DOMContentLoaded', bindAccordions);
+
+      /* Bottom tab bar — highlight current tab */
+      function updateActiveTab(){
+        const bar = document.getElementById('bottomTabBar');
+        if (!bar) return;
+        const raw = (location.hash || '#home').replace('#','').split('/')[0];
+        const map = { 'home':'home', 'suppliers-directory':'suppliers', 'suppliers':'suppliers', 'catalog':'suppliers', 'rfq':'rfq', 'cart':'cart', 'confirm':'cart' };
+        const active = map[raw] || 'home';
+        bar.querySelectorAll('a').forEach(a => a.classList.toggle('active', a.dataset.tab === active));
+      }
+      updateActiveTab();
+      window.addEventListener('hashchange', updateActiveTab);
     })();
   </script>
 
