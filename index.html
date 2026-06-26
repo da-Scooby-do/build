@@ -5532,7 +5532,170 @@ p {
       [data-theme="dark"] .ms-body p { color: #b3c2dc !important; }
       [data-theme="dark"] .ms-head h2 { color: #f3f6fc !important; }
       [data-theme="dark"] .mobile-services { background: #060f1f; }
+
+      /* === Mobile account pill (replaces inline auth chip on phone) === */
+      .mobile-account-pill {
+        display: inline-flex !important;
+        align-items: center; justify-content: center;
+        width: 40px; height: 40px;
+        background: linear-gradient(135deg, var(--gold-400), var(--gold-600));
+        color: #fff;
+        border: 0; border-radius: 999px;
+        cursor: pointer;
+        box-shadow: 0 4px 14px rgba(164,118,46,.35);
+        flex-shrink: 0;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .mobile-account-pill svg { color: #fff; }
+      /* Hide the inline auth chip the laptop nav builds — replaced by the account pill + sheet */
+      #userChip { display: none !important; }
     }
+    /* Hide the mobile account pill on desktop (laptop uses the inline chip) */
+    .mobile-account-pill { display: none; }
+
+    /* ===== Profile bottom sheet ===== */
+    .profile-sheet-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(2, 8, 20, .55);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      z-index: 1500;
+      opacity: 0;
+      transition: opacity .22s ease;
+    }
+    .profile-sheet-overlay.open { display: block; opacity: 1; }
+    .profile-sheet {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: #fff;
+      border-top-left-radius: 26px;
+      border-top-right-radius: 26px;
+      padding: 12px 18px calc(24px + env(safe-area-inset-bottom));
+      box-shadow: 0 -14px 50px rgba(2, 8, 20, .28);
+      z-index: 1600;
+      transform: translateY(110%);
+      transition: transform .28s cubic-bezier(.32,.72,.0,1);
+      max-height: 82vh; overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .profile-sheet.open { transform: translateY(0); }
+    .ps-grip {
+      width: 48px; height: 5px;
+      background: rgba(212,165,99,.45);
+      border-radius: 3px;
+      margin: 4px auto 18px;
+    }
+    .ps-header {
+      padding: 6px 8px 18px;
+      border-bottom: 1px dashed rgba(212,165,99,.3);
+      margin-bottom: 14px;
+    }
+    .ps-name {
+      font-family: var(--font-display);
+      font-weight: 800; font-size: 1.18rem;
+      color: var(--navy-deep);
+      line-height: 1.3;
+    }
+    .ps-email {
+      font-size: .85rem; color: var(--gray-500);
+      margin-top: 4px; word-break: break-all;
+    }
+    .ps-role-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      margin-top: 8px; padding: 4px 12px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--gold-400), var(--gold-600));
+      color: #fff; font-size: .74rem; font-weight: 800;
+    }
+    .ps-items { display: flex; flex-direction: column; gap: 10px; }
+    .ps-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 16px;
+      background: #faf6f0;
+      border: 1px solid rgba(212,165,99,.18);
+      border-radius: 14px;
+      color: var(--navy-deep); font-weight: 800; font-size: 1rem;
+      text-decoration: none; cursor: pointer;
+      font-family: inherit;
+      width: 100%;
+      transition: transform .12s ease, box-shadow .12s ease, border-color .15s ease;
+      -webkit-tap-highlight-color: transparent;
+      text-align: right;
+    }
+    .ps-item:active { transform: scale(.985); box-shadow: 0 4px 14px rgba(8,21,42,.08); }
+    .ps-item .ps-icon {
+      width: 40px; height: 40px;
+      background: linear-gradient(135deg, var(--gold-400), var(--gold-600));
+      color: #fff; border-radius: 12px;
+      display: grid; place-items: center;
+      flex-shrink: 0;
+    }
+    .ps-item .ps-icon svg { width: 20px; height: 20px; }
+    .ps-item .ps-label { flex: 1; }
+    .ps-item .ps-arrow {
+      color: var(--gold-500);
+      flex-shrink: 0;
+    }
+    .ps-item.ps-logout {
+      background: #fef2f2;
+      border-color: rgba(220,38,38,.25);
+      color: #b91c1c;
+    }
+    .ps-item.ps-logout .ps-icon {
+      background: linear-gradient(135deg, #ef4444, #b91c1c);
+    }
+    .ps-item.ps-logout .ps-arrow { color: #ef4444; }
+    .ps-item.ps-admin {
+      background: linear-gradient(135deg, var(--navy-deep), #14233f);
+      border-color: rgba(212,165,99,.45);
+      color: #fff;
+    }
+    .ps-item.ps-admin .ps-arrow { color: var(--gold-400); }
+
+    [data-theme="dark"] .profile-sheet { background: #0f1a2e; }
+    [data-theme="dark"] .ps-name { color: #f3f6fc; }
+    [data-theme="dark"] .ps-email { color: #93acd1; }
+    [data-theme="dark"] .ps-header { border-bottom-color: rgba(212,165,99,.25); }
+    [data-theme="dark"] .ps-item {
+      background: #16243d;
+      border-color: rgba(212,165,99,.25);
+      color: #e8eef8;
+    }
+    [data-theme="dark"] .ps-item.ps-logout {
+      background: rgba(127, 29, 29, .25);
+      color: #fca5a5;
+      border-color: rgba(239, 68, 68, .3);
+    }
+    [data-theme="dark"] .ps-item.ps-admin {
+      background: linear-gradient(135deg, #060f1f, #0a1322);
+    }
+
+    /* ===== Order tracker — dark-mode contrast fix ===== */
+    /* The renderer uses inline cream backgrounds (#faf6f0 notes panel, #f6f1e8 "awaiting" pill).
+       In dark mode those pale on dark navy + the navy-900 text becomes invisible. Override here. */
+    [data-theme="dark"] #ordersHost article {
+      background: linear-gradient(135deg, #0f1a2e, #14233f) !important;
+      border-color: rgba(212,165,99,.30) !important;
+      box-shadow: 0 6px 20px rgba(2,8,20,.4) !important;
+    }
+    [data-theme="dark"] #ordersHost article > div[style*="background:#faf6f0"] {
+      background: rgba(212,165,99,.10) !important;
+      border-color: rgba(212,165,99,.35) !important;
+      color: #e8eef8 !important;
+    }
+    [data-theme="dark"] #ordersHost article > div[style*="background:#faf6f0"] div { color: #e8eef8 !important; }
+    [data-theme="dark"] #ordersHost article div[style*="background:#f6f1e8"] {
+      background: linear-gradient(135deg, rgba(212,165,99,.22), rgba(192,142,63,.12)) !important;
+      color: var(--gold-400) !important;
+      border: 1px solid rgba(212,165,99,.45) !important;
+    }
+    /* Inactive pipeline ticks (gray) get a navy variant so the line is visible */
+    [data-theme="dark"] #ordersHost article > div[style*="display:flex"] > div > div[style*="background:#e5e7eb"] {
+      background: rgba(212,165,99,.20) !important;
+    }
+    /* Header order-number + date stay readable */
+    [data-theme="dark"] #ordersHost article header > div:first-child > div:first-child { color: #f3f6fc !important; }
+    [data-theme="dark"] #ordersHost article header > div:first-child > div:last-child { color: #93acd1 !important; }
   </style>
 
   <!-- Supabase JS SDK — pinned version + SRI (security: prevent CDN tampering) -->
@@ -5612,6 +5775,13 @@ p {
               <line x1="21" y1="12" x2="23" y2="12" />
               <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
               <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+            </svg>
+          </button>
+          <!-- Mobile-only account pill: opens the profile sheet when signed in, the auth modal otherwise -->
+          <button class="mobile-account-pill" id="mobileAccountPill" onclick="onMobileAccountPillClick(event)" aria-label="حسابي">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
             </svg>
           </button>
           <a href="#wishlist" data-link class="cart-btn" aria-label="المفضلة"
@@ -7662,6 +7832,14 @@ p {
     </a>
   </div>
 
+  <!-- ===== Mobile profile sheet (slides up from bottom on phone) ===== -->
+  <div class="profile-sheet-overlay" id="profileSheetOverlay" onclick="closeProfileSheet(event)"></div>
+  <div class="profile-sheet" id="profileSheet" role="dialog" aria-label="حسابي" aria-modal="true">
+    <div class="ps-grip" aria-hidden="true"></div>
+    <div class="ps-header" id="psHeader"></div>
+    <div class="ps-items" id="psItems"></div>
+  </div>
+
   <!-- ===== Mobile bottom tab bar (Saudi-standard navigation) ===== -->
   <nav class="bottom-tab-bar" id="bottomTabBar" aria-label="القائمة الرئيسية">
     <a href="#home" data-link data-tab="home" aria-label="الرئيسية">
@@ -7685,6 +7863,114 @@ p {
       <span>واتساب</span>
     </a>
   </nav>
+
+  <!-- Mobile profile sheet — bottom-sheet account menu (Saudi standard) -->
+  <script>
+    (function(){
+      const sheet = () => document.getElementById('profileSheet');
+      const overlay = () => document.getElementById('profileSheetOverlay');
+      const header = () => document.getElementById('psHeader');
+      const items  = () => document.getElementById('psItems');
+
+      function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+      function close(){
+        sheet()?.classList.remove('open');
+        overlay()?.classList.remove('open');
+        document.body.style.overflow = '';
+      }
+      function open(){
+        populate();
+        sheet()?.classList.add('open');
+        overlay()?.classList.add('open');
+        document.body.style.overflow = 'hidden';
+      }
+      function populate(){
+        const h = header(), it = items();
+        if (!h || !it) return;
+        const user = window.currentUser;
+        if (user) {
+          const name = user.user_metadata?.full_name || (user.email || '').split('@')[0] || 'مستخدم';
+          const email = user.email || '';
+          const role = window.isAdmin ? '🛠️ مالك المنصة' : '👤 عميل';
+          h.innerHTML = `
+            <div class="ps-name">${esc(name)}</div>
+            ${email ? `<div class="ps-email">${esc(email)}</div>` : ''}
+            <span class="ps-role-badge">${esc(role)}</span>
+          `;
+          const adminItem = window.isAdmin ? `
+            <a href="#admin" data-link class="ps-item ps-admin" onclick="closeProfileSheet()">
+              <span class="ps-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span>
+              <span class="ps-label">لوحة التحكم</span>
+              <svg class="ps-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </a>` : '';
+          it.innerHTML = `
+            ${adminItem}
+            <a href="#addresses" data-link class="ps-item" onclick="closeProfileSheet()">
+              <span class="ps-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
+              <span class="ps-label">عناويني المحفوظة</span>
+              <svg class="ps-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </a>
+            <a href="#wishlist" data-link class="ps-item" onclick="closeProfileSheet()">
+              <span class="ps-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></span>
+              <span class="ps-label">المفضّلة</span>
+              <svg class="ps-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </a>
+            <button class="ps-item ps-logout" onclick="closeProfileSheet(); if (typeof signOut === 'function') signOut();">
+              <span class="ps-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span>
+              <span class="ps-label">تسجيل الخروج</span>
+              <svg class="ps-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+          `;
+        } else {
+          h.innerHTML = `
+            <div class="ps-name">مرحبًا بك في مداد</div>
+            <div class="ps-email">سجّل دخولك للوصول لطلباتك وعناوينك المحفوظة</div>
+          `;
+          it.innerHTML = `
+            <button class="ps-item" onclick="closeProfileSheet(); setTimeout(() => { if (typeof openAuth==='function') openAuth('login'); }, 80);">
+              <span class="ps-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg></span>
+              <span class="ps-label">تسجيل الدخول</span>
+              <svg class="ps-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <button class="ps-item ps-admin" onclick="closeProfileSheet(); setTimeout(() => { if (typeof openAuth==='function') openAuth('signup'); }, 80);">
+              <span class="ps-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg></span>
+              <span class="ps-label">إنشاء حساب جديد</span>
+              <svg class="ps-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+          `;
+        }
+      }
+
+      window.openProfileSheet = open;
+      window.closeProfileSheet = (e) => {
+        // Allow either: no arg (close), or click event on overlay (close), or programmatic.
+        if (!e || e.target === overlay() || e.type === 'click' && e.currentTarget === overlay()) close();
+        else if (!e.target) close();
+        else if (e.target === overlay()) close();
+        else close();
+      };
+      window.onMobileAccountPillClick = function(e){
+        if (e) e.stopPropagation();
+        if (window.currentUser) open();
+        else if (typeof openAuth === 'function') openAuth('login');
+        else open();
+      };
+
+      // Close on Escape
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+
+      // The laptop's onAuthChange repaints #userChip in .auth-buttons. On mobile we hide that
+      // via CSS, but we still want our pill to live-react if the user signs in/out while
+      // the page is open. Re-populate the sheet content whenever onAuthChange fires.
+      const reactToAuth = () => { if (sheet()?.classList.contains('open')) populate(); };
+      const __prevOnAuthChange = window.onAuthChange;
+      window.onAuthChange = async function(user) {
+        if (typeof __prevOnAuthChange === 'function') await __prevOnAuthChange(user);
+        reactToAuth();
+      };
+    })();
+  </script>
 
   <!-- Mobile accordion behaviour for step cards (active only on ≤ 720px) -->
   <script>
