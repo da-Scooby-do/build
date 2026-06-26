@@ -6013,6 +6013,8 @@ p {
           return DIR_CITIES[activeCity] || {};
         }
         let activeCat = Object.keys(getActiveData())[0];
+        let dirShowAll = false;
+        const INITIAL_CARDS = 6;
         const tabs = document.getElementById('dirTabs');
         const content = document.getElementById('dirContent');
         const dirHead = document.getElementById('dirHead');
@@ -6037,7 +6039,9 @@ p {
           </button>`).join('');
           const items = data[activeCat] || [];
           const cityBadges = { 'الرياض':'🏙️ الرياض', 'جدة':'🌊 جدة', 'المدينة المنورة':'🕌 المدينة المنورة' };
-          content.innerHTML = `<div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(290px,1fr)); gap:16px;">${items.map(s => {
+          const visible = (dirShowAll || items.length <= INITIAL_CARDS) ? items : items.slice(0, INITIAL_CARDS);
+          const hidden = items.length - visible.length;
+          const cardsHTML = `<div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(290px,1fr)); gap:16px;">${visible.map(s => {
             const isPhone = /^\d+$/.test(String(s.phone).replace(/\s/g,''));
             const cityBadge = s._city ? `<span style="display:inline-flex; align-items:center; gap:4px; background:#0a1830; color:#fff; padding:3px 9px; border-radius:999px; font-size:.72rem; font-weight:700; align-self:flex-start;">${cityBadges[s._city] || s._city}</span>` : '';
             return `<article style="background:#fff; border:1px solid rgba(212,165,99,.25); border-radius:14px; padding:18px 20px; display:flex; flex-direction:column; gap:10px; box-shadow:0 4px 12px rgba(8,21,42,.04); transition:transform .2s, box-shadow .2s, border-color .2s;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 12px 28px rgba(8,21,42,.10)'; this.style.borderColor='rgba(212,165,99,.6)'" onmouseout="this.style.transform=''; this.style.boxShadow='0 4px 12px rgba(8,21,42,.04)'; this.style.borderColor='rgba(212,165,99,.25)'">
@@ -6057,12 +6061,31 @@ p {
                     ${s.phone}
                   </div>`}
             </article>`;}).join('')}</div>`;
+          // "عرض المزيد" / "عرض أقل" toggle when more than INITIAL_CARDS suppliers exist in the category
+          let moreBtnHTML = '';
+          if (items.length > INITIAL_CARDS) {
+            moreBtnHTML = `<div style="display:flex; justify-content:center; margin-top:26px;">
+              <button onclick="window.__toggleDirShowAll()" style="display:inline-flex; align-items:center; gap:10px; background:#fff; color:var(--navy-900); border:1.5px solid var(--gold-400); padding:13px 28px; border-radius:999px; font-weight:800; font-size:.95rem; cursor:pointer; box-shadow:0 4px 14px rgba(164,118,46,.18); transition:all .2s;" onmouseover="this.style.background='var(--gold-400)'; this.style.color='#fff'" onmouseout="this.style.background='#fff'; this.style.color='var(--navy-900)'">
+                ${dirShowAll
+                  ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg> عرض أقل`
+                  : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg> عرض المزيد <span style="opacity:.75; font-weight:600;">(+${toAR(hidden)} مورد)</span>`}
+              </button>
+            </div>`;
+          }
+          content.innerHTML = cardsHTML + moreBtnHTML;
         }
-        window.__setDirCat = function(c){ activeCat = c; render(); };
+        window.__setDirCat = function(c){ activeCat = c; dirShowAll = false; render(); };
+        window.__toggleDirShowAll = function(){
+          dirShowAll = !dirShowAll;
+          render();
+          // when collapsing, scroll back to the directory top so the user sees the tabs
+          if (!dirShowAll) document.getElementById('suppliers-directory')?.scrollIntoView({ behavior: 'smooth' });
+        };
         window.setCity = function(city){
           if (city !== ALL_LABEL && !DIR_CITIES[city]) return;
           activeCity = city;
           activeCat = Object.keys(getActiveData())[0];
+          dirShowAll = false;
           try { localStorage.setItem('medad_city', city); } catch{}
           render();
           if (cityMenu) cityMenu.classList.remove('open');
