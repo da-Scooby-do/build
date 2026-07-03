@@ -5708,9 +5708,172 @@ p {
     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <!-- ===== Fable additions: splash opener + supplier registration + micro-interactions ===== -->
+  <style id="fableAdditions">
+    /* ---------- Splash opener (once per session) ---------- */
+    #medadSplash {
+      position: fixed; inset: 0; z-index: 12000;
+      background:
+        radial-gradient(ellipse 120% 70% at 80% -10%, rgba(212,165,99,.22), transparent 55%),
+        linear-gradient(160deg, #0a1830 0%, #12233f 55%, #0a1830 100%);
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px; overflow: hidden;
+      transition: opacity .55s ease, visibility .55s;
+    }
+    #medadSplash.hide { opacity: 0; visibility: hidden; pointer-events: none; }
+    #medadSplash[hidden] { display: none; }
+    #medadSplash::before {
+      content: ""; position: absolute; inset: 0; opacity: .06; pointer-events: none;
+      background-image: repeating-linear-gradient(45deg, #d4a563 0 1px, transparent 1px 26px),
+                        repeating-linear-gradient(-45deg, #d4a563 0 1px, transparent 1px 26px);
+    }
+    .sp-inner { position: relative; max-width: 620px; width: 100%; text-align: center; color: #fdf9f1; }
+    .sp-skip {
+      position: absolute; top: 18px; left: 18px; z-index: 2;
+      background: rgba(255,255,255,.08); color: #e9dfca; border: 1px solid rgba(212,165,99,.35);
+      border-radius: 999px; padding: 8px 18px; font-size: .85rem; font-weight: 700; cursor: pointer;
+      font-family: inherit; transition: background .2s;
+    }
+    .sp-skip:hover { background: rgba(212,165,99,.22); }
+    .sp-logo {
+      width: 74px; height: 74px; margin: 0 auto 18px; border-radius: 22px;
+      background: linear-gradient(135deg, #d4a563, #b98a45); color: #0a1830;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 12px 40px rgba(212,165,99,.35);
+    }
+    /* animated growth bars — "ضاعف مبيعاتك" */
+    .sp-chart { display: flex; align-items: flex-end; justify-content: center; gap: 10px; height: 96px; margin: 6px auto 22px; direction: ltr; }
+    .sp-chart .bar {
+      width: 26px; border-radius: 7px 7px 3px 3px;
+      background: linear-gradient(180deg, #e7c68f, #c08e3f);
+      transform-origin: bottom; transform: scaleY(0);
+      animation: spGrow .8s cubic-bezier(.2,.9,.3,1.2) forwards;
+      box-shadow: 0 6px 20px rgba(212,165,99,.28);
+    }
+    .sp-chart .bar:nth-child(1) { height: 34%; animation-delay: .45s; opacity: .75; }
+    .sp-chart .bar:nth-child(2) { height: 52%; animation-delay: .60s; opacity: .85; }
+    .sp-chart .bar:nth-child(3) { height: 72%; animation-delay: .75s; opacity: .95; }
+    .sp-chart .bar:nth-child(4) { height: 100%; animation-delay: .90s; }
+    .sp-chart svg { position: absolute; overflow: visible; }
+    .sp-arrow path {
+      stroke-dasharray: 260; stroke-dashoffset: 260;
+      animation: spDraw 1s ease-out 1.15s forwards;
+    }
+    .sp-arrow .head { opacity: 0; animation: spPop .35s ease-out 2s forwards; }
+    @keyframes spGrow { to { transform: scaleY(1); } }
+    @keyframes spDraw { to { stroke-dashoffset: 0; } }
+    @keyframes spPop { from { opacity: 0; transform: scale(.4); } to { opacity: 1; transform: scale(1); } }
+    .sp-anim { opacity: 0; transform: translateY(20px); animation: spUp .7s cubic-bezier(.2,.8,.3,1) forwards; }
+    @keyframes spUp { to { opacity: 1; transform: none; } }
+    .sp-eyebrow {
+      display: inline-block; padding: 6px 16px; border-radius: 999px; margin-bottom: 14px;
+      background: rgba(212,165,99,.16); border: 1px solid rgba(212,165,99,.45);
+      color: #f0dcb4; font-size: .84rem; font-weight: 700; letter-spacing: .3px;
+    }
+    .sp-inner h2 { font-family: var(--font-display, inherit); font-size: clamp(1.5rem, 5.5vw, 2.3rem); line-height: 1.35; margin: 0 0 14px; color: #fdf9f1; }
+    .sp-inner h2 em { font-style: normal; color: #d4a563; }
+    .sp-inner p { font-size: clamp(.92rem, 3.4vw, 1.05rem); line-height: 1.9; color: #c3cfe2; margin: 0 auto 26px; max-width: 520px; }
+    .sp-ctas { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .sp-btn {
+      display: inline-flex; align-items: center; gap: 8px; padding: 14px 30px; border-radius: 14px;
+      font-family: inherit; font-size: 1rem; font-weight: 800; cursor: pointer; text-decoration: none;
+      transition: transform .15s, box-shadow .2s;
+    }
+    .sp-btn:active { transform: scale(.96); }
+    .sp-btn-gold {
+      background: linear-gradient(135deg, #dfb578, #c08e3f); color: #0a1830; border: 0;
+      box-shadow: 0 10px 32px rgba(212,165,99,.38);
+    }
+    .sp-btn-gold:hover { transform: translateY(-2px); box-shadow: 0 14px 40px rgba(212,165,99,.5); }
+    .sp-btn-ghost { background: transparent; color: #e8edf6; border: 1.5px solid rgba(255,255,255,.35); }
+    .sp-btn-ghost:hover { border-color: rgba(212,165,99,.7); color: #f0dcb4; }
+    .sp-note { margin-top: 20px; font-size: .78rem; color: #7e8ca4; }
+    @media (prefers-reduced-motion: reduce) {
+      .sp-anim, .sp-chart .bar { animation: none; opacity: 1; transform: none; }
+      .sp-arrow path { animation: none; stroke-dashoffset: 0; }
+      .sp-arrow .head { animation: none; opacity: 1; }
+    }
+
+    /* ---------- Supplier registration ---------- */
+    .sreg-cats { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; margin-top: 6px; }
+    .cat-chip { position: relative; display: flex; align-items: center; gap: 10px; padding: 12px 14px;
+      border: 1.5px solid var(--gray-200); border-radius: 12px; cursor: pointer; user-select: none;
+      background: var(--white, #fff); transition: border-color .2s, background .2s, transform .12s; font-weight: 600; }
+    .cat-chip:active { transform: scale(.97); }
+    .cat-chip input { position: absolute; opacity: 0; pointer-events: none; }
+    .cat-chip .box { width: 20px; height: 20px; flex: 0 0 20px; border-radius: 6px; border: 2px solid var(--gray-300, #cbd5e1);
+      display: flex; align-items: center; justify-content: center; color: transparent; font-size: 13px; transition: all .18s; }
+    .cat-chip input:checked ~ .box { background: linear-gradient(135deg, #d4a563, #c08e3f); border-color: #c08e3f; color: #fff; }
+    .cat-chip input:checked ~ .txt { color: var(--navy-900, #0a1830); }
+    .cat-chip:has(input:checked) { border-color: #d4a563; background: rgba(212,165,99,.08); }
+    [data-theme="dark"] .cat-chip { background: rgba(255,255,255,.04); border-color: rgba(255,255,255,.14); }
+    [data-theme="dark"] .cat-chip:has(input:checked) { background: rgba(212,165,99,.14); }
+    .sreg-file { display: flex; align-items: center; gap: 10px; padding: 13px 14px; border: 1.5px dashed var(--gray-300, #cbd5e1);
+      border-radius: 12px; cursor: pointer; color: var(--gray-600, #5b6472); font-size: .9rem; transition: border-color .2s, background .2s; }
+    .sreg-file:hover { border-color: #d4a563; background: rgba(212,165,99,.06); }
+    .sreg-file.has-file { border-style: solid; border-color: #2e9e5b; color: #2e9e5b; background: rgba(46,158,91,.06); }
+    .sreg-file input { display: none; }
+    .sreg-hero {
+      background: linear-gradient(135deg, #0a1830 0%, #16294a 100%); color: #fdf9f1;
+      border-radius: 18px; padding: 26px 24px; margin-bottom: 26px; position: relative; overflow: hidden;
+    }
+    .sreg-hero::after { content: ""; position: absolute; inset: 0;
+      background: radial-gradient(ellipse at top left, rgba(212,165,99,.25), transparent 55%); pointer-events: none; }
+    .sreg-hero h2 { margin: 0 0 8px; font-size: 1.25rem; color: #fdf9f1; }
+    .sreg-hero h2 em { font-style: normal; color: #d4a563; }
+    .sreg-hero p { margin: 0; color: #c3cfe2; font-size: .92rem; line-height: 1.85; }
+    .sreg-steps { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; position: relative; z-index: 1; }
+    .sreg-steps span { background: rgba(212,165,99,.16); border: 1px solid rgba(212,165,99,.4);
+      color: #f0dcb4; padding: 5px 13px; border-radius: 999px; font-size: .78rem; font-weight: 700; }
+
+    /* ---------- Micro-interactions ---------- */
+    .btn:active, .tab-item:active, .ms-card:active { transform: scale(.965); }
+    .btn, .tab-item, .ms-card { transition: transform .13s ease, box-shadow .2s ease, background .2s, color .2s, border-color .2s; }
+    @keyframes confettiFall {
+      0%   { transform: translate3d(0,0,0) rotate(0); opacity: 1; }
+      100% { transform: translate3d(var(--cx, 0), 105vh, 0) rotate(var(--cr, 540deg)); opacity: .15; }
+    }
+    .confetti-bit { position: fixed; top: -14px; z-index: 13000; pointer-events: none;
+      width: 9px; height: 13px; border-radius: 2px; animation: confettiFall var(--cd, 2s) ease-in forwards; }
+    @keyframes statPulse { 0% { transform: scale(1); } 50% { transform: scale(1.12); color: #c08e3f; } 100% { transform: scale(1); } }
+    .stat-pop { animation: statPulse .6s ease; display: inline-block; }
+    @media (prefers-reduced-motion: reduce) { .confetti-bit { display: none; } }
+  </style>
 </head>
 
 <body>
+
+  <!-- ============================================================
+     SPLASH OPENER — once per session (supplier pitch)
+     ============================================================ -->
+  <div id="medadSplash" hidden role="dialog" aria-modal="true" aria-label="انضم كمورد إلى مداد">
+    <button class="sp-skip" onclick="dismissSplash()">تخطّي ✕</button>
+    <div class="sp-inner">
+      <div class="sp-logo sp-anim" style="animation-delay:.1s;">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 21V8l9-5 9 5v13" /><path d="M9 21V12h6v9" /><path d="M3 21h18" />
+        </svg>
+      </div>
+      <div class="sp-chart" aria-hidden="true" style="position:relative;">
+        <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+        <svg class="sp-arrow" width="150" height="96" viewBox="0 0 150 96" fill="none"
+          style="position:absolute; inset:0; margin:auto; left:-6px;">
+          <path d="M8 82 C 45 78, 75 62, 138 14" stroke="#f0dcb4" stroke-width="3.5" stroke-linecap="round"/>
+          <path class="head" d="M138 14 l-16 1 M138 14 l-2 15" stroke="#f0dcb4" stroke-width="3.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="sp-eyebrow sp-anim" style="animation-delay:.3s;">🏗️ للموردين والمصانع</div>
+      <h2 class="sp-anim" style="animation-delay:.45s;">ضاعف مبيعاتك في قطاع الإنشاءات مع <em>مداد</em></h2>
+      <p class="sp-anim" style="animation-delay:.6s;">انضم اليوم إلى منصة مداد للبناء، وسهّل على آلاف المقاولين والعملاء في المملكة العثور على منتجاتك. نحن نربطك مباشرة بطلبات السوق الحقيقية، لنضمن لك تدفقاً مستمراً للفرص التجارية وتوسيع نطاق وصولك الجغرافي بكل سهولة.</p>
+      <div class="sp-ctas sp-anim" style="animation-delay:.75s;">
+        <button class="sp-btn sp-btn-gold" onclick="dismissSplash('#supplier-register')">سجّل كمورد الآن ←</button>
+        <button class="sp-btn sp-btn-ghost" onclick="dismissSplash()">أتصفّح كعميل</button>
+      </div>
+      <div class="sp-note sp-anim" style="animation-delay:.9s;">التسجيل مجاني — يستغرق أقل من دقيقتين</div>
+    </div>
+  </div>
 
   <!-- ============================================================
      HEADER
@@ -5829,6 +5992,7 @@ p {
           <li><a href="#about" data-link>كيف نعمل</a></li>
           <li><a href="#rfq" data-link>اطلب عرض سعر</a></li>
           <li><a href="#cart" data-link>صفحة الطلب</a></li>
+          <li><a href="#supplier-register" data-link style="color:var(--gold-500, #c08e3f); font-weight:700;">✦ سجّل كمورد</a></li>
           <li><a href="#policy" data-link>الشروط والسياسة</a></li>
         </ul>
       </div>
@@ -5842,6 +6006,7 @@ p {
         <li><a href="#about" data-link onclick="toggleMobileNav()">كيف نعمل</a></li>
         <li><a href="#rfq" data-link onclick="toggleMobileNav()">اطلب عرض سعر</a></li>
         <li><a href="#cart" data-link onclick="toggleMobileNav()">صفحة الطلب</a></li>
+        <li><a href="#supplier-register" data-link onclick="toggleMobileNav()" style="color:var(--gold-500, #c08e3f); font-weight:700;">✦ سجّل كمورد — ضاعف مبيعاتك</a></li>
         <li><a href="#policy" data-link onclick="toggleMobileNav()">الشروط والسياسة</a></li>
       </ul>
     </div>
@@ -5990,6 +6155,15 @@ p {
         <div id="dirTabs" style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:28px; padding-bottom:14px; border-bottom:1px solid rgba(212,165,99,.25);"></div>
 
         <div id="dirContent"></div>
+
+        <!-- Supplier CTA — join the network -->
+        <a href="#supplier-register" data-link class="reveal" style="display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-top:34px; padding:22px 26px; border-radius:18px; text-decoration:none; background:linear-gradient(135deg, #0a1830 0%, #16294a 100%); border:1px solid rgba(212,165,99,.35); box-shadow:0 10px 32px rgba(10,24,48,.18);">
+          <div>
+            <div style="font-weight:800; font-size:1.08rem; color:#fdf9f1;">هل أنت مورد أو مصنع؟ <span style="color:#d4a563;">ضاعف مبيعاتك مع مداد</span> 📈</div>
+            <div style="color:#c3cfe2; font-size:.88rem; margin-top:4px;">سجّل منشأتك مجانًا — وستصلك طلبات التسعير المطابقة لتخصصك مباشرة.</div>
+          </div>
+          <span class="btn btn-amber" style="pointer-events:none; padding:12px 26px; font-weight:800;">سجّل كمورد الآن ←</span>
+        </a>
       </div>
     </section>
 
@@ -6989,6 +7163,138 @@ p {
   <!-- ============================================================
      VIEW: CONCRETE ORDER
      ============================================================ -->
+  <!-- ============================================================
+     VIEW: SUPPLIER REGISTRATION (سجّل كمورد)
+     ============================================================ -->
+  <section class="view" id="view-supplier-register">
+    <section class="page-intro">
+      <div class="container">
+        <nav class="breadcrumb">
+          <a href="#home" data-link>الرئيسية</a>
+          <span class="sep">›</span>
+          <span class="current">التسجيل كمورد</span>
+        </nav>
+        <div class="title-row">
+          <h1>انضم إلى شبكة موردي مداد</h1>
+          <p class="sub">سجّل منشأتك مرة واحدة — وستصلك طلبات التسعير المطابقة لتخصصك ومدينتك مباشرة.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="catalog-shell">
+      <div class="container" style="max-width:860px;">
+        <div class="sreg-hero reveal">
+          <h2>ضاعف مبيعاتك في قطاع الإنشاءات مع <em>مداد</em> 📈</h2>
+          <p>انضم اليوم إلى منصة مداد للبناء، وسهّل على آلاف المقاولين والعملاء في المملكة العثور على منتجاتك. نحن نربطك مباشرة بطلبات السوق الحقيقية، لنضمن لك تدفقاً مستمراً للفرص التجارية وتوسيع نطاق وصولك الجغرافي بكل سهولة.</p>
+          <div class="sreg-steps">
+            <span>١. عبّئ النموذج</span>
+            <span>٢. نتحقق من السجل التجاري</span>
+            <span>٣. تبدأ الطلبات بالوصول</span>
+          </div>
+        </div>
+
+        <form class="rfq-form" id="supplierRegForm" onsubmit="submitSupplierApp(event)">
+
+          <h3 style="margin:4px 0 2px; color:var(--navy-900); font-size:1.05rem;">🏢 بيانات المنشأة</h3>
+          <div class="row2">
+            <div>
+              <label>اسم الشركة / المؤسسة *</label>
+              <input type="text" name="company_name" required placeholder="الاسم الرسمي المسجل" />
+            </div>
+            <div>
+              <label>رقم السجل التجاري *</label>
+              <input type="text" name="cr_number" required inputmode="numeric" pattern="[0-9٠-٩]{10}"
+                placeholder="١٠ أرقام — إلزامي للتحقق" title="رقم السجل التجاري: ١٠ أرقام" />
+            </div>
+          </div>
+          <div class="row2">
+            <div>
+              <label>المدينة / المنطقة *</label>
+              <select name="city" required>
+                <option value="">اختر المدينة…</option>
+                <option>الرياض</option>
+                <option>جدة</option>
+                <option>المدينة المنورة</option>
+                <option>مكة المكرمة</option>
+                <option>ينبع</option>
+                <option>الدمام</option>
+                <option>الخبر</option>
+                <option>الطائف</option>
+                <option>تبوك</option>
+                <option>أبها</option>
+                <option>أخرى</option>
+              </select>
+            </div>
+            <div>
+              <label>رابط موقع قوقل ماب (اختياري)</label>
+              <input type="url" name="maps_url" placeholder="https://maps.app.goo.gl/…" dir="ltr" style="text-align:left;" />
+            </div>
+          </div>
+          <div>
+            <label>العنوان الرئيسي</label>
+            <input type="text" name="address" placeholder="الحي، الشارع، رقم المبنى…" />
+          </div>
+
+          <h3 style="margin:18px 0 2px; color:var(--navy-900); font-size:1.05rem;">📦 التخصص والمواد التي توردها *</h3>
+          <p style="margin:0 0 4px; font-size:.85rem; color:var(--gray-500);">اختر كل ما ينطبق — ستصلك فقط طلبات التسعير المطابقة لتخصصك.</p>
+          <div class="sreg-cats" id="sregCats">
+            <label class="cat-chip"><input type="checkbox" name="cats" value="حديد تسليح"><span class="box">✓</span><span class="txt">🏗️ حديد تسليح</span></label>
+            <label class="cat-chip"><input type="checkbox" name="cats" value="خرسانة جاهزة وبلوك"><span class="box">✓</span><span class="txt">🧱 خرسانة جاهزة وبلوك</span></label>
+            <label class="cat-chip"><input type="checkbox" name="cats" value="أسمنت ومواد لياسة"><span class="box">✓</span><span class="txt">🏭 أسمنت ومواد لياسة</span></label>
+            <label class="cat-chip"><input type="checkbox" name="cats" value="مواد سباكة وعزل"><span class="box">✓</span><span class="txt">🔧 مواد سباكة وعزل</span></label>
+            <label class="cat-chip"><input type="checkbox" name="cats" value="مواد كهرباء وإنارة"><span class="box">✓</span><span class="txt">💡 مواد كهرباء وإنارة</span></label>
+            <label class="cat-chip"><input type="checkbox" name="cats" value="أخرى" id="sregOtherChk"><span class="box">✓</span><span class="txt">➕ أخرى</span></label>
+          </div>
+          <div id="sregOtherWrap" style="display:none;">
+            <label>حدّد المواد الأخرى</label>
+            <input type="text" name="other_category" placeholder="مثال: سيراميك، أبواب، دهانات…" />
+          </div>
+
+          <h3 style="margin:18px 0 2px; color:var(--navy-900); font-size:1.05rem;">📞 معلومات التواصل</h3>
+          <div class="row2">
+            <div>
+              <label>اسم الشخص المسؤول *</label>
+              <input type="text" name="contact_name" required placeholder="ممثّل المبيعات أو صاحب المنشأة" />
+            </div>
+            <div>
+              <label>رقم الجوال *</label>
+              <input type="tel" name="phone" required inputmode="tel"
+                pattern="(\+?966|0)?5[0-9٠-٩]{8}" placeholder="05xxxxxxxx"
+                title="رقم جوال سعودي: يبدأ بـ 05 أو +9665" />
+            </div>
+          </div>
+          <div>
+            <label>البريد الإلكتروني التجاري</label>
+            <input type="email" name="email" placeholder="sales@company.sa" dir="ltr" style="text-align:left;" />
+          </div>
+
+          <h3 style="margin:18px 0 2px; color:var(--navy-900); font-size:1.05rem;">📎 المرفقات والتوثيق <span style="font-weight:400; font-size:.82rem; color:var(--gray-500);">(اختياري — يسرّع اعتماد حسابك)</span></h3>
+          <div class="row2">
+            <div>
+              <label class="sreg-file" id="crFileLabel">
+                <input type="file" name="cr_doc" accept="application/pdf,image/jpeg,image/png,image/webp" onchange="sregFileChanged(this,'crFileLabel','نسخة السجل التجاري')">
+                <span>📄</span><span class="fname">نسخة من السجل التجاري (PDF أو صورة)</span>
+              </label>
+            </div>
+            <div>
+              <label class="sreg-file" id="vatFileLabel">
+                <input type="file" name="vat_doc" accept="application/pdf,image/jpeg,image/png,image/webp" onchange="sregFileChanged(this,'vatFileLabel','شهادة الضريبة')">
+                <span>🧾</span><span class="fname">شهادة ضريبة القيمة المضافة (VAT)</span>
+              </label>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-amber" id="sregSubmitBtn" style="margin-top:16px; padding:15px; font-size:1.05rem;">
+            🚀 إرسال طلب الانضمام
+          </button>
+          <p style="margin:10px 0 0; font-size:.8rem; color:var(--gray-500); text-align:center;">
+            سيتواصل معك فريق مداد خلال ٢٤ ساعة لتأكيد بياناتك وتفعيل حسابك.
+          </p>
+        </form>
+      </div>
+    </section>
+  </section>
+
   <section class="view" id="view-concrete">
     <section class="page-intro">
       <div class="container">
@@ -7373,6 +7679,7 @@ p {
         <button class="admin-tab" onclick="switchAdminTab('suppliers')" data-tab="suppliers" style="padding:12px 22px; background:transparent; border:0; border-bottom:3px solid transparent; font-weight:600; color:var(--gray-500); cursor:pointer;">الموردون</button>
         <button class="admin-tab" onclick="switchAdminTab('categories')" data-tab="categories" style="padding:12px 22px; background:transparent; border:0; border-bottom:3px solid transparent; font-weight:600; color:var(--gray-500); cursor:pointer;">التصنيفات</button>
         <button class="admin-tab" onclick="switchAdminTab('customers')" data-tab="customers" style="padding:12px 22px; background:transparent; border:0; border-bottom:3px solid transparent; font-weight:600; color:var(--gray-500); cursor:pointer;">العملاء</button>
+        <button class="admin-tab" onclick="switchAdminTab('applications')" data-tab="applications" style="padding:12px 22px; background:transparent; border:0; border-bottom:3px solid transparent; font-weight:600; color:var(--gray-500); cursor:pointer;">طلبات الانضمام <span id="appsBadge" style="display:none; background:#d4a563; color:#0a1830; border-radius:999px; padding:1px 8px; font-size:.75rem; font-weight:800; margin-inline-start:4px;">0</span></button>
       </div>
 
       <!-- ORDERS TAB -->
@@ -7479,6 +7786,32 @@ p {
             </thead>
             <tbody id="adminCustomersTbody">
               <tr><td colspan="5" style="padding:30px; text-align:center; color:var(--gray-500);">جارٍ التحميل...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- SUPPLIER APPLICATIONS TAB -->
+      <div class="admin-panel" id="adminPanel-applications" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+          <h3 style="margin:0;">طلبات انضمام الموردين</h3>
+          <button class="btn btn-ghost" onclick="loadAdminApplications()">🔄 تحديث</button>
+        </div>
+        <div style="overflow-x:auto; background:var(--white); border:1px solid var(--gray-150); border-radius:var(--radius-lg);">
+          <table style="width:100%; border-collapse:collapse;">
+            <thead style="background:var(--gray-50); border-bottom:1px solid var(--gray-150);">
+              <tr>
+                <th style="padding:12px; text-align:right; font-weight:700; color:var(--navy-900); font-size:.88rem;">المنشأة</th>
+                <th style="padding:12px; text-align:right; font-weight:700; color:var(--navy-900); font-size:.88rem;">السجل التجاري</th>
+                <th style="padding:12px; text-align:right; font-weight:700; color:var(--navy-900); font-size:.88rem;">المدينة</th>
+                <th style="padding:12px; text-align:right; font-weight:700; color:var(--navy-900); font-size:.88rem;">التخصصات</th>
+                <th style="padding:12px; text-align:right; font-weight:700; color:var(--navy-900); font-size:.88rem;">التواصل</th>
+                <th style="padding:12px; text-align:right; font-weight:700; color:var(--navy-900); font-size:.88rem;">المستندات</th>
+                <th style="padding:12px; text-align:right; font-weight:700; color:var(--navy-900); font-size:.88rem;">الحالة</th>
+              </tr>
+            </thead>
+            <tbody id="adminApplicationsTbody">
+              <tr><td colspan="7" style="padding:30px; text-align:center; color:var(--gray-500);">جارٍ التحميل...</td></tr>
             </tbody>
           </table>
         </div>
@@ -8192,6 +8525,7 @@ p {
       if (name === 'suppliers') return loadAdminSuppliers();
       if (name === 'categories')return loadAdminCategories();
       if (name === 'customers') return loadAdminCustomers();
+      if (name === 'applications') return loadAdminApplications();
     }
 
     function refreshAdminData() { loadAdminDashboard(); toast('تم تحديث البيانات', '✓'); }
@@ -8479,6 +8813,86 @@ p {
         </tr>
       `).join('');
     }
+
+    /* ---- Supplier applications (طلبات الانضمام) ---- */
+    async function loadAdminApplications() {
+      const tbody = document.getElementById('adminApplicationsTbody');
+      if (!tbody) return;
+      const { data, error } = await window.supabaseClient
+        .from('supplier_applications')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(100);
+      // pending-count badge on the tab
+      const badge = document.getElementById('appsBadge');
+      if (badge) {
+        const pending = (data || []).filter(a => a.status === 'pending').length;
+        badge.textContent = arabicDigits(pending);
+        badge.style.display = pending > 0 ? 'inline-block' : 'none';
+      }
+      if (!adminTableGuard(tbody, data, error, { colspan: 7, emptyMsg: 'لا توجد طلبات انضمام بعد' })) return;
+      const stAr = { pending: '⏳ قيد المراجعة', approved: '✅ مقبول', rejected: '✖️ مرفوض' };
+      const stBg = { pending: '#fef3c7', approved: '#dcfce7', rejected: '#fee2e2' };
+      tbody.innerHTML = data.map(a => `
+        <tr style="border-top:1px solid var(--gray-150); vertical-align:top;">
+          <td style="padding:12px;">
+            <div style="font-weight:700;">${escapeHtml(a.company_name)}</div>
+            <div style="color:var(--gray-500); font-size:.78rem;">${escapeHtml(new Date(a.created_at).toLocaleDateString('ar-SA'))}</div>
+            ${a.address ? `<div style="color:var(--gray-600); font-size:.8rem;">📍 ${escapeHtml(a.address)}</div>` : ''}
+            ${a.maps_url ? `<a href="${escapeHtml(a.maps_url)}" target="_blank" rel="noopener noreferrer" style="font-size:.8rem;">🗺️ الموقع على الخريطة</a>` : ''}
+          </td>
+          <td style="padding:12px; font-family:monospace; direction:ltr; text-align:right;">${escapeHtml(a.cr_number)}</td>
+          <td style="padding:12px;">${escapeHtml(a.city)}</td>
+          <td style="padding:12px; font-size:.82rem; color:var(--gray-600);">
+            ${(a.categories || []).map(c => `<span style="display:inline-block; background:var(--gray-100); border-radius:10px; padding:2px 9px; margin:2px;">${escapeHtml(c)}</span>`).join('')}
+            ${a.other_category ? `<div style="margin-top:4px;">➕ ${escapeHtml(a.other_category)}</div>` : ''}
+          </td>
+          <td style="padding:12px; font-size:.85rem;">
+            <div style="font-weight:600;">${escapeHtml(a.contact_name)}</div>
+            <div style="direction:ltr; text-align:right; color:var(--gray-600);">${escapeHtml(a.phone)}</div>
+            ${a.email ? `<div style="direction:ltr; text-align:right; color:var(--gray-600); font-size:.78rem;">${escapeHtml(a.email)}</div>` : ''}
+            <a href="https://wa.me/${escapeHtml(String(a.phone).replace(/[^0-9]/g,'').replace(/^0/,'966'))}" target="_blank" rel="noopener noreferrer" style="font-size:.8rem;">💬 واتساب</a>
+          </td>
+          <td style="padding:12px; font-size:.82rem;">
+            ${a.cr_doc_path ? `<button class="btn btn-ghost" style="padding:4px 10px; font-size:.78rem;" onclick="viewAppDoc('${escapeHtml(a.cr_doc_path)}')">📄 السجل</button>` : '—'}
+            ${a.vat_doc_path ? `<button class="btn btn-ghost" style="padding:4px 10px; font-size:.78rem;" onclick="viewAppDoc('${escapeHtml(a.vat_doc_path)}')">🧾 VAT</button>` : ''}
+          </td>
+          <td style="padding:12px;">
+            <span style="background:${stBg[a.status] || 'var(--gray-100)'}; color:#333; padding:4px 10px; border-radius:12px; font-size:.8rem; white-space:nowrap;">${stAr[a.status] || escapeHtml(a.status)}</span>
+            <select onchange="updateApplicationStatus('${escapeHtml(a.id)}', this.value)" style="display:block; margin-top:8px; padding:6px 10px; border:1px solid var(--gray-200); border-radius:6px; background:var(--white); font-size:.82rem;">
+              <option value="">تغيير…</option>
+              <option value="approved">✅ قبول</option>
+              <option value="rejected">✖️ رفض</option>
+              <option value="pending">⏳ إعادة للمراجعة</option>
+            </select>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function updateApplicationStatus(id, status) {
+      if (!status) return;
+      const { error } = await window.supabaseClient
+        .from('supplier_applications')
+        .update({ status, reviewed_at: new Date().toISOString() })
+        .eq('id', id);
+      if (error) { toast('تعذّر التحديث: ' + error.message, '⚠'); return; }
+      toast(status === 'approved' ? 'تم قبول المورد ✅ — أضِفه الآن من تبويب الموردين' : 'تم تحديث حالة الطلب', '✓');
+      loadAdminApplications();
+    }
+
+    async function viewAppDoc(path) {
+      try {
+        const { data, error } = await window.supabaseClient.storage
+          .from('supplier-docs')
+          .createSignedUrl(path, 300);
+        if (error || !data?.signedUrl) throw error || new Error('no url');
+        window.open(data.signedUrl, '_blank', 'noopener');
+      } catch (e) { toast('تعذّر فتح المستند', '⚠'); }
+    }
+    window.loadAdminApplications = loadAdminApplications;
+    window.updateApplicationStatus = updateApplicationStatus;
+    window.viewAppDoc = viewAppDoc;
 
     // Hook into the existing router so #admin loads the dashboard
     const __originalGoFn = window.go;
@@ -9525,7 +9939,7 @@ p {
     function go(hash) {
       const raw = (hash || '#home').replace('#', '');
       const [route, param] = raw.split('/');
-      const views = ['home', 'supplier', 'wishlist', 'rfq', 'concrete', 'cart', 'confirm', 'policy'];
+      const views = ['home', 'supplier', 'wishlist', 'rfq', 'concrete', 'cart', 'confirm', 'policy', 'supplier-register'];
       let target = views.includes(route) ? route : 'home';
       // catalog / product no longer exist — redirect to home (or directory for product)
       if (route === 'catalog' || route === 'product') target = 'home';
@@ -10556,6 +10970,7 @@ p {
         details: f.querySelector('[name=details]')?.value || '',
       };
       if (window.apiSubmitRFQ) await apiSubmitRFQ(data);
+      if (typeof celebrate === 'function') celebrate();
       toast('تم إرسال طلب عرض السعر — سيتواصل معك أكثر من مورد خلال ٢٤ ساعة', '✉');
       f.reset();
       setTimeout(() => location.hash = '#home', 1200);
@@ -10811,6 +11226,10 @@ p {
             if (typeof toast === 'function') toast('🔔 طلب عرض سعر جديد!', '🔔');
             try { if (typeof loadAdminOrders === 'function') loadAdminOrders(); } catch{}
           })
+          .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'supplier_applications' }, () => {
+            if (typeof toast === 'function') toast('📨 طلب انضمام مورد جديد!', '📨');
+            try { if (typeof loadAdminApplications === 'function') loadAdminApplications(); } catch{}
+          })
           .subscribe(status => console.log('[admin realtime]', status));
       } catch (e) { console.warn('realtime setup failed', e); window.__adminRealtimeSetup = false; }
     }
@@ -10818,6 +11237,163 @@ p {
 
     window.apiSubmitRFQ = apiSubmitRFQ;
     window.apiPlaceOrder = apiPlaceOrder;
+
+    /* ============================================================
+       CONFETTI — small celebration on successful submits
+       ============================================================ */
+    function celebrate() {
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      const colors = ['#d4a563', '#c08e3f', '#0a1830', '#f6f0e3', '#e7c68f', '#2e9e5b'];
+      for (let i = 0; i < 55; i++) {
+        const b = document.createElement('div');
+        b.className = 'confetti-bit';
+        b.style.left = Math.random() * 100 + 'vw';
+        b.style.background = colors[Math.floor(Math.random() * colors.length)];
+        b.style.setProperty('--cx', (Math.random() * 160 - 80) + 'px');
+        b.style.setProperty('--cr', (Math.random() * 720 - 360) + 'deg');
+        b.style.setProperty('--cd', (1.6 + Math.random() * 1.2) + 's');
+        b.style.animationDelay = (Math.random() * .35) + 's';
+        document.body.appendChild(b);
+        setTimeout(() => b.remove(), 3400);
+      }
+    }
+    window.celebrate = celebrate;
+
+    /* ============================================================
+       SPLASH OPENER — supplier pitch, once per session
+       ============================================================ */
+    (function initSplash() {
+      const splash = document.getElementById('medadSplash');
+      if (!splash) return;
+      const seen = sessionStorage.getItem('medad_splash_seen');
+      const onHome = !location.hash || location.hash === '#' || location.hash === '#home';
+      if (seen || !onHome) { splash.remove(); return; }
+      splash.hidden = false;
+      document.body.style.overflow = 'hidden';
+    })();
+    function dismissSplash(target) {
+      const splash = document.getElementById('medadSplash');
+      sessionStorage.setItem('medad_splash_seen', '1');
+      document.body.style.overflow = '';
+      if (splash) {
+        splash.classList.add('hide');
+        setTimeout(() => splash.remove(), 600);
+      }
+      if (target) {
+        if (location.hash === target) go(target);
+        else location.hash = target;
+      }
+    }
+    window.dismissSplash = dismissSplash;
+
+    /* ============================================================
+       SUPPLIER REGISTRATION (سجّل كمورد)
+       ============================================================ */
+    // "أخرى" checkbox reveals the free-text field
+    document.getElementById('sregOtherChk')?.addEventListener('change', function () {
+      const wrap = document.getElementById('sregOtherWrap');
+      if (wrap) wrap.style.display = this.checked ? 'block' : 'none';
+    });
+
+    function sregFileChanged(input, labelId, docLabel) {
+      const label = document.getElementById(labelId);
+      if (!label) return;
+      const f = input.files && input.files[0];
+      const nameEl = label.querySelector('.fname');
+      if (f) {
+        if (f.size > 5 * 1024 * 1024) {
+          toast('حجم الملف يتجاوز ٥ ميجابايت', '⚠');
+          input.value = '';
+          label.classList.remove('has-file');
+          if (nameEl) nameEl.textContent = docLabel;
+          return;
+        }
+        label.classList.add('has-file');
+        if (nameEl) nameEl.textContent = '✓ ' + f.name;
+      } else {
+        label.classList.remove('has-file');
+        if (nameEl) nameEl.textContent = docLabel;
+      }
+    }
+    window.sregFileChanged = sregFileChanged;
+
+    const toEnDigits = s => String(s || '').replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d));
+
+    async function uploadSupplierDoc(file, folder, kind) {
+      if (!file) return null;
+      const ext = (file.name.split('.').pop() || 'pdf').toLowerCase().replace(/[^a-z0-9]/g, '') || 'pdf';
+      const path = `${folder}/${kind}.${ext}`;
+      const { error } = await window.supabaseClient.storage
+        .from('supplier-docs')
+        .upload(path, file, { contentType: file.type || 'application/pdf', upsert: false });
+      if (error) throw error;
+      return path;
+    }
+
+    async function submitSupplierApp(e) {
+      e.preventDefault();
+      const f = e.target;
+      const cats = [...f.querySelectorAll('input[name=cats]:checked')].map(c => c.value);
+      if (cats.length === 0) {
+        toast('اختر تخصصًا واحدًا على الأقل من قائمة المواد', '⚠');
+        document.getElementById('sregCats')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+      if (!window.supabaseClient) { toast('لا يوجد اتصال — حاول مرة أخرى', '⚠'); return; }
+
+      const btn = document.getElementById('sregSubmitBtn');
+      const btnHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '⏳ جارٍ إرسال طلبك…';
+
+      try {
+        const folder = Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+        const crFile = f.querySelector('[name=cr_doc]')?.files?.[0] || null;
+        const vatFile = f.querySelector('[name=vat_doc]')?.files?.[0] || null;
+
+        let cr_doc_path = null, vat_doc_path = null;
+        try {
+          cr_doc_path = await uploadSupplierDoc(crFile, folder, 'cr');
+          vat_doc_path = await uploadSupplierDoc(vatFile, folder, 'vat');
+        } catch (upErr) {
+          console.warn('doc upload failed', upErr);
+          toast('تعذّر رفع المستندات — سنستلم طلبك بدونها ويمكن إرسالها لاحقًا عبر واتساب', 'ℹ');
+        }
+
+        const row = {
+          company_name: f.querySelector('[name=company_name]').value.trim(),
+          cr_number: toEnDigits(f.querySelector('[name=cr_number]').value.trim()),
+          city: f.querySelector('[name=city]').value,
+          address: f.querySelector('[name=address]').value.trim() || null,
+          maps_url: f.querySelector('[name=maps_url]').value.trim() || null,
+          categories: cats,
+          other_category: f.querySelector('[name=other_category]').value.trim() || null,
+          contact_name: f.querySelector('[name=contact_name]').value.trim(),
+          phone: toEnDigits(f.querySelector('[name=phone]').value.trim()),
+          email: f.querySelector('[name=email]').value.trim() || null,
+          cr_doc_path, vat_doc_path,
+          user_id: window.currentUser?.id || null,
+        };
+        const { error } = await window.supabaseClient.from('supplier_applications').insert(row);
+        if (error) throw error;
+
+        celebrate();
+        toast('🎉 تم استلام طلب انضمامك! سيتواصل معك فريق مداد خلال ٢٤ ساعة', '✓');
+        f.reset();
+        document.querySelectorAll('.sreg-file').forEach(l => l.classList.remove('has-file'));
+        const crN = document.querySelector('#crFileLabel .fname'); if (crN) crN.textContent = 'نسخة من السجل التجاري (PDF أو صورة)';
+        const vatN = document.querySelector('#vatFileLabel .fname'); if (vatN) vatN.textContent = 'شهادة ضريبة القيمة المضافة (VAT)';
+        const ow = document.getElementById('sregOtherWrap'); if (ow) ow.style.display = 'none';
+        setTimeout(() => { location.hash = '#home'; }, 1800);
+      } catch (err) {
+        console.warn('supplier application failed', err);
+        toast('تعذّر إرسال الطلب: ' + (err?.message || 'خطأ غير معروف'), '⚠');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = btnHtml;
+      }
+    }
+    window.submitSupplierApp = submitSupplierApp;
 
     /* ============================================================
        BOOT
