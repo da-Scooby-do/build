@@ -9,6 +9,26 @@
     content="مداد للبناء والخدمات اللوجستية تربط المقاولين والأفراد بأفضل موردي مواد البناء في المملكة العربية السعودية." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+  <!-- PWA / mobile-pro -->
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#faf6f0" />
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0a1830" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="مداد" />
+
+  <!-- Social sharing -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="مداد للبناء والخدمات اللوجستية" />
+  <meta property="og:title" content="مداد للبناء | اطلب مواد البناء بأفضل سعر في المملكة" />
+  <meta property="og:description" content="أرسل احتياجك من مواد البناء — نتفاوض مع أكثر من ٣٨٠ موردًا ونوافيك بأفضل عرض: السعر، الكمية، ووقت التسليم." />
+  <meta property="og:url" content="https://build-omega-sand.vercel.app/" />
+  <meta property="og:image" content="https://build-omega-sand.vercel.app/icon-512.png" />
+  <meta property="og:locale" content="ar_SA" />
+  <meta name="twitter:card" content="summary" />
   <style>
 /* ============================================
    مداد للبناء والخدمات اللوجستية — Saudi Construction Marketplace
@@ -8623,9 +8643,9 @@ p {
       const catSel = form.category_id;
       const supSel = form.supplier_id;
       const citySel = form.city_code;
-      catSel.innerHTML = '<option value="">اختر تصنيفًا</option>' + (cats.data||[]).map(c => `<option value="${c.id}">${c.name_ar}</option>`).join('');
-      supSel.innerHTML = '<option value="">اختر موردًا</option>' + (sups.data||[]).map(s => `<option value="${s.id}">${s.name_ar}</option>`).join('');
-      citySel.innerHTML = '<option value="">اختر مدينة</option>' + (cits.data||[]).map(c => `<option value="${c.code}">${c.name_ar}</option>`).join('');
+      catSel.innerHTML = '<option value="">اختر تصنيفًا</option>' + (cats.data||[]).map(c => `<option value="${escapeHtml(c.id)}">${escapeHtml(c.name_ar)}</option>`).join('');
+      supSel.innerHTML = '<option value="">اختر موردًا</option>' + (sups.data||[]).map(s => `<option value="${escapeHtml(s.id)}">${escapeHtml(s.name_ar)}</option>`).join('');
+      citySel.innerHTML = '<option value="">اختر مدينة</option>' + (cits.data||[]).map(c => `<option value="${escapeHtml(c.code)}">${escapeHtml(c.name_ar)}</option>`).join('');
 
       if (product && typeof product === 'object') {
         form.id.value = product.id || '';
@@ -8752,7 +8772,7 @@ p {
     async function loadAdminCategories() {
       const grid = document.getElementById('adminCategoriesGrid');
       const { data, error } = await window.supabaseClient.from('categories').select('*').order('sort_order');
-      if (error) { grid.innerHTML = `<div style="color:#d33; padding:20px;">${error.message}</div>`; return; }
+      if (error) { grid.innerHTML = `<div style="color:#d33; padding:20px;">${escapeHtml(error.message)}</div>`; return; }
       if (!data?.length) { grid.innerHTML = '<div style="grid-column:1/-1; padding:30px; text-align:center; color:var(--gray-500);">لا توجد تصنيفات</div>'; return; }
       grid.innerHTML = data.map(c => `
         <div style="background:var(--white); border:1px solid var(--gray-150); border-radius:var(--radius-md); padding:18px; display:flex; flex-direction:column; gap:8px;">
@@ -9132,7 +9152,7 @@ p {
         .order('created_at', { ascending: false });
 
       if (error) {
-        container.innerHTML = `<div class="addresses-empty">خطأ: ${error.message}</div>`;
+        container.innerHTML = `<div class="addresses-empty">خطأ: ${escapeHtml(error.message)}</div>`;
         return;
       }
       if (!data?.length) {
@@ -9180,7 +9200,7 @@ p {
       try {
         const { data: cities } = await window.supabaseClient.from('cities').select('code, name_ar').order('name_ar');
         const sel = form.city_code;
-        sel.innerHTML = '<option value="">اختر مدينة</option>' + (cities || []).map(c => `<option value="${c.code}">${c.name_ar}</option>`).join('');
+        sel.innerHTML = '<option value="">اختر مدينة</option>' + (cities || []).map(c => `<option value="${escapeHtml(c.code)}">${escapeHtml(c.name_ar)}</option>`).join('');
       } catch {}
 
       if (address && typeof address === 'object') {
@@ -10456,7 +10476,7 @@ p {
         .limit(50)
         .then(({ data, error }) => {
           if (error) {
-            host.innerHTML = `<div style="background:#fde8e8; color:#d33; padding:18px 24px; border-radius:12px; text-align:center;">تعذّر تحميل الطلبات: ${error.message}</div>`;
+            host.innerHTML = `<div style="background:#fde8e8; color:#d33; padding:18px 24px; border-radius:12px; text-align:center;">تعذّر تحميل الطلبات: ${escapeHtml(error.message)}</div>`;
             return;
           }
           if (!data || !data.length) {
@@ -10969,7 +10989,14 @@ p {
         neededBy: f.querySelector('[name=neededBy]')?.value || '',
         details: f.querySelector('[name=details]')?.value || '',
       };
-      if (window.apiSubmitRFQ) await apiSubmitRFQ(data);
+      const res = window.apiSubmitRFQ ? await apiSubmitRFQ(data) : { ok: false };
+      if (!res || res.ok === false) {
+        // Be honest with the customer — don't pretend it was saved.
+        toast('تعذّر حفظ الطلب — أرسله لنا مباشرة عبر واتساب وسنخدمك فورًا', '⚠');
+        window.open(waLink('966920002362',
+          `طلب عرض سعر:\nالمادة: ${data.category}\nالكمية: ${data.qty}\nالمدينة: ${data.city}\nالاسم: ${data.contactName}\nالجوال: ${data.phone}`), '_blank', 'noopener');
+        return;
+      }
       if (typeof celebrate === 'function') celebrate();
       toast('تم إرسال طلب عرض السعر — سيتواصل معك أكثر من مورد خلال ٢٤ ساعة', '✉');
       f.reset();
@@ -11115,9 +11142,18 @@ p {
             payment_method: null,
             customer_notes,
           };
-          const { data: order, error } = await window.supabaseClient
-            .from('orders').insert(orderRow).select().single();
-          if (error) throw error;
+          // Guests have no SELECT policy on orders, so INSERT..RETURNING would
+          // be rejected — use a plain insert for them (admin sees the row).
+          let order = null;
+          if (window.currentUser?.id) {
+            const { data, error } = await window.supabaseClient
+              .from('orders').insert(orderRow).select().single();
+            if (error) throw error;
+            order = data;
+          } else {
+            const { error } = await window.supabaseClient.from('orders').insert(orderRow);
+            if (error) throw error;
+          }
 
           // 4) One synthetic order_item describing the requested material
           if (order) {
@@ -11149,10 +11185,13 @@ p {
             if (rfqErr) console.warn('rfqs mirror insert failed', rfqErr);
           } catch (e) { console.warn('rfqs mirror exception', e); }
 
-          return { id: order?.id, orderNo, status: 'pending' };
-        } catch (e) { console.warn('customer request save failed', e); }
+          return { ok: true, id: order?.id, orderNo, status: 'pending' };
+        } catch (e) {
+          console.warn('customer request save failed', e);
+          return { ok: false, error: e?.message };
+        }
       }
-      return { id: 'local-' + Date.now(), status: 'received' };
+      return { ok: false, error: 'no client' };
     }
 
     // Order placement hook — writes to Supabase orders + order_items
