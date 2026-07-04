@@ -5859,6 +5859,23 @@ p {
     @keyframes statPulse { 0% { transform: scale(1); } 50% { transform: scale(1.12); color: #c08e3f; } 100% { transform: scale(1); } }
     .stat-pop { animation: statPulse .6s ease; display: inline-block; }
     @media (prefers-reduced-motion: reduce) { .confetti-bit { display: none; } }
+
+    /* ---------- Customer receipt: theme-aware boxes ---------- */
+    .req-details {
+      background: #faf6f0; border: 1px solid rgba(212,165,99,.25); border-radius: 10px;
+      margin: 0 0 14px; color: #45536b; font-size: .88rem; line-height: 1.8;
+    }
+    .req-details summary { padding: 12px 18px; cursor: pointer; font-weight: 700; color: #0a1830; list-style-position: inside; }
+    .req-details > div { padding: 2px 18px 14px; }
+    [data-theme="dark"] .req-details { background: #101f3a; border-color: rgba(212,165,99,.35); color: #c9d4e6; }
+    [data-theme="dark"] .req-details summary { color: #f0dcb4; }
+    .quote-note {
+      background: rgba(212,165,99,.12); border: 1px solid rgba(212,165,99,.4); border-radius: 10px;
+      padding: 12px 16px; margin: 0 0 14px; color: #45536b; font-size: .88rem; line-height: 1.8;
+    }
+    .quote-note b { color: #0a1830; }
+    [data-theme="dark"] .quote-note { background: rgba(212,165,99,.14); color: #d8e0ee; }
+    [data-theme="dark"] .quote-note b { color: #f0dcb4; }
   </style>
 </head>
 
@@ -6079,6 +6096,9 @@ p {
           </a>
           <a href="#suppliers-directory" data-link class="btn btn-ghost" style="padding:15px 30px; font-size:1.02rem; color:#fff; border:1px solid rgba(255,255,255,.45);">
             تصفّح موردينا — كل المملكة
+          </a>
+          <a href="#supplier-register" data-link style="display:inline-flex; align-items:center; gap:10px; padding:14px 28px; font-size:1rem; font-weight:800; border-radius:12px; text-decoration:none; color:#f0dcb4; background:rgba(212,165,99,.14); border:1.5px solid rgba(212,165,99,.65);">
+            🏭 انضم كمورد — ضاعف مبيعاتك
           </a>
         </div>
       </div>
@@ -7101,7 +7121,7 @@ p {
           <div class="row2">
             <div>
               <label>المادة المطلوبة</label>
-              <select required id="rfq-cat">
+              <select required id="rfq-cat" name="category">
                 <option value="">اختر المادة…</option>
                 <option>خرسانة جاهزة</option>
                 <option>طوب</option>
@@ -7116,13 +7136,13 @@ p {
             </div>
             <div>
               <label>الكمية التقديرية</label>
-              <input type="text" required placeholder="مثال: ٥٠٠ طن، ١٠٠٠ م٣، ٢٠٠ باب…" />
+              <input type="text" name="qty" required placeholder="مثال: ٥٠٠ طن، ١٠٠٠ م٣، ٢٠٠ باب…" />
             </div>
           </div>
           <div class="row2">
             <div>
               <label>المدينة / موقع المشروع</label>
-              <select required>
+              <select required name="city">
                 <option value="">اختر المدينة…</option>
                 <option>الرياض</option>
                 <option>جدة</option>
@@ -7137,12 +7157,12 @@ p {
             </div>
             <div>
               <label>تاريخ التسليم المطلوب</label>
-              <input type="date" required />
+              <input type="date" name="neededBy" required />
             </div>
           </div>
           <div>
             <label>تفاصيل إضافية ومواصفات</label>
-            <textarea required placeholder="مواصفات تقنية، عدد الدفعات، شروط خاصة…"></textarea>
+            <textarea name="details" required placeholder="مواصفات تقنية، عدد الدفعات، شروط خاصة…"></textarea>
           </div>
           <div>
             <label>إرفاق ملف (مخططات، BOQ، صور)</label>
@@ -7160,11 +7180,11 @@ p {
           <div class="row2">
             <div>
               <label>اسمك أو اسم الشركة</label>
-              <input type="text" required placeholder="شركة المقاولات…" />
+              <input type="text" name="contactName" required placeholder="شركة المقاولات…" />
             </div>
             <div>
               <label>رقم الجوال (واتساب)</label>
-              <input type="tel" required placeholder="05xxxxxxxx" />
+              <input type="tel" name="phone" required inputmode="tel" pattern="(\+?966|0)?5[0-9٠-٩]{8}" placeholder="05xxxxxxxx" />
             </div>
           </div>
           <button type="submit" class="btn btn-amber" style="justify-self:start;">
@@ -7690,22 +7710,26 @@ p {
           <div style="color:var(--gray-500); font-size:.85rem; margin-bottom:8px;">طلبات قيد المعالجة</div>
           <div id="statPendingOrders" style="font-size:1.8rem; font-weight:800; color:#e0a100; font-family:var(--font-display);">٠</div>
         </div>
+        <div class="stat-card" style="background:linear-gradient(135deg, #0a1830, #16294a); border:1px solid rgba(212,165,99,.4); border-radius:var(--radius-lg); padding:22px; box-shadow:var(--shadow-xs);">
+          <div style="color:#c3cfe2; font-size:.85rem; margin-bottom:8px;">⏳ بانتظار التسعير</div>
+          <div id="statAwaitingQuote" style="font-size:1.8rem; font-weight:800; color:#d4a563; font-family:var(--font-display);">٠</div>
+        </div>
       </div>
 
       <!-- Tab nav -->
       <div class="admin-tabs" style="display:flex; gap:0; border-bottom:2px solid var(--gray-150); margin-bottom:24px; flex-wrap:wrap;">
-        <button class="admin-tab active" onclick="switchAdminTab('orders')" data-tab="orders" style="padding:12px 22px; background:transparent; border:0; border-bottom:3px solid var(--amber-400); font-weight:700; color:var(--navy-900); cursor:pointer;">الطلبات الأخيرة</button>
-        <button class="admin-tab" onclick="switchAdminTab('products')" data-tab="products" style="padding:12px 22px; background:transparent; border:0; border-bottom:3px solid transparent; font-weight:600; color:var(--gray-500); cursor:pointer;">المنتجات</button>
+        <button class="admin-tab active" onclick="switchAdminTab('orders')" data-tab="orders" style="padding:12px 22px; background:transparent; border:0; border-bottom:3px solid var(--amber-400); font-weight:700; color:var(--navy-900); cursor:pointer;">📥 طلبات العملاء</button>
+        <button class="admin-tab" onclick="switchAdminTab('applications')" data-tab="applications" style="padding:12px 22px; background:transparent; border:0; border-bottom:3px solid transparent; font-weight:600; color:var(--gray-500); cursor:pointer;">🏭 طلبات الانضمام <span id="appsBadge" style="display:none; background:#d4a563; color:#0a1830; border-radius:999px; padding:1px 8px; font-size:.75rem; font-weight:800; margin-inline-start:4px;">0</span></button>
         <button class="admin-tab" onclick="switchAdminTab('suppliers')" data-tab="suppliers" style="padding:12px 22px; background:transparent; border:0; border-bottom:3px solid transparent; font-weight:600; color:var(--gray-500); cursor:pointer;">الموردون</button>
-        <button class="admin-tab" onclick="switchAdminTab('categories')" data-tab="categories" style="padding:12px 22px; background:transparent; border:0; border-bottom:3px solid transparent; font-weight:600; color:var(--gray-500); cursor:pointer;">التصنيفات</button>
         <button class="admin-tab" onclick="switchAdminTab('customers')" data-tab="customers" style="padding:12px 22px; background:transparent; border:0; border-bottom:3px solid transparent; font-weight:600; color:var(--gray-500); cursor:pointer;">العملاء</button>
-        <button class="admin-tab" onclick="switchAdminTab('applications')" data-tab="applications" style="padding:12px 22px; background:transparent; border:0; border-bottom:3px solid transparent; font-weight:600; color:var(--gray-500); cursor:pointer;">طلبات الانضمام <span id="appsBadge" style="display:none; background:#d4a563; color:#0a1830; border-radius:999px; padding:1px 8px; font-size:.75rem; font-weight:800; margin-inline-start:4px;">0</span></button>
+        <button class="admin-tab" onclick="switchAdminTab('products')" data-tab="products" style="padding:12px 22px; background:transparent; border:0; border-bottom:3px solid transparent; font-weight:600; color:var(--gray-500); cursor:pointer;">المنتجات</button>
+        <button class="admin-tab" onclick="switchAdminTab('categories')" data-tab="categories" style="padding:12px 22px; background:transparent; border:0; border-bottom:3px solid transparent; font-weight:600; color:var(--gray-500); cursor:pointer;">التصنيفات</button>
       </div>
 
       <!-- ORDERS TAB -->
       <div class="admin-panel" id="adminPanel-orders">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-          <h3 style="margin:0;">الطلبات الأخيرة</h3>
+          <h3 style="margin:0;">📥 طلبات العملاء — سعّرها وأرسل العرض</h3>
           <button class="btn btn-ghost" onclick="refreshAdminData()">🔄 تحديث</button>
         </div>
         <div style="overflow-x:auto; background:var(--white); border:1px solid var(--gray-150); border-radius:var(--radius-lg);">
@@ -8562,6 +8586,25 @@ p {
         }
       } catch (e) { console.warn('stats load failed', e); }
 
+      // Brokerage KPIs: orders awaiting a quote + pending supplier applications badge
+      try {
+        const { count: awaiting } = await window.supabaseClient
+          .from('orders').select('id', { count: 'exact', head: true })
+          .eq('total', 0).in('status', ['pending', 'confirmed']);
+        const el = document.getElementById('statAwaitingQuote');
+        if (el) el.textContent = arabicDigits(awaiting || 0);
+      } catch (e) { console.warn('awaiting-quote count failed', e); }
+      try {
+        const { count: pendingApps } = await window.supabaseClient
+          .from('supplier_applications').select('id', { count: 'exact', head: true })
+          .eq('status', 'pending');
+        const badge = document.getElementById('appsBadge');
+        if (badge) {
+          badge.textContent = arabicDigits(pendingApps || 0);
+          badge.style.display = (pendingApps || 0) > 0 ? 'inline-block' : 'none';
+        }
+      } catch (e) { console.warn('apps badge count failed', e); }
+
       // Load current tab content
       const activeTab = document.querySelector('.admin-tab.active')?.dataset.tab || 'orders';
       loadAdminTab(activeTab);
@@ -8625,7 +8668,7 @@ p {
       tbody.innerHTML = data.map(o => `
         <tr style="border-top:1px solid var(--gray-150);">
           <td style="padding:12px; font-weight:600;">${escapeHtml(o.order_number)}</td>
-          <td style="padding:12px; color:var(--gray-600); font-size:.88rem;">${escapeHtml(new Date(o.created_at).toLocaleDateString('ar-SA'))}</td>
+          <td style="padding:12px; color:var(--gray-600); font-size:.88rem;">${escapeHtml(new Date(o.created_at).toLocaleDateString('ar-SA-u-ca-gregory'))}</td>
           <td style="padding:12px;">${escapeHtml(o.profiles?.full_name || o.profiles?.email || (o.user_id ? '—' : '👤 زائر'))}</td>
           <td style="padding:12px; font-weight:700;">${parseFloat(o.total) > 0 ? arSAR(o.total) : '<span style="color:#e0a100; font-weight:600; font-size:.82rem;">⏳ بانتظار التسعير</span>'}</td>
           <td style="padding:12px;"><span style="background:var(--gray-100); padding:4px 10px; border-radius:12px; font-size:.8rem;">${escapeHtml(statusAr[o.status]||o.status)}</span></td>
@@ -8938,7 +8981,7 @@ p {
           <td style="padding:12px; color:var(--gray-600); font-size:.85rem;">${escapeHtml(p.email)}</td>
           <td style="padding:12px; color:var(--gray-600); font-size:.85rem;">${escapeHtml(p.phone || '—')}</td>
           <td style="padding:12px;"><span style="background:${p.user_type==='admin'?'#fef3c7':'var(--gray-100)'}; padding:4px 10px; border-radius:12px; font-size:.8rem;">${escapeHtml(typeAr[p.user_type]||p.user_type)}</span></td>
-          <td style="padding:12px; color:var(--gray-600); font-size:.85rem;">${escapeHtml(new Date(p.created_at).toLocaleDateString('ar-SA'))}</td>
+          <td style="padding:12px; color:var(--gray-600); font-size:.85rem;">${escapeHtml(new Date(p.created_at).toLocaleDateString('ar-SA-u-ca-gregory'))}</td>
         </tr>
       `).join('');
     }
@@ -8966,7 +9009,7 @@ p {
         <tr style="border-top:1px solid var(--gray-150); vertical-align:top;">
           <td style="padding:12px;">
             <div style="font-weight:700;">${escapeHtml(a.company_name)}</div>
-            <div style="color:var(--gray-500); font-size:.78rem;">${escapeHtml(new Date(a.created_at).toLocaleDateString('ar-SA'))}</div>
+            <div style="color:var(--gray-500); font-size:.78rem;">${escapeHtml(new Date(a.created_at).toLocaleDateString('ar-SA-u-ca-gregory'))}</div>
             ${a.address ? `<div style="color:var(--gray-600); font-size:.8rem;">📍 ${escapeHtml(a.address)}</div>` : ''}
             ${a.maps_url ? `<a href="${escapeHtml(a.maps_url)}" target="_blank" rel="noopener noreferrer" style="font-size:.8rem;">🗺️ الموقع على الخريطة</a>` : ''}
           </td>
@@ -9722,7 +9765,7 @@ p {
       if (sec < 3600) return `منذ ${Math.floor(sec/60)} دقيقة`;
       if (sec < 86400) return `منذ ${Math.floor(sec/3600)} ساعة`;
       if (sec < 604800) return `منذ ${Math.floor(sec/86400)} يوم`;
-      return d.toLocaleDateString('ar-SA');
+      return d.toLocaleDateString('ar-SA-u-ca-gregory');
     }
 
     async function loadProductReviews(productId, containerSelector = '#productReviewsSection') {
@@ -10614,7 +10657,7 @@ p {
           host.innerHTML = data.map(o => {
             const meta = statusMap[o.status] || statusMap.pending;
             const isStopped = o.status === 'cancelled' || o.status === 'refunded';
-            const dt = new Date(o.created_at).toLocaleDateString('ar-SA');
+            const dt = new Date(o.created_at).toLocaleDateString('ar-SA-u-ca-gregory');
             const tm = new Date(o.created_at).toLocaleTimeString('ar-SA', { hour:'2-digit', minute:'2-digit' });
             const notesHTML = (o.customer_notes || '').split('\n').map(line =>
               line.trim() ? `<div style="margin:3px 0;">${escapeHtml(line)}</div>` : ''
@@ -10626,12 +10669,12 @@ p {
             const canAccept = hasQuote && ['pending','confirmed'].includes(o.status);
             const acceptMsg = `أوافق على عرض السعر لطلبي رقم ${o.order_number} بإجمالي ${parseFloat(o.total||0).toFixed(2)} ر.س — الرجاء إكمال إجراءات التوريد.`;
             const dlvDate = o.delivery_date
-              ? `<div style="${rowStyle} border-top:1px dashed rgba(212,165,99,.35); margin-top:6px; padding-top:9px;"><span style="color:var(--gray-600);">🚚 التسليم المتوقع</span><span style="font-weight:700; color:var(--navy-900);">${escapeHtml(new Date(o.delivery_date + 'T00:00:00').toLocaleDateString('ar-SA', { weekday:'long', day:'numeric', month:'long' }))}</span></div>`
+              ? `<div style="${rowStyle} border-top:1px dashed rgba(212,165,99,.35); margin-top:6px; padding-top:9px;"><span style="color:var(--gray-600);">🚚 التسليم المتوقع</span><span style="font-weight:700; color:var(--navy-900);">${escapeHtml(new Date(o.delivery_date + 'T00:00:00').toLocaleDateString('ar-SA-u-ca-gregory', { weekday:'long', day:'numeric', month:'long' }))}</span></div>`
               : '';
             const quoteHTML = hasQuote ? `
               <div style="background:linear-gradient(135deg, #0a1830, #16294a); border-radius:12px; padding:18px 20px; margin:14px 0; color:#fdf9f1; position:relative; overflow:hidden;">
                 <div style="position:absolute; inset:0; background:radial-gradient(ellipse at top left, rgba(212,165,99,.18), transparent 55%); pointer-events:none;"></div>
-                <div style="display:flex; align-items:center; gap:8px; font-weight:800; margin-bottom:10px; position:relative;">🧾 عرض السعر من مداد ${o.quoted_at ? `<span style="font-weight:500; font-size:.75rem; color:#93acd1;">${escapeHtml(new Date(o.quoted_at).toLocaleDateString('ar-SA'))}</span>` : ''}</div>
+                <div style="display:flex; align-items:center; gap:8px; font-weight:800; margin-bottom:10px; position:relative;">🧾 عرض السعر من مداد ${o.quoted_at ? `<span style="font-weight:500; font-size:.75rem; color:#93acd1;">${escapeHtml(new Date(o.quoted_at).toLocaleDateString('ar-SA-u-ca-gregory'))}</span>` : ''}</div>
                 <div style="position:relative;">
                   <div style="${rowStyle}"><span style="color:#c3cfe2;">السعر قبل الضريبة</span><span style="font-weight:600;">${money(o.subtotal)}</span></div>
                   <div style="${rowStyle}"><span style="color:#c3cfe2;">ضريبة القيمة المضافة (١٥٪)</span><span style="font-weight:600;">${money(o.vat_amount)}</span></div>
@@ -10644,7 +10687,7 @@ p {
                   ${dlvDate}
                 </div>
               </div>
-              ${o.quote_note ? `<div style="background:rgba(212,165,99,.1); border:1px solid rgba(212,165,99,.35); border-radius:10px; padding:12px 16px; margin:0 0 14px; color:var(--gray-700); font-size:.88rem; line-height:1.8;"><b style="color:var(--navy-900);">💬 رسالة من فريق مداد:</b><br>${escapeHtml(o.quote_note)}</div>` : ''}
+              ${o.quote_note ? `<div class="quote-note"><b>💬 رسالة من فريق مداد:</b><br>${escapeHtml(o.quote_note)}</div>` : ''}
               ${canAccept ? `<a href="https://wa.me/966920002362?text=${encodeURIComponent(acceptMsg)}" target="_blank" rel="noopener" style="display:flex; align-items:center; justify-content:center; gap:8px; background:linear-gradient(135deg, #dfb578, #c08e3f); color:#0a1830; padding:13px 20px; border-radius:12px; text-decoration:none; font-weight:800; font-size:1rem; margin-bottom:14px; box-shadow:0 8px 24px rgba(212,165,99,.35);">✅ أوافق على العرض — أكمل الطلب</a>` : ''}
             ` : `
               <div style="display:flex; align-items:center; gap:12px; background:#f6f1e8; border:1px dashed rgba(212,165,99,.5); color:var(--navy-900); padding:14px 18px; border-radius:12px; margin:14px 0; font-weight:600; font-size:.9rem;">
@@ -10688,9 +10731,9 @@ p {
 
                 ${quoteHTML}
 
-                <details style="background:#faf6f0; border:1px solid rgba(212,165,99,.18); border-radius:10px; margin:0 0 14px; color:var(--gray-700); font-size:.88rem; line-height:1.7;">
-                  <summary style="padding:12px 18px; cursor:pointer; font-weight:700; color:var(--navy-900); list-style-position:inside;">📋 تفاصيل طلبك</summary>
-                  <div style="padding:0 18px 14px;">${notesHTML || '<div style="color:var(--gray-500);">—</div>'}</div>
+                <details class="req-details">
+                  <summary>📋 تفاصيل طلبك</summary>
+                  <div>${notesHTML || '<div style="opacity:.6;">—</div>'}</div>
                 </details>
 
                 <div style="display:flex; align-items:center; justify-content:flex-end; gap:12px; flex-wrap:wrap;">
@@ -11261,16 +11304,18 @@ p {
 
           // 2) Pack the request details into customer_notes so the admin sees
           //    everything in the order row without needing another tab
-          const customer_notes =
-            `📋 الفئة: ${payload.category || '-'}\n` +
-            `📦 الكمية: ${payload.qty || '-'}\n` +
-            `👤 الاسم: ${payload.contactName || '-'}\n` +
-            `📞 الجوال: ${payload.phone || '-'}\n` +
-            `✉️ البريد: ${payload.email || '-'}\n` +
-            `🏙️ المدينة: ${payload.city || '-'}\n` +
-            `🏢 الجهة: ${payload.company || '-'}\n` +
-            `📅 المطلوب بحلول: ${payload.neededBy || '-'}\n\n` +
-            `📝 التفاصيل: ${payload.details || '-'}`;
+          const customer_notes = [
+            ['📋 الفئة', payload.category],
+            ['📦 الكمية', payload.qty],
+            ['👤 الاسم', payload.contactName],
+            ['📞 الجوال', payload.phone],
+            ['✉️ البريد', payload.email],
+            ['🏙️ المدينة', payload.city],
+            ['🏢 الجهة', payload.company],
+            ['📅 المطلوب بحلول', payload.neededBy],
+            ['📝 التفاصيل', payload.details],
+          ].filter(([, v]) => v && String(v).trim())
+           .map(([k, v]) => `${k}: ${v}`).join('\n');
 
           // 3) Insert as a pending order with totals=0 (admin fills them in
           //    once they have negotiated price + quantity from suppliers)
