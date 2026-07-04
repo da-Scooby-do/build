@@ -7184,7 +7184,7 @@ p {
             </div>
             <div>
               <label>رقم الجوال (واتساب)</label>
-              <input type="tel" name="phone" required inputmode="tel" pattern="(\+?966|0)?5[0-9٠-٩]{8}" placeholder="05xxxxxxxx" />
+              <input type="tel" name="phone" required inputmode="tel" pattern="[+0-9٠-٩][0-9٠-٩\s\-]{8,14}" title="أدخل رقم جوال صحيح مثل 05xxxxxxxx" placeholder="05xxxxxxxx" />
             </div>
           </div>
           <button type="submit" class="btn btn-amber" style="justify-self:start;">
@@ -7299,8 +7299,8 @@ p {
             <div>
               <label>رقم الجوال *</label>
               <input type="tel" name="phone" required inputmode="tel"
-                pattern="(\+?966|0)?5[0-9٠-٩]{8}" placeholder="05xxxxxxxx"
-                title="رقم جوال سعودي: يبدأ بـ 05 أو +9665" />
+                pattern="[+0-9٠-٩][0-9٠-٩\s\-]{8,14}" placeholder="05xxxxxxxx"
+                title="أدخل رقم جوال صحيح مثل 05xxxxxxxx" />
             </div>
           </div>
           <div>
@@ -8665,21 +8665,49 @@ p {
         pending:'قيد الانتظار', confirmed:'مؤكد', preparing:'قيد التحضير',
         shipped:'تم الشحن', delivered:'تم التسليم', cancelled:'ملغي', refunded:'مسترجع'
       };
-      tbody.innerHTML = data.map(o => `
+      tbody.innerHTML = data.map(o => {
+        const notesLines = (o.customer_notes || '').split('\n').filter(l => l.trim());
+        const phoneMatch = (o.customer_notes || '').match(/(\+?9665\d{8}|05\d{8})/);
+        const summary = notesLines.slice(0, 2).map(l => escapeHtml(l)).join(' • ');
+        return `
         <tr style="border-top:1px solid var(--gray-150);">
-          <td style="padding:12px; font-weight:600;">${escapeHtml(o.order_number)}</td>
+          <td style="padding:12px;">
+            <div style="font-weight:600;">${escapeHtml(o.order_number)}</div>
+            ${summary ? `<div style="color:var(--gray-500); font-size:.76rem; margin-top:3px; max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${summary}</div>` : ''}
+          </td>
           <td style="padding:12px; color:var(--gray-600); font-size:.88rem;">${escapeHtml(new Date(o.created_at).toLocaleDateString('ar-SA-u-ca-gregory'))}</td>
           <td style="padding:12px;">${escapeHtml(o.profiles?.full_name || o.profiles?.email || (o.user_id ? '—' : '👤 زائر'))}</td>
           <td style="padding:12px; font-weight:700;">${parseFloat(o.total) > 0 ? arSAR(o.total) : '<span style="color:#e0a100; font-weight:600; font-size:.82rem;">⏳ بانتظار التسعير</span>'}</td>
           <td style="padding:12px;"><span style="background:var(--gray-100); padding:4px 10px; border-radius:12px; font-size:.8rem;">${escapeHtml(statusAr[o.status]||o.status)}</span></td>
           <td style="padding:12px; white-space:nowrap;">
+            <button class="btn btn-ghost" onclick="toggleOrderDetails('${escapeHtml(o.id)}')" style="padding:6px 10px; font-size:.82rem;" title="عرض تفاصيل الطلب">📋 التفاصيل</button>
             <button class="btn btn-amber" onclick="openQuoteEditor('${escapeHtml(o.id)}')" style="padding:6px 12px; font-size:.82rem;">💰 ${parseFloat(o.total) > 0 ? 'تعديل السعر' : 'تسعير'}</button>
             <select onchange="updateOrderStatus('${escapeHtml(o.id)}', this.value)" style="padding:6px 10px; border:1px solid var(--gray-200); border-radius:6px; background:var(--white); font-size:.85rem;">
             ${Object.entries(statusAr).map(([k,v]) => `<option value="${k}" ${k===o.status?'selected':''}>${v}</option>`).join('')}
           </select></td>
         </tr>
-      `).join('');
+        <tr id="orderDetails-${escapeHtml(o.id)}" style="display:none; border-top:1px dashed var(--gray-150); background:var(--gray-50);">
+          <td colspan="6" style="padding:16px 20px;">
+            <div style="font-weight:700; color:var(--navy-900); margin-bottom:8px;">📋 تفاصيل طلب العميل</div>
+            <div style="line-height:2; font-size:.9rem; color:var(--gray-600);">
+              ${notesLines.length ? notesLines.map(l => `<div>${escapeHtml(l)}</div>`).join('') : '<div style="color:#e0a100;">⚠ الطلب وصل بدون تفاصيل (أُرسل قبل إصلاح النموذج)</div>'}
+            </div>
+            ${o.quote_note ? `<div style="margin-top:10px; padding:10px 14px; background:rgba(212,165,99,.12); border-radius:8px; font-size:.85rem;"><b>💬 رسالتك للعميل:</b> ${escapeHtml(o.quote_note)}</div>` : ''}
+            <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
+              ${phoneMatch ? `<a href="https://wa.me/${escapeHtml(phoneMatch[0].replace(/^0/, '966').replace('+',''))}" target="_blank" rel="noopener noreferrer" class="btn btn-ghost" style="padding:7px 14px; font-size:.83rem; color:#25D366; border-color:#25D366;">💬 واتساب العميل</a>
+              <a href="tel:${escapeHtml(phoneMatch[0])}" class="btn btn-ghost" style="padding:7px 14px; font-size:.83rem;">📞 اتصال</a>` : ''}
+              <button class="btn btn-amber" onclick="openQuoteEditor('${escapeHtml(o.id)}')" style="padding:7px 16px; font-size:.83rem;">💰 سعّر هذا الطلب</button>
+            </div>
+          </td>
+        </tr>`;
+      }).join('');
     }
+
+    function toggleOrderDetails(id) {
+      const row = document.getElementById('orderDetails-' + id);
+      if (row) row.style.display = row.style.display === 'none' ? 'table-row' : 'none';
+    }
+    window.toggleOrderDetails = toggleOrderDetails;
 
     /* ---- Order quote editor (owner writes the customer's price) ---- */
     function openQuoteEditor(orderId) {
@@ -11165,10 +11193,11 @@ p {
     async function submitRFQ(e) {
       e.preventDefault();
       const f = e.target;
+      const normDigits = s => String(s || '').replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[\s\-]/g, '');
       const data = {
         company: f.querySelector('[name=company]')?.value || '',
         contactName: f.querySelector('[name=contactName]')?.value || '',
-        phone: f.querySelector('[name=phone]')?.value || '',
+        phone: normDigits(f.querySelector('[name=phone]')?.value),
         email: f.querySelector('[name=email]')?.value || '',
         category: f.querySelector('[name=category]')?.value || '',
         qty: f.querySelector('[name=qty]')?.value || '',
