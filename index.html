@@ -8573,27 +8573,55 @@ p {
       }
       if (!window.supabaseClient) return;
 
-      // Load stats
-      try {
-        const { data: stats } = await window.supabaseClient.from('sales_stats').select('*').single();
-        if (stats) {
-          document.getElementById('statRevToday').textContent = arSAR(stats.revenue_today);
-          document.getElementById('statRevMonth').textContent = arSAR(stats.revenue_this_month);
-          document.getElementById('statRevTotal').textContent = arSAR(stats.total_revenue);
-          document.getElementById('statOrdersMonth').textContent = arEN(stats.orders_this_month);
-          document.getElementById('statCustomers').textContent = arEN(stats.total_customers);
-          document.getElementById('statPendingOrders').textContent = arEN(stats.pending_orders);
+      // Load stats — computed directly from orders/profiles (the old sales_stats
+      // view silently returned zeros when its query raced session restore).
+      // Numbers animate (count up) as they load.
+      function countUp(id, target, format) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        target = parseFloat(target) || 0;
+        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          el.textContent = format(target); return;
         }
-      } catch (e) { console.warn('stats load failed', e); }
-
-      // Brokerage KPIs: orders awaiting a quote + pending supplier applications badge
-      try {
-        const { count: awaiting } = await window.supabaseClient
-          .from('orders').select('id', { count: 'exact', head: true })
-          .eq('total', 0).in('status', ['pending', 'confirmed']);
-        const el = document.getElementById('statAwaitingQuote');
-        if (el) el.textContent = arabicDigits(awaiting || 0);
-      } catch (e) { console.warn('awaiting-quote count failed', e); }
+        const dur = 700, t0 = performance.now();
+        function tick(t) {
+          const p = Math.min(1, (t - t0) / dur);
+          const eased = 1 - Math.pow(1 - p, 3);
+          el.textContent = format(target * eased);
+          if (p < 1) requestAnimationFrame(tick);
+          else el.textContent = format(target);
+        }
+        requestAnimationFrame(tick);
+      }
+      const fmtSAR = v => arSAR(Math.round(v));
+      const fmtN = v => arEN(Math.round(v));
+      async function loadAdminStats(retry) {
+        try {
+          const { data: orders, error } = await window.supabaseClient
+            .from('orders').select('total, status, created_at');
+          if (error) throw error;
+          const now = new Date();
+          const todayKey = now.toISOString().slice(0, 10);
+          const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+          const active = o => !['cancelled', 'refunded'].includes(o.status);
+          const amt = o => parseFloat(o.total) || 0;
+          const list = orders || [];
+          countUp('statRevToday', list.filter(o => active(o) && String(o.created_at).slice(0, 10) === todayKey).reduce((s, o) => s + amt(o), 0), fmtSAR);
+          countUp('statRevMonth', list.filter(o => active(o) && new Date(o.created_at) >= monthStart).reduce((s, o) => s + amt(o), 0), fmtSAR);
+          countUp('statRevTotal', list.filter(active).reduce((s, o) => s + amt(o), 0), fmtSAR);
+          countUp('statOrdersMonth', list.filter(o => new Date(o.created_at) >= monthStart).length, fmtN);
+          countUp('statPendingOrders', list.filter(o => ['pending', 'confirmed', 'preparing', 'shipped'].includes(o.status)).length, fmtN);
+          countUp('statAwaitingQuote', list.filter(o => amt(o) === 0 && ['pending', 'confirmed'].includes(o.status)).length, fmtN);
+          const { count: customers } = await window.supabaseClient
+            .from('profiles').select('id', { count: 'exact', head: true });
+          countUp('statCustomers', customers || 0, fmtN);
+        } catch (e) {
+          console.warn('stats load failed', e?.message || e);
+          // One retry — covers the session-restore race right after page load
+          if (!retry) setTimeout(() => loadAdminStats(true), 1600);
+        }
+      }
+      loadAdminStats();
       try {
         const { count: pendingApps } = await window.supabaseClient
           .from('supplier_applications').select('id', { count: 'exact', head: true })
