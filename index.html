@@ -8538,8 +8538,13 @@ p {
         if (typeof setupUserOrdersRealtime === 'function') setupUserOrdersRealtime();
         if (window.isAdmin && typeof setupAdminRealtime === 'function') setupAdminRealtime();
 
-        // Re-render whatever page they're on (in case admin features need to appear)
-        if (typeof renderRoute === 'function') renderRoute();
+        // Re-render whatever page they're on (in case admin features need to appear).
+        // renderRoute never existed — call the real router so a hard refresh at
+        // #admin actually loads the dashboard once the session is restored.
+        try {
+          if (location.hash === '#admin' || location.hash?.startsWith('#admin')) window.go('#admin');
+          else if (location.hash === '#cart' && typeof renderCart === 'function') renderCart();
+        } catch (e) { console.warn('post-auth rerender failed', e); }
       } else {
         document.querySelectorAll('.auth-buttons .btn').forEach(btn => btn.style.display = '');
         document.getElementById('userChip')?.remove();
@@ -8567,10 +8572,25 @@ p {
     function arSAR(n) { return new Intl.NumberFormat('ar-SA', { style:'currency', currency:'SAR', maximumFractionDigits:0 }).format(n||0); }
 
     async function loadAdminDashboard() {
+      // IMPORTANT: never destroy the dashboard DOM. On a hard refresh at #admin
+      // this runs BEFORE the auth session finishes restoring (isAdmin still
+      // false) — the old innerHTML overwrite permanently killed the dashboard.
+      const view = document.getElementById('view-admin');
+      if (!view) return;
+      const content = Array.from(view.children).filter(el => el.id !== 'adminLockMsg');
+      let lock = document.getElementById('adminLockMsg');
       if (!window.isAdmin) {
-        document.getElementById('view-admin').innerHTML = '<div class="container" style="padding:60px 20px; text-align:center;"><h2>🔒 صفحة محظورة</h2><p>هذه الصفحة مخصصة للمالك فقط.</p></div>';
+        if (!lock) {
+          lock = document.createElement('div');
+          lock.id = 'adminLockMsg';
+          lock.innerHTML = '<div class="container" style="padding:60px 20px; text-align:center;"><h2>🔒 صفحة محظورة</h2><p>هذه الصفحة مخصصة للمالك فقط — جارٍ التحقق من الجلسة…</p></div>';
+          view.prepend(lock);
+        }
+        content.forEach(el => { el.style.display = 'none'; });
         return;
       }
+      if (lock) lock.remove();
+      content.forEach(el => { el.style.display = ''; });
       if (!window.supabaseClient) return;
 
       // Load stats — computed directly from orders/profiles (the old sales_stats
@@ -8667,6 +8687,7 @@ p {
     /* Admin table boilerplate: handles error + empty states.
        Returns true if the caller should proceed to render rows. */
     function adminTableGuard(tbody, data, error, { colspan, emptyMsg }) {
+      if (!tbody) return false;
       if (error) {
         tbody.innerHTML = `<tr><td colspan="${colspan}" style="padding:20px; text-align:center; color:#d33;">${escapeHtml(error.message)}</td></tr>`;
         return false;
