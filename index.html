@@ -7886,6 +7886,49 @@ p {
     </form>
   </div>
 
+  <!-- Order quote (pricing) modal — owner writes the offer the customer sees -->
+  <div class="modal-backdrop" id="quoteModal" onclick="if(event.target===this)closeQuoteEditor()">
+    <form class="modal modal-pro" id="quoteForm" onsubmit="saveQuote(event)" style="max-width:560px;">
+      <div class="modal-header">
+        <h2>💰 تسعير الطلب <span id="quoteOrderNo" style="color:var(--amber-500); font-size:.85em;"></span></h2>
+        <button type="button" class="close-x" onclick="closeQuoteEditor()" aria-label="إغلاق">✕</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" name="order_id" />
+
+        <div id="quoteCustomerNotes" style="background:var(--gray-50); border:1px solid var(--gray-150); border-radius:10px; padding:12px 14px; margin-bottom:14px; font-size:.85rem; color:var(--gray-600); line-height:1.8; max-height:150px; overflow:auto;"></div>
+
+        <div class="section-divider">عرض السعر</div>
+        <div class="form-grid">
+          <div class="form-grid-2">
+            <div class="fld"><label>السعر قبل الضريبة (ر.س) *</label><input type="number" name="subtotal" step="0.01" min="0" required oninput="updateQuoteTotals()"></div>
+            <div class="fld"><label>رسوم التوصيل (ر.س)</label><input type="number" name="delivery_fee" step="0.01" min="0" value="0" oninput="updateQuoteTotals()"></div>
+          </div>
+          <div class="form-grid-2">
+            <div class="fld"><label>الخصم (ر.س)</label><input type="number" name="discount" step="0.01" min="0" value="0" oninput="updateQuoteTotals()"></div>
+            <div class="fld"><label>تاريخ التسليم المتوقع</label><input type="date" name="delivery_date"></div>
+          </div>
+        </div>
+
+        <div style="background:linear-gradient(135deg, #0a1830, #16294a); border-radius:12px; padding:14px 18px; margin:14px 0; color:#fdf9f1;">
+          <div style="display:flex; justify-content:space-between; font-size:.88rem; padding:3px 0;"><span style="color:#c3cfe2;">ضريبة القيمة المضافة (١٥٪)</span><span id="quoteVat" style="font-weight:700;">٠٫٠٠ ر.س</span></div>
+          <div style="display:flex; justify-content:space-between; font-size:1.05rem; padding:6px 0 0; border-top:1px solid rgba(212,165,99,.3); margin-top:6px;"><span style="font-weight:700;">الإجمالي للعميل</span><span id="quoteTotal" style="font-weight:800; color:#d4a563;">٠٫٠٠ ر.س</span></div>
+        </div>
+
+        <div class="fld"><label>رسالة للعميل (تظهر في إيصاله)</label><textarea name="quote_note" rows="3" placeholder="مثال: السعر شامل التوصيل إلى موقعك في حي الياسمين. الكمية متوفرة بالكامل لدى مورد معتمد."></textarea></div>
+
+        <label style="display:flex; gap:10px; align-items:center; margin-top:12px; padding:11px 14px; background:var(--gray-50); border:1px solid var(--gray-150); border-radius:10px; cursor:pointer;">
+          <input type="checkbox" name="bump_status" checked style="width:17px; height:17px; cursor:pointer;">
+          <span style="font-weight:600; color:var(--navy-900); font-size:.9rem;">تحديث حالة الطلب إلى «قيد التأكيد» بعد الحفظ</span>
+        </label>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="closeQuoteEditor()">إلغاء</button>
+        <button type="submit" class="btn btn-amber">📤 إرسال العرض للعميل</button>
+      </div>
+    </form>
+  </div>
+
   <!-- Supplier editor modal -->
   <div class="modal-backdrop" id="supplierModal" onclick="if(event.target===this)closeSupplierEditor()">
     <form class="modal modal-pro" id="supplierForm" onsubmit="saveSupplier(event)">
@@ -8568,10 +8611,13 @@ p {
       const tbody = document.getElementById('adminOrdersTbody');
       const { data, error } = await window.supabaseClient
         .from('orders')
-        .select('id, order_number, created_at, total, status, payment_status, user_id, profiles(full_name,email)')
+        .select('id, order_number, created_at, subtotal, vat_amount, delivery_fee, discount, total, status, payment_status, user_id, customer_notes, quote_note, delivery_date, profiles(full_name,email)')
         .order('created_at', { ascending: false })
         .limit(50);
       if (!adminTableGuard(tbody, data, error, { colspan: 6, emptyMsg: 'لا توجد طلبات بعد' })) return;
+      // cache rows so the quote modal can pre-fill without another fetch
+      window.__adminOrdersById = {};
+      data.forEach(o => { window.__adminOrdersById[o.id] = o; });
       const statusAr = {
         pending:'قيد الانتظار', confirmed:'مؤكد', preparing:'قيد التحضير',
         shipped:'تم الشحن', delivered:'تم التسليم', cancelled:'ملغي', refunded:'مسترجع'
@@ -8580,15 +8626,78 @@ p {
         <tr style="border-top:1px solid var(--gray-150);">
           <td style="padding:12px; font-weight:600;">${escapeHtml(o.order_number)}</td>
           <td style="padding:12px; color:var(--gray-600); font-size:.88rem;">${escapeHtml(new Date(o.created_at).toLocaleDateString('ar-SA'))}</td>
-          <td style="padding:12px;">${escapeHtml(o.profiles?.full_name || o.profiles?.email || '—')}</td>
-          <td style="padding:12px; font-weight:700;">${arSAR(o.total)}</td>
+          <td style="padding:12px;">${escapeHtml(o.profiles?.full_name || o.profiles?.email || (o.user_id ? '—' : '👤 زائر'))}</td>
+          <td style="padding:12px; font-weight:700;">${parseFloat(o.total) > 0 ? arSAR(o.total) : '<span style="color:#e0a100; font-weight:600; font-size:.82rem;">⏳ بانتظار التسعير</span>'}</td>
           <td style="padding:12px;"><span style="background:var(--gray-100); padding:4px 10px; border-radius:12px; font-size:.8rem;">${escapeHtml(statusAr[o.status]||o.status)}</span></td>
-          <td style="padding:12px;"><select onchange="updateOrderStatus('${escapeHtml(o.id)}', this.value)" style="padding:6px 10px; border:1px solid var(--gray-200); border-radius:6px; background:var(--white); font-size:.85rem;">
+          <td style="padding:12px; white-space:nowrap;">
+            <button class="btn btn-amber" onclick="openQuoteEditor('${escapeHtml(o.id)}')" style="padding:6px 12px; font-size:.82rem;">💰 ${parseFloat(o.total) > 0 ? 'تعديل السعر' : 'تسعير'}</button>
+            <select onchange="updateOrderStatus('${escapeHtml(o.id)}', this.value)" style="padding:6px 10px; border:1px solid var(--gray-200); border-radius:6px; background:var(--white); font-size:.85rem;">
             ${Object.entries(statusAr).map(([k,v]) => `<option value="${k}" ${k===o.status?'selected':''}>${v}</option>`).join('')}
           </select></td>
         </tr>
       `).join('');
     }
+
+    /* ---- Order quote editor (owner writes the customer's price) ---- */
+    function openQuoteEditor(orderId) {
+      const o = (window.__adminOrdersById || {})[orderId];
+      if (!o) { toast('تعذّر تحميل بيانات الطلب — حدّث الصفحة', '⚠'); return; }
+      const form = document.getElementById('quoteForm');
+      form.reset();
+      form.order_id.value = o.id;
+      document.getElementById('quoteOrderNo').textContent = o.order_number || '';
+      document.getElementById('quoteCustomerNotes').innerHTML =
+        (o.customer_notes || '').split('\n').map(l => l.trim() ? `<div>${escapeHtml(l)}</div>` : '').join('') || '—';
+      if (parseFloat(o.subtotal) > 0) form.subtotal.value = parseFloat(o.subtotal);
+      form.delivery_fee.value = parseFloat(o.delivery_fee || 0);
+      form.discount.value = parseFloat(o.discount || 0);
+      if (o.delivery_date) form.delivery_date.value = o.delivery_date;
+      if (o.quote_note) form.quote_note.value = o.quote_note;
+      form.bump_status.checked = o.status === 'pending';
+      updateQuoteTotals();
+      document.getElementById('quoteModal').classList.add('open');
+    }
+    function closeQuoteEditor() { document.getElementById('quoteModal').classList.remove('open'); }
+    function updateQuoteTotals() {
+      const form = document.getElementById('quoteForm');
+      const sub = parseFloat(form.subtotal.value) || 0;
+      const del = parseFloat(form.delivery_fee.value) || 0;
+      const dis = parseFloat(form.discount.value) || 0;
+      const vat = Math.round(sub * 0.15 * 100) / 100;
+      const total = Math.max(0, Math.round((sub + vat + del - dis) * 100) / 100);
+      document.getElementById('quoteVat').textContent = arSAR(vat);
+      document.getElementById('quoteTotal').textContent = arSAR(total);
+    }
+    async function saveQuote(e) {
+      e.preventDefault();
+      const form = e.target;
+      const sub = parseFloat(form.subtotal.value) || 0;
+      const del = parseFloat(form.delivery_fee.value) || 0;
+      const dis = parseFloat(form.discount.value) || 0;
+      const vat = Math.round(sub * 0.15 * 100) / 100;
+      const total = Math.max(0, Math.round((sub + vat + del - dis) * 100) / 100);
+      const patch = {
+        subtotal: sub,
+        vat_rate: 0.15,
+        vat_amount: vat,
+        delivery_fee: del,
+        discount: dis,
+        total,
+        quote_note: form.quote_note.value.trim() || null,
+        delivery_date: form.delivery_date.value || null,
+        quoted_at: new Date().toISOString(),
+      };
+      if (form.bump_status.checked) patch.status = 'confirmed';
+      const { error } = await window.supabaseClient.from('orders').update(patch).eq('id', form.order_id.value);
+      if (error) { toast('تعذّر حفظ العرض: ' + error.message, '⚠'); return; }
+      closeQuoteEditor();
+      toast('📤 تم إرسال العرض — سيظهر للعميل فورًا في صفحة طلباته', '✓');
+      loadAdminDashboard();
+    }
+    window.openQuoteEditor = openQuoteEditor;
+    window.closeQuoteEditor = closeQuoteEditor;
+    window.updateQuoteTotals = updateQuoteTotals;
+    window.saveQuote = saveQuote;
 
     async function updateOrderStatus(orderId, newStatus) {
       const { error } = await window.supabaseClient.from('orders').update({ status: newStatus }).eq('id', orderId);
@@ -10470,7 +10579,7 @@ p {
 
       window.supabaseClient
         .from('orders')
-        .select('id, order_number, status, total, customer_notes, created_at, updated_at')
+        .select('id, order_number, status, subtotal, vat_amount, delivery_fee, discount, total, customer_notes, quote_note, delivery_date, quoted_at, created_at, updated_at')
         .eq('user_id', window.currentUser.id)
         .order('created_at', { ascending: false })
         .limit(50)
@@ -10510,9 +10619,38 @@ p {
             const notesHTML = (o.customer_notes || '').split('\n').map(line =>
               line.trim() ? `<div style="margin:3px 0;">${escapeHtml(line)}</div>` : ''
             ).join('');
-            const totalLine = (o.total && parseFloat(o.total) > 0)
-              ? `<div style="display:inline-flex; align-items:center; gap:8px; background:linear-gradient(135deg, #d4a563, #b88a3f); color:#fff; padding:9px 18px; border-radius:10px; font-weight:700;">💰 الإجمالي: ${toAR(parseFloat(o.total).toFixed(2))} ر.س</div>`
-              : `<div style="display:inline-flex; align-items:center; gap:8px; background:#f6f1e8; color:var(--navy-900); padding:9px 16px; border-radius:10px; font-weight:600; font-size:.88rem;">⏳ بانتظار عرض السعر من فريقنا</div>`;
+            // ---- Quote / receipt block (the offer the owner priced) ----
+            const money = v => toAR(parseFloat(v || 0).toFixed(2)) + ' ر.س';
+            const hasQuote = o.total && parseFloat(o.total) > 0;
+            const rowStyle = 'display:flex; justify-content:space-between; padding:5px 0; font-size:.9rem;';
+            const canAccept = hasQuote && ['pending','confirmed'].includes(o.status);
+            const acceptMsg = `أوافق على عرض السعر لطلبي رقم ${o.order_number} بإجمالي ${parseFloat(o.total||0).toFixed(2)} ر.س — الرجاء إكمال إجراءات التوريد.`;
+            const dlvDate = o.delivery_date
+              ? `<div style="${rowStyle} border-top:1px dashed rgba(212,165,99,.35); margin-top:6px; padding-top:9px;"><span style="color:var(--gray-600);">🚚 التسليم المتوقع</span><span style="font-weight:700; color:var(--navy-900);">${escapeHtml(new Date(o.delivery_date + 'T00:00:00').toLocaleDateString('ar-SA', { weekday:'long', day:'numeric', month:'long' }))}</span></div>`
+              : '';
+            const quoteHTML = hasQuote ? `
+              <div style="background:linear-gradient(135deg, #0a1830, #16294a); border-radius:12px; padding:18px 20px; margin:14px 0; color:#fdf9f1; position:relative; overflow:hidden;">
+                <div style="position:absolute; inset:0; background:radial-gradient(ellipse at top left, rgba(212,165,99,.18), transparent 55%); pointer-events:none;"></div>
+                <div style="display:flex; align-items:center; gap:8px; font-weight:800; margin-bottom:10px; position:relative;">🧾 عرض السعر من مداد ${o.quoted_at ? `<span style="font-weight:500; font-size:.75rem; color:#93acd1;">${escapeHtml(new Date(o.quoted_at).toLocaleDateString('ar-SA'))}</span>` : ''}</div>
+                <div style="position:relative;">
+                  <div style="${rowStyle}"><span style="color:#c3cfe2;">السعر قبل الضريبة</span><span style="font-weight:600;">${money(o.subtotal)}</span></div>
+                  <div style="${rowStyle}"><span style="color:#c3cfe2;">ضريبة القيمة المضافة (١٥٪)</span><span style="font-weight:600;">${money(o.vat_amount)}</span></div>
+                  ${parseFloat(o.delivery_fee) > 0 ? `<div style="${rowStyle}"><span style="color:#c3cfe2;">رسوم التوصيل</span><span style="font-weight:600;">${money(o.delivery_fee)}</span></div>` : ''}
+                  ${parseFloat(o.discount) > 0 ? `<div style="${rowStyle}"><span style="color:#7fd8a4;">الخصم</span><span style="font-weight:600; color:#7fd8a4;">− ${money(o.discount)}</span></div>` : ''}
+                  <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid rgba(212,165,99,.4); margin-top:8px; padding-top:10px;">
+                    <span style="font-weight:800;">الإجمالي شامل الضريبة</span>
+                    <span style="font-weight:800; font-size:1.25rem; color:#d4a563; font-family:var(--font-display);">${money(o.total)}</span>
+                  </div>
+                  ${dlvDate}
+                </div>
+              </div>
+              ${o.quote_note ? `<div style="background:rgba(212,165,99,.1); border:1px solid rgba(212,165,99,.35); border-radius:10px; padding:12px 16px; margin:0 0 14px; color:var(--gray-700); font-size:.88rem; line-height:1.8;"><b style="color:var(--navy-900);">💬 رسالة من فريق مداد:</b><br>${escapeHtml(o.quote_note)}</div>` : ''}
+              ${canAccept ? `<a href="https://wa.me/966920002362?text=${encodeURIComponent(acceptMsg)}" target="_blank" rel="noopener" style="display:flex; align-items:center; justify-content:center; gap:8px; background:linear-gradient(135deg, #dfb578, #c08e3f); color:#0a1830; padding:13px 20px; border-radius:12px; text-decoration:none; font-weight:800; font-size:1rem; margin-bottom:14px; box-shadow:0 8px 24px rgba(212,165,99,.35);">✅ أوافق على العرض — أكمل الطلب</a>` : ''}
+            ` : `
+              <div style="display:flex; align-items:center; gap:12px; background:#f6f1e8; border:1px dashed rgba(212,165,99,.5); color:var(--navy-900); padding:14px 18px; border-radius:12px; margin:14px 0; font-weight:600; font-size:.9rem;">
+                <span style="font-size:1.4rem;">⏳</span>
+                <span>فريقنا يجمع الأسعار من الموردين الآن — سيصلك عرض السعر الكامل هنا خلال <b>٢٤ ساعة</b>.</span>
+              </div>`;
 
             let pipelineHTML;
             if (isStopped) {
@@ -10548,12 +10686,14 @@ p {
 
                 ${pipelineHTML}
 
-                <div style="background:#faf6f0; border:1px solid rgba(212,165,99,.18); border-radius:10px; padding:14px 18px; margin:14px 0; color:var(--gray-700); font-size:.9rem; line-height:1.7;">
-                  ${notesHTML || '<div style="color:var(--gray-500);">—</div>'}
-                </div>
+                ${quoteHTML}
 
-                <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
-                  ${totalLine}
+                <details style="background:#faf6f0; border:1px solid rgba(212,165,99,.18); border-radius:10px; margin:0 0 14px; color:var(--gray-700); font-size:.88rem; line-height:1.7;">
+                  <summary style="padding:12px 18px; cursor:pointer; font-weight:700; color:var(--navy-900); list-style-position:inside;">📋 تفاصيل طلبك</summary>
+                  <div style="padding:0 18px 14px;">${notesHTML || '<div style="color:var(--gray-500);">—</div>'}</div>
+                </details>
+
+                <div style="display:flex; align-items:center; justify-content:flex-end; gap:12px; flex-wrap:wrap;">
                   <a href="https://wa.me/966920002362?text=${encodeURIComponent(waMsg)}" target="_blank" rel="noopener" style="display:inline-flex; align-items:center; gap:6px; background:#25D366; color:#fff; padding:10px 18px; border-radius:10px; text-decoration:none; font-weight:700; font-size:.9rem;">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24z"/></svg>
                     تواصل عبر واتساب
@@ -10573,7 +10713,11 @@ p {
         window.__userOrdersChannel = window.supabaseClient
           .channel('my-orders-' + window.currentUser.id)
           .on('postgres_changes', { event: '*', schema: 'public', table: 'orders', filter: 'user_id=eq.' + window.currentUser.id }, (payload) => {
-            if (payload.eventType === 'UPDATE' && typeof toast === 'function') toast('✨ تم تحديث حالة طلبك', '✨');
+            if (payload.eventType === 'UPDATE' && typeof toast === 'function') {
+              const gotQuote = parseFloat(payload.new?.total || 0) > 0 && parseFloat(payload.old?.total || 0) === 0;
+              toast(gotQuote ? '🧾 وصلك عرض السعر! افتح صفحة الطلب للاطلاع' : '✨ تم تحديث حالة طلبك', '✨');
+              if (gotQuote && typeof celebrate === 'function') celebrate();
+            }
             const v = document.getElementById('view-cart');
             if (v && v.classList.contains('active')) renderCart();
           })
