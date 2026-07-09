@@ -7139,6 +7139,10 @@ p {
               <input type="text" name="qty" required placeholder="مثال: ٥٠٠ طن، ١٠٠٠ م٣، ٢٠٠ باب…" />
             </div>
           </div>
+          <div id="rfqEquipWrap" style="display:none;">
+            <label>حدّد المعدات المطلوبة بدقة</label>
+            <div id="rfqEquipGroups"></div>
+          </div>
           <div class="row2">
             <div>
               <label>المدينة / موقع المشروع</label>
@@ -7283,7 +7287,12 @@ p {
             <label class="cat-chip"><input type="checkbox" name="cats" value="أسمنت ومواد لياسة"><span class="box">✓</span><span class="txt">أسمنت ومواد لياسة</span></label>
             <label class="cat-chip"><input type="checkbox" name="cats" value="مواد سباكة وعزل"><span class="box">✓</span><span class="txt">مواد سباكة وعزل</span></label>
             <label class="cat-chip"><input type="checkbox" name="cats" value="مواد كهرباء وإنارة"><span class="box">✓</span><span class="txt">مواد كهرباء وإنارة</span></label>
+            <label class="cat-chip"><input type="checkbox" name="cats" value="معدات ثقيلة" id="sregHeavyChk"><span class="box">✓</span><span class="txt">معدات ثقيلة</span></label>
             <label class="cat-chip"><input type="checkbox" name="cats" value="أخرى" id="sregOtherChk"><span class="box">✓</span><span class="txt">أخرى</span></label>
+          </div>
+          <div id="sregEquipWrap" style="display:none;">
+            <label style="margin-top:10px; display:block;">حدّد أنواع المعدات التي توفّرها</label>
+            <div id="sregEquipGroups"></div>
           </div>
           <div id="sregOtherWrap" style="display:none;">
             <label>حدّد المواد الأخرى</label>
@@ -11246,6 +11255,7 @@ p {
         phone: normDigits(f.querySelector('[name=phone]')?.value),
         email: f.querySelector('[name=email]')?.value || '',
         category: f.querySelector('[name=category]')?.value || '',
+        equipment: [...f.querySelectorAll('input[name=equip]:checked')].map(c => c.value).join('، '),
         qty: f.querySelector('[name=qty]')?.value || '',
         city: f.querySelector('[name=city]')?.value || '',
         neededBy: f.querySelector('[name=neededBy]')?.value || '',
@@ -11260,8 +11270,9 @@ p {
         return;
       }
       if (typeof celebrate === 'function') celebrate();
-      toast('تم إرسال طلب عرض السعر — سيتواصل معك أكثر من مورد خلال ٢٤ ساعة', '');
+      toast('تم إرسال طلب عرض السعر — سيتواصل معك أكثر من مورد خلال ٢٤ ساعة');
       f.reset();
+      const eqw = document.getElementById('rfqEquipWrap'); if (eqw) eqw.style.display = 'none';
       setTimeout(() => location.hash = '#home', 1200);
     }
 
@@ -11381,6 +11392,7 @@ p {
           //    everything in the order row without needing another tab
           const customer_notes = [
             ['الفئة', payload.category],
+            ['المعدات المطلوبة', payload.equipment],
             ['الكمية', payload.qty],
             ['الاسم', payload.contactName],
             ['الجوال', payload.phone],
@@ -11598,6 +11610,34 @@ p {
       if (wrap) wrap.style.display = this.checked ? 'block' : 'none';
     });
 
+    /* ---- Heavy-equipment subcategories (تظهر عند اختيار معدات ثقيلة) ---- */
+    const HEAVY_EQUIPMENT_GROUPS = {
+      'معدات الحفر والردم': ['بوكلين / حفار', 'دركتر', 'شيول', 'قشاطات'],
+      'معدات الرفع والنقل': ['رافعات برجية', 'كران / ونش متنقل', 'رافعات شوكية / فوركلفت'],
+      'معدات التمهيد والسفلتة': ['رصاصات', 'جريدر'],
+      'المركبات الثقيلة وشاحنات النقل': ['قلابات', 'وايتات مياه/ديزل', 'خلاطات خرسانة', 'سطحات'],
+      'المعدات المساعدة والطاقة': ['مولدات كهربائية عملاقة', 'كمبروسرات هواء', 'مضخات مياه'],
+    };
+    function renderEquipGroups(hostId, inputName) {
+      const host = document.getElementById(hostId);
+      if (!host) return;
+      host.innerHTML = Object.entries(HEAVY_EQUIPMENT_GROUPS).map(([group, items]) => `
+        <div style="margin:12px 0 6px; font-weight:700; font-size:.88rem; color:var(--navy-900);">${group}</div>
+        <div class="sreg-cats" style="grid-template-columns:repeat(auto-fill, minmax(150px, 1fr));">
+          ${items.map(it => `<label class="cat-chip" style="padding:9px 12px; font-size:.85rem;"><input type="checkbox" name="${inputName}" value="${it}"><span class="box">✓</span><span class="txt">${it}</span></label>`).join('')}
+        </div>`).join('');
+    }
+    renderEquipGroups('rfqEquipGroups', 'equip');
+    renderEquipGroups('sregEquipGroups', 'sregEquip');
+    document.getElementById('rfq-cat')?.addEventListener('change', function () {
+      const w = document.getElementById('rfqEquipWrap');
+      if (w) w.style.display = this.value === 'معدات ثقيلة' ? 'block' : 'none';
+    });
+    document.getElementById('sregHeavyChk')?.addEventListener('change', function () {
+      const w = document.getElementById('sregEquipWrap');
+      if (w) w.style.display = this.checked ? 'block' : 'none';
+    });
+
     function sregFileChanged(input, labelId, docLabel) {
       const label = document.getElementById(labelId);
       if (!label) return;
@@ -11637,6 +11677,9 @@ p {
       e.preventDefault();
       const f = e.target;
       const cats = [...f.querySelectorAll('input[name=cats]:checked')].map(c => c.value);
+      // Heavy-equipment specifics selected? append them so the admin sees exactly what they supply
+      const equipSel = [...f.querySelectorAll('input[name=sregEquip]:checked')].map(c => c.value);
+      if (equipSel.length) cats.push(...equipSel);
       if (cats.length === 0) {
         toast('اختر تخصصًا واحدًا على الأقل من قائمة المواد', '');
         document.getElementById('sregCats')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -11687,6 +11730,7 @@ p {
         const crN = document.querySelector('#crFileLabel .fname'); if (crN) crN.textContent = 'نسخة من السجل التجاري (PDF أو صورة)';
         const vatN = document.querySelector('#vatFileLabel .fname'); if (vatN) vatN.textContent = 'شهادة ضريبة القيمة المضافة (VAT)';
         const ow = document.getElementById('sregOtherWrap'); if (ow) ow.style.display = 'none';
+        const ew = document.getElementById('sregEquipWrap'); if (ew) ew.style.display = 'none';
         setTimeout(() => { location.hash = '#home'; }, 1800);
       } catch (err) {
         console.warn('supplier application failed', err);
