@@ -5731,90 +5731,6 @@ p {
 
   <!-- ===== Fable additions: splash opener + supplier registration + micro-interactions ===== -->
   <style id="fableAdditions">
-    /* ---------- Splash opener (once per session) ---------- */
-    #medadSplash {
-      position: fixed; inset: 0; z-index: 12000;
-      background:
-        radial-gradient(ellipse 120% 70% at 80% -10%, rgba(212,165,99,.22), transparent 55%),
-        linear-gradient(160deg, #0a1830 0%, #12233f 55%, #0a1830 100%);
-      display: flex; align-items: center; justify-content: center;
-      padding: 24px; overflow: hidden;
-      transition: opacity .55s ease, visibility .55s;
-    }
-    #medadSplash.hide { opacity: 0; visibility: hidden; pointer-events: none; }
-    #medadSplash[hidden] { display: none; }
-    #medadSplash::before {
-      content: ""; position: absolute; inset: 0; opacity: .06; pointer-events: none;
-      background-image: repeating-linear-gradient(45deg, #d4a563 0 1px, transparent 1px 26px),
-                        repeating-linear-gradient(-45deg, #d4a563 0 1px, transparent 1px 26px);
-    }
-    .sp-inner { position: relative; max-width: 620px; width: 100%; text-align: center; color: #fdf9f1; }
-    .sp-skip {
-      position: absolute; top: 18px; left: 18px; z-index: 2;
-      background: rgba(255,255,255,.08); color: #e9dfca; border: 1px solid rgba(212,165,99,.35);
-      border-radius: 999px; padding: 8px 18px; font-size: .85rem; font-weight: 700; cursor: pointer;
-      font-family: inherit; transition: background .2s;
-    }
-    .sp-skip:hover { background: rgba(212,165,99,.22); }
-    .sp-logo {
-      width: 74px; height: 74px; margin: 0 auto 18px; border-radius: 22px;
-      background: linear-gradient(135deg, #d4a563, #b98a45); color: #0a1830;
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 12px 40px rgba(212,165,99,.35);
-    }
-    /* animated growth bars — "ضاعف مبيعاتك" */
-    .sp-chart { display: flex; align-items: flex-end; justify-content: center; gap: 10px; height: 96px; margin: 6px auto 22px; direction: ltr; }
-    .sp-chart .bar {
-      width: 26px; border-radius: 7px 7px 3px 3px;
-      background: linear-gradient(180deg, #e7c68f, #c08e3f);
-      transform-origin: bottom; transform: scaleY(0);
-      animation: spGrow .8s cubic-bezier(.2,.9,.3,1.2) forwards;
-      box-shadow: 0 6px 20px rgba(212,165,99,.28);
-    }
-    .sp-chart .bar:nth-child(1) { height: 34%; animation-delay: .45s; opacity: .75; }
-    .sp-chart .bar:nth-child(2) { height: 52%; animation-delay: .60s; opacity: .85; }
-    .sp-chart .bar:nth-child(3) { height: 72%; animation-delay: .75s; opacity: .95; }
-    .sp-chart .bar:nth-child(4) { height: 100%; animation-delay: .90s; }
-    .sp-chart svg { position: absolute; overflow: visible; }
-    .sp-arrow path {
-      stroke-dasharray: 260; stroke-dashoffset: 260;
-      animation: spDraw 1s ease-out 1.15s forwards;
-    }
-    .sp-arrow .head { opacity: 0; animation: spPop .35s ease-out 2s forwards; }
-    @keyframes spGrow { to { transform: scaleY(1); } }
-    @keyframes spDraw { to { stroke-dashoffset: 0; } }
-    @keyframes spPop { from { opacity: 0; transform: scale(.4); } to { opacity: 1; transform: scale(1); } }
-    .sp-anim { opacity: 0; transform: translateY(20px); animation: spUp .7s cubic-bezier(.2,.8,.3,1) forwards; }
-    @keyframes spUp { to { opacity: 1; transform: none; } }
-    .sp-eyebrow {
-      display: inline-block; padding: 6px 16px; border-radius: 999px; margin-bottom: 14px;
-      background: rgba(212,165,99,.16); border: 1px solid rgba(212,165,99,.45);
-      color: #f0dcb4; font-size: .84rem; font-weight: 700; letter-spacing: .3px;
-    }
-    .sp-inner h2 { font-family: var(--font-display, inherit); font-size: clamp(1.5rem, 5.5vw, 2.3rem); line-height: 1.35; margin: 0 0 14px; color: #fdf9f1; }
-    .sp-inner h2 em { font-style: normal; color: #d4a563; }
-    .sp-inner p { font-size: clamp(.92rem, 3.4vw, 1.05rem); line-height: 1.9; color: #c3cfe2; margin: 0 auto 26px; max-width: 520px; }
-    .sp-ctas { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-    .sp-btn {
-      display: inline-flex; align-items: center; gap: 8px; padding: 14px 30px; border-radius: 14px;
-      font-family: inherit; font-size: 1rem; font-weight: 800; cursor: pointer; text-decoration: none;
-      transition: transform .15s, box-shadow .2s;
-    }
-    .sp-btn:active { transform: scale(.96); }
-    .sp-btn-gold {
-      background: linear-gradient(135deg, #dfb578, #c08e3f); color: #0a1830; border: 0;
-      box-shadow: 0 10px 32px rgba(212,165,99,.38);
-    }
-    .sp-btn-gold:hover { transform: translateY(-2px); box-shadow: 0 14px 40px rgba(212,165,99,.5); }
-    .sp-btn-ghost { background: transparent; color: #e8edf6; border: 1.5px solid rgba(255,255,255,.35); }
-    .sp-btn-ghost:hover { border-color: rgba(212,165,99,.7); color: #f0dcb4; }
-    .sp-note { margin-top: 20px; font-size: .78rem; color: #7e8ca4; }
-    @media (prefers-reduced-motion: reduce) {
-      .sp-anim, .sp-chart .bar { animation: none; opacity: 1; transform: none; }
-      .sp-arrow path { animation: none; stroke-dashoffset: 0; }
-      .sp-arrow .head { animation: none; opacity: 1; }
-    }
-
     /* ---------- Supplier registration ---------- */
     .sreg-cats { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; margin-top: 6px; }
     .cat-chip { position: relative; display: flex; align-items: center; gap: 10px; padding: 12px 14px;
@@ -5880,37 +5796,6 @@ p {
 </head>
 
 <body>
-
-  <!-- ============================================================
-     SPLASH OPENER — once per session (supplier pitch)
-     ============================================================ -->
-  <div id="medadSplash" hidden role="dialog" aria-modal="true" aria-label="انضم كمورد إلى مداد">
-    <button class="sp-skip" onclick="dismissSplash()">تخطّي ✕</button>
-    <div class="sp-inner">
-      <div class="sp-logo sp-anim" style="animation-delay:.1s;">
-        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-          stroke-linecap="round" stroke-linejoin="round">
-          <path d="M3 21V8l9-5 9 5v13" /><path d="M9 21V12h6v9" /><path d="M3 21h18" />
-        </svg>
-      </div>
-      <div class="sp-chart" aria-hidden="true" style="position:relative;">
-        <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
-        <svg class="sp-arrow" width="150" height="96" viewBox="0 0 150 96" fill="none"
-          style="position:absolute; inset:0; margin:auto; left:-6px;">
-          <path d="M8 82 C 45 78, 75 62, 138 14" stroke="#f0dcb4" stroke-width="3.5" stroke-linecap="round"/>
-          <path class="head" d="M138 14 l-16 1 M138 14 l-2 15" stroke="#f0dcb4" stroke-width="3.5" stroke-linecap="round"/>
-        </svg>
-      </div>
-      <div class="sp-eyebrow sp-anim" style="animation-delay:.3s;">للموردين والمصانع</div>
-      <h2 class="sp-anim" style="animation-delay:.45s;">ضاعف مبيعاتك في قطاع الإنشاءات مع <em>مداد</em></h2>
-      <p class="sp-anim" style="animation-delay:.6s;">انضم اليوم إلى منصة مداد للبناء، وسهّل على آلاف المقاولين والعملاء في المملكة العثور على منتجاتك. نحن نربطك مباشرة بطلبات السوق الحقيقية، لنضمن لك تدفقاً مستمراً للفرص التجارية وتوسيع نطاق وصولك الجغرافي بكل سهولة.</p>
-      <div class="sp-ctas sp-anim" style="animation-delay:.75s;">
-        <button class="sp-btn sp-btn-gold" onclick="dismissSplash('#supplier-register')">سجّل كمورد الآن ←</button>
-        <button class="sp-btn sp-btn-ghost" onclick="dismissSplash()">أتصفّح كعميل</button>
-      </div>
-      <div class="sp-note sp-anim" style="animation-delay:.9s;">التسجيل مجاني — يستغرق أقل من دقيقتين</div>
-    </div>
-  </div>
 
   <!-- ============================================================
      HEADER
@@ -11573,33 +11458,6 @@ p {
       }
     }
     window.celebrate = celebrate;
-
-    /* ============================================================
-       SPLASH OPENER — supplier pitch, once per session
-       ============================================================ */
-    (function initSplash() {
-      const splash = document.getElementById('medadSplash');
-      if (!splash) return;
-      const seen = sessionStorage.getItem('medad_splash_seen');
-      const onHome = !location.hash || location.hash === '#' || location.hash === '#home';
-      if (seen || !onHome) { splash.remove(); return; }
-      splash.hidden = false;
-      document.body.style.overflow = 'hidden';
-    })();
-    function dismissSplash(target) {
-      const splash = document.getElementById('medadSplash');
-      sessionStorage.setItem('medad_splash_seen', '1');
-      document.body.style.overflow = '';
-      if (splash) {
-        splash.classList.add('hide');
-        setTimeout(() => splash.remove(), 600);
-      }
-      if (target) {
-        if (location.hash === target) go(target);
-        else location.hash = target;
-      }
-    }
-    window.dismissSplash = dismissSplash;
 
     /* ============================================================
        SUPPLIER REGISTRATION (سجّل كمورد)
