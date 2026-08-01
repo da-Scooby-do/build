@@ -7835,6 +7835,11 @@ p {
 
         <div class="fld"><label>رسالة للعميل (تظهر في إيصاله)</label><textarea name="quote_note" rows="3" placeholder="مثال: السعر شامل التوصيل إلى موقعك في حي الياسمين. الكمية متوفرة بالكامل لدى مورد معتمد."></textarea></div>
 
+        <div class="fld"><label>رابط الدفع — سلة أو أي بوابة (اختياري)</label>
+          <input type="url" name="payment_url" placeholder="https://s.salla.sa/…" dir="ltr" style="text-align:left;">
+          <div style="font-size:.78rem; color:var(--gray-500); margin-top:4px;">أنشئ طلبًا يدويًا بقيمة العرض في متجرك على سلة، انسخ رابط الدفع والصقه هنا — سيظهر للعميل زر «ادفع الآن» في إيصاله.</div>
+        </div>
+
         <label style="display:flex; gap:10px; align-items:center; margin-top:12px; padding:11px 14px; background:var(--gray-50); border:1px solid var(--gray-150); border-radius:10px; cursor:pointer;">
           <input type="checkbox" name="bump_status" checked style="width:17px; height:17px; cursor:pointer;">
           <span style="font-weight:600; color:var(--navy-900); font-size:.9rem;">تحديث حالة الطلب إلى «قيد التأكيد» بعد الحفظ</span>
@@ -8597,7 +8602,7 @@ p {
       const tbody = document.getElementById('adminOrdersTbody');
       const { data, error } = await window.supabaseClient
         .from('orders')
-        .select('id, order_number, created_at, subtotal, vat_amount, delivery_fee, discount, total, status, payment_status, user_id, customer_notes, quote_note, delivery_date, profiles(full_name,email)')
+        .select('id, order_number, created_at, subtotal, vat_amount, delivery_fee, discount, total, status, payment_status, user_id, customer_notes, quote_note, delivery_date, payment_url, profiles(full_name,email)')
         .order('created_at', { ascending: false })
         .limit(50);
       if (!adminTableGuard(tbody, data, error, { colspan: 6, emptyMsg: 'لا توجد طلبات بعد' })) return;
@@ -8640,6 +8645,9 @@ p {
               ${phoneMatch ? `<a href="https://wa.me/${escapeHtml(phoneMatch[0].replace(/^0/, '966').replace('+',''))}" target="_blank" rel="noopener noreferrer" class="btn btn-ghost" style="padding:7px 14px; font-size:.83rem; color:#25D366; border-color:#25D366;">واتساب العميل</a>
               <a href="tel:${escapeHtml(phoneMatch[0])}" class="btn btn-ghost" style="padding:7px 14px; font-size:.83rem;">اتصال</a>` : ''}
               <button class="btn btn-amber" onclick="openQuoteEditor('${escapeHtml(o.id)}')" style="padding:7px 16px; font-size:.83rem;">سعّر هذا الطلب</button>
+              ${o.payment_status === 'paid'
+                ? '<span style="display:inline-flex; align-items:center; padding:7px 14px; font-size:.83rem; background:#dcfce7; color:#1f7a47; border-radius:8px; font-weight:700;">✓ مدفوع</span>'
+                : `<button class="btn btn-ghost" onclick="markOrderPaid('${escapeHtml(o.id)}')" style="padding:7px 14px; font-size:.83rem; color:#1f7a47; border-color:#2e9e5b;">تأكيد استلام الدفع</button>`}
             </div>
           </td>
         </tr>`;
@@ -8651,6 +8659,15 @@ p {
       if (row) row.style.display = row.style.display === 'none' ? 'table-row' : 'none';
     }
     window.toggleOrderDetails = toggleOrderDetails;
+
+    async function markOrderPaid(id) {
+      const { error } = await window.supabaseClient.from('orders')
+        .update({ payment_status: 'paid' }).eq('id', id);
+      if (error) { toast('تعذّر التحديث: ' + error.message, '!'); return; }
+      toast('تم تسجيل الدفعة — سيظهر «تم استلام الدفعة» للعميل');
+      loadAdminOrders();
+    }
+    window.markOrderPaid = markOrderPaid;
 
     /* ---- Order quote editor (owner writes the customer's price) ---- */
     function openQuoteEditor(orderId) {
@@ -8667,6 +8684,7 @@ p {
       form.discount.value = parseFloat(o.discount || 0);
       if (o.delivery_date) form.delivery_date.value = o.delivery_date;
       if (o.quote_note) form.quote_note.value = o.quote_note;
+      if (o.payment_url) form.payment_url.value = o.payment_url;
       form.bump_status.checked = o.status === 'pending';
       updateQuoteTotals();
       document.getElementById('quoteModal').classList.add('open');
@@ -8690,6 +8708,11 @@ p {
       const dis = parseFloat(form.discount.value) || 0;
       const vat = Math.round(sub * 0.15 * 100) / 100;
       const total = Math.max(0, Math.round((sub + vat + del - dis) * 100) / 100);
+      const payUrl = form.payment_url.value.trim();
+      if (payUrl && !/^https:\/\//.test(payUrl)) {
+        toast('رابط الدفع يجب أن يبدأ بـ https://', '!');
+        return;
+      }
       const patch = {
         subtotal: sub,
         vat_rate: 0.15,
@@ -8699,6 +8722,7 @@ p {
         total,
         quote_note: form.quote_note.value.trim() || null,
         delivery_date: form.delivery_date.value || null,
+        payment_url: payUrl || null,
         quoted_at: new Date().toISOString(),
       };
       if (form.bump_status.checked) patch.status = 'confirmed';
@@ -10592,7 +10616,7 @@ p {
 
       window.supabaseClient
         .from('orders')
-        .select('id, order_number, status, subtotal, vat_amount, delivery_fee, discount, total, customer_notes, quote_note, delivery_date, quoted_at, created_at, updated_at')
+        .select('id, order_number, status, subtotal, vat_amount, delivery_fee, discount, total, customer_notes, quote_note, delivery_date, quoted_at, payment_url, payment_status, created_at, updated_at')
         .eq('user_id', window.currentUser.id)
         .order('created_at', { ascending: false })
         .limit(50)
@@ -10657,7 +10681,9 @@ p {
                 </div>
               </div>
               ${o.quote_note ? `<div class="quote-note"><b>رسالة من فريق مداد:</b><br>${escapeHtml(o.quote_note)}</div>` : ''}
-              ${canAccept ? `<a href="https://wa.me/966920002362?text=${encodeURIComponent(acceptMsg)}" target="_blank" rel="noopener" style="display:flex; align-items:center; justify-content:center; gap:8px; background:linear-gradient(135deg, #dfb578, #c08e3f); color:#0a1830; padding:13px 20px; border-radius:12px; text-decoration:none; font-weight:800; font-size:1rem; margin-bottom:14px; box-shadow:0 8px 24px rgba(212,165,99,.35);">أوافق على العرض — أكمل الطلب</a>` : ''}
+              ${o.payment_status === 'paid' ? `<div style="display:flex; align-items:center; justify-content:center; gap:8px; background:rgba(46,158,91,.12); border:1px solid #2e9e5b; color:#1f7a47; padding:12px 20px; border-radius:12px; font-weight:800; margin-bottom:14px;">✓ تم استلام الدفعة — شكرًا لك</div>` : ''}
+              ${o.payment_status !== 'paid' && o.payment_url && /^https:\/\//.test(o.payment_url) ? `<a href="${escapeHtml(o.payment_url)}" target="_blank" rel="noopener noreferrer" style="display:flex; align-items:center; justify-content:center; gap:8px; background:linear-gradient(135deg, #2eb862, #1f9d51); color:#fff; padding:14px 20px; border-radius:12px; text-decoration:none; font-weight:800; font-size:1.02rem; margin-bottom:10px; box-shadow:0 8px 24px rgba(34,160,107,.35);">ادفع الآن بأمان — مدى، Apple Pay، بطاقة</a>` : ''}
+              ${canAccept && !(o.payment_url && o.payment_status !== 'paid') ? `<a href="https://wa.me/966920002362?text=${encodeURIComponent(acceptMsg)}" target="_blank" rel="noopener" style="display:flex; align-items:center; justify-content:center; gap:8px; background:linear-gradient(135deg, #dfb578, #c08e3f); color:#0a1830; padding:13px 20px; border-radius:12px; text-decoration:none; font-weight:800; font-size:1rem; margin-bottom:14px; box-shadow:0 8px 24px rgba(212,165,99,.35);">أوافق على العرض — أكمل الطلب</a>` : ''}
             ` : `
               <div style="display:flex; align-items:center; gap:12px; background:#f6f1e8; border:1px dashed rgba(212,165,99,.5); color:var(--navy-900); padding:14px 18px; border-radius:12px; margin:14px 0; font-weight:600; font-size:.9rem;">
                                 <span>فريقنا يجمع الأسعار من الموردين الآن — سيصلك عرض السعر الكامل هنا خلال <b>٢٤ ساعة</b>.</span>
