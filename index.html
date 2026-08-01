@@ -6581,7 +6581,6 @@ p {
           const visible = (dirShowAll || items.length <= INITIAL_CARDS) ? items : items.slice(0, INITIAL_CARDS);
           const hidden = items.length - visible.length;
           const cardsHTML = `<div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(290px,1fr)); gap:16px;">${visible.map(s => {
-            const isPhone = /^\d+$/.test(String(s.phone).replace(/\s/g,''));
             const cityBadge = s._city ? `<span style="display:inline-flex; align-items:center; gap:4px; background:#0a1830; color:#fff; padding:3px 9px; border-radius:999px; font-size:.72rem; font-weight:700; align-self:flex-start;">${cityBadges[s._city] || s._city}</span>` : '';
             return `<article style="background:#fff; border:1px solid rgba(212,165,99,.25); border-radius:14px; padding:18px 20px; display:flex; flex-direction:column; gap:10px; box-shadow:0 4px 12px rgba(8,21,42,.04); transition:transform .2s, box-shadow .2s, border-color .2s;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 12px 28px rgba(8,21,42,.10)'; this.style.borderColor='rgba(212,165,99,.6)'" onmouseout="this.style.transform=''; this.style.boxShadow='0 4px 12px rgba(8,21,42,.04)'; this.style.borderColor='rgba(212,165,99,.25)'">
               ${cityBadge}
@@ -6591,18 +6590,9 @@ p {
                 <span>${s.area}</span>
               </div>
               <div class="action-row" style="display:flex; gap:8px; margin-top:auto;">
-                ${isPhone
-                  ? `<a href="tel:${s.phone}" style="flex:1; display:inline-flex; align-items:center; justify-content:center; gap:8px; background:linear-gradient(135deg, #d4a563, #b88a3f); color:#fff; padding:11px 14px; border-radius:10px; text-decoration:none; font-weight:800; font-size:.94rem;">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.98.98 0 0 0-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z"/></svg>
-                      اتصل
-                    </a>`
-                  : `<a href="https://wa.me/966920002362?text=${encodeURIComponent('مرحبًا، أحتاج تواصل مع ' + s.name)}" target="_blank" rel="noopener" style="flex:1; display:inline-flex; align-items:center; justify-content:center; gap:8px; background:linear-gradient(135deg, #d4a563, #b88a3f); color:#fff; padding:11px 14px; border-radius:10px; text-decoration:none; font-weight:800; font-size:.92rem;">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-                      تواصل عبر مداد
-                    </a>`}
-                <a href="https://wa.me/${isPhone ? '966' + s.phone.replace(/^0/,'') : '966920002362'}?text=${encodeURIComponent('مرحبًا، أحتاج ' + s.name)}" target="_blank" rel="noopener" class="sup-wa-btn" style="flex:1; display:inline-flex; align-items:center; justify-content:center; gap:8px; background:#25D366; color:#fff; padding:11px 14px; border-radius:10px; text-decoration:none; font-weight:800; font-size:.92rem; box-shadow:0 4px 14px rgba(37,211,102,.35);">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24z"/></svg>
-                  واتساب
+                <a href="#rfq" data-link style="flex:1; display:inline-flex; align-items:center; justify-content:center; gap:8px; background:linear-gradient(135deg, #d4a563, #b88a3f); color:#fff; padding:11px 14px; border-radius:10px; text-decoration:none; font-weight:800; font-size:.92rem;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+                  اطلب عرض سعر عبر مداد
                 </a>
               </div>
             </article>`;}).join('')}</div>`;
@@ -10461,7 +10451,7 @@ p {
             ${s.fastDelivery ? `<span class="badge-verified" style="background:#fff;">${s.deliveryDays}</span>` : ''}
           </div>
         </div>
-        <a class="wa-btn" href="${waLink(s.phone, `مرحبًا، أرغب بطلب عرض سعر من ${s.name}`)}" target="_blank" rel="noopener" style="padding:10px 18px; font-size:.92rem;">
+        <a class="wa-btn" href="${waLink('966920002362', `مرحبًا، أرغب بطلب عرض سعر من ${s.name}`)}" target="_blank" rel="noopener" style="padding:10px 18px; font-size:.92rem;">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24z"/></svg>
           اتصل عبر واتساب
         </a>
