@@ -25,8 +25,8 @@
   <meta property="og:site_name" content="مداد للبناء والخدمات اللوجستية" />
   <meta property="og:title" content="مداد للبناء | اطلب مواد البناء بأفضل سعر في المملكة" />
   <meta property="og:description" content="أرسل احتياجك من مواد البناء — نتفاوض مع شبكة واسعة من الموردين ونوافيك بأفضل عرض: السعر، الكمية، ووقت التسليم." />
-  <meta property="og:url" content="https://build-omega-sand.vercel.app/" />
-  <meta property="og:image" content="https://build-omega-sand.vercel.app/icon-512.png" />
+  <meta property="og:url" content="https://www.midad-ksa.com/" />
+  <meta property="og:image" content="https://www.midad-ksa.com/icon-512.png" />
   <meta property="og:locale" content="ar_SA" />
   <meta name="twitter:card" content="summary" />
   <style>
@@ -5792,6 +5792,423 @@ p {
     .quote-note b { color: #0a1830; }
     [data-theme="dark"] .quote-note { background: rgba(212,165,99,.14); color: #d8e0ee; }
     [data-theme="dark"] .quote-note b { color: #f0dcb4; }
+  
+  /* ============================================================
+     RECEIPT / إيصال — printable order receipt (added Aug 2026)
+     Two modes: .r-ack (order received, not yet priced)
+                .r-quote (priced, after the admin sends the quote)
+     Printing is handled by the browser's own "Save as PDF", which
+     keeps Arabic text as real selectable vector text.
+     ============================================================ */
+
+  .receipt-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(7, 26, 51, .72);
+    backdrop-filter: blur(3px);
+    z-index: 9000;
+    display: none;
+    overflow-y: auto;
+    padding: 24px 14px 90px;
+  }
+
+  .receipt-overlay.open {
+    display: block;
+  }
+
+  .receipt-sheet {
+    background: #fff;
+    color: #10203c;
+    max-width: 780px;
+    margin: 0 auto;
+    border-radius: 14px;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, .38);
+    overflow: hidden;
+    font-family: 'Tajawal', system-ui, sans-serif;
+  }
+
+  .r-head {
+    background: linear-gradient(135deg, #0a1830, #16294a);
+    color: #fdf9f1;
+    padding: 26px 30px 22px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .r-head::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at top left, rgba(212, 165, 99, .22), transparent 58%);
+    pointer-events: none;
+  }
+
+  .r-head-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 18px;
+    flex-wrap: wrap;
+    position: relative;
+  }
+
+  .r-brand {
+    font-family: var(--font-display), 'Tajawal', sans-serif;
+    font-weight: 800;
+    font-size: 1.32rem;
+    letter-spacing: -.01em;
+    line-height: 1.3;
+  }
+
+  .r-brand small {
+    display: block;
+    font-weight: 500;
+    font-size: .78rem;
+    color: #a8bcdb;
+    margin-top: 3px;
+    letter-spacing: 0;
+  }
+
+  .r-doctype {
+    text-align: left;
+    flex-shrink: 0;
+  }
+
+  .r-doctype .lbl {
+    display: inline-block;
+    background: rgba(212, 165, 99, .18);
+    border: 1px solid rgba(212, 165, 99, .55);
+    color: #e7c68f;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: .82rem;
+    white-space: nowrap;
+  }
+
+  .r-doctype .num {
+    font-family: var(--font-display), 'Tajawal', sans-serif;
+    font-weight: 800;
+    font-size: 1.15rem;
+    color: #fff;
+    margin-top: 9px;
+    direction: ltr;
+    unicode-bidi: embed;
+  }
+
+  .r-doctype .date {
+    font-size: .78rem;
+    color: #a8bcdb;
+    margin-top: 3px;
+  }
+
+  .r-body {
+    padding: 24px 30px 8px;
+  }
+
+  .r-section {
+    margin-bottom: 22px;
+  }
+
+  .r-section > h4 {
+    font-size: .82rem;
+    font-weight: 700;
+    color: #8a6a33;
+    text-transform: none;
+    letter-spacing: .02em;
+    margin: 0 0 10px;
+    padding-bottom: 7px;
+    border-bottom: 1px solid rgba(212, 165, 99, .32);
+  }
+
+  .r-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px 26px;
+  }
+
+  .r-field {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: .9rem;
+    padding: 3px 0;
+  }
+
+  .r-field > span:first-child {
+    color: #6b7a90;
+    flex-shrink: 0;
+  }
+
+  .r-field > span:last-child {
+    font-weight: 600;
+    text-align: left;
+    word-break: break-word;
+  }
+
+  .r-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .88rem;
+  }
+
+  .r-table th {
+    background: #f6f1e8;
+    color: #10203c;
+    font-weight: 700;
+    padding: 10px 12px;
+    text-align: right;
+    border-bottom: 2px solid rgba(212, 165, 99, .45);
+    font-size: .84rem;
+  }
+
+  .r-table td {
+    padding: 11px 12px;
+    border-bottom: 1px solid #eef1f5;
+    vertical-align: top;
+  }
+
+  .r-table td.num,
+  .r-table th.num {
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .r-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .r-totals {
+    margin-top: 6px;
+    margin-right: auto;
+    margin-left: 0;
+    min-width: 310px;
+    max-width: 430px;
+  }
+
+  .r-totals .row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 26px;
+    padding: 7px 0;
+    font-size: .92rem;
+  }
+
+  .r-totals .row span:first-child,
+  .r-totals .row span:last-child {
+    white-space: nowrap;
+  }
+
+  .r-totals .row span:first-child {
+    color: #6b7a90;
+  }
+
+  .r-totals .row.grand {
+    border-top: 2px solid rgba(212, 165, 99, .5);
+    margin-top: 8px;
+    padding-top: 12px;
+    font-weight: 800;
+    font-size: 1.12rem;
+  }
+
+  .r-totals .row.grand span:last-child {
+    color: #9a6b12;
+    font-family: var(--font-display), 'Tajawal', sans-serif;
+  }
+
+  .r-pending {
+    background: #f6f1e8;
+    border: 1px dashed rgba(212, 165, 99, .6);
+    border-radius: 11px;
+    padding: 16px 20px;
+    text-align: center;
+    font-weight: 600;
+    font-size: .93rem;
+    color: #10203c;
+    line-height: 1.65;
+  }
+
+  .r-pending b {
+    color: #8a6a33;
+  }
+
+  .r-paid {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: rgba(46, 158, 91, .1);
+    border: 1px solid #2e9e5b;
+    color: #1c7043;
+    padding: 11px 20px;
+    border-radius: 10px;
+    font-weight: 800;
+    font-size: .95rem;
+    margin-top: 14px;
+  }
+
+  .r-verify {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    background: #fafbfd;
+    border: 1px solid #e8edf3;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-top: 4px;
+  }
+
+  .r-verify .txt {
+    flex: 1;
+    font-size: .84rem;
+    color: #55637a;
+    line-height: 1.7;
+  }
+
+  .r-verify .txt b {
+    color: #10203c;
+    display: block;
+    margin-bottom: 3px;
+    font-size: .9rem;
+  }
+
+  .r-verify canvas,
+  .r-verify img {
+    display: block;
+    border-radius: 6px;
+  }
+
+  .r-qr {
+    flex-shrink: 0;
+    width: 104px;
+    height: 104px;
+    display: grid;
+    place-items: center;
+  }
+
+  .r-note {
+    background: #fff9ed;
+    border-right: 3px solid #d4a563;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: .88rem;
+    line-height: 1.75;
+    color: #4a4230;
+  }
+
+  .r-foot {
+    border-top: 1px dashed rgba(212, 165, 99, .4);
+    margin-top: 8px;
+    padding: 18px 30px 24px;
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+    font-size: .8rem;
+    color: #6b7a90;
+    line-height: 1.85;
+  }
+
+  .r-foot a {
+    color: #8a6a33;
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .r-foot .legal {
+    max-width: 400px;
+    font-size: .74rem;
+    color: #8a93a3;
+  }
+
+  /* Action bar — screen only */
+  .r-actions {
+    position: sticky;
+    bottom: 0;
+    background: #fff;
+    border-top: 1px solid #e8edf3;
+    padding: 14px 30px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .r-actions .btn {
+    font-size: .92rem;
+  }
+
+  @media (max-width: 640px) {
+    .receipt-overlay { padding: 12px 8px 80px; }
+    .r-head { padding: 20px 18px 18px; }
+    .r-body { padding: 18px 18px 6px; }
+    .r-foot { padding: 16px 18px 20px; }
+    .r-actions { padding: 12px 18px; }
+    .r-grid { grid-template-columns: 1fr; }
+    .r-doctype { text-align: right; }
+    .r-totals { max-width: none; }
+    .r-verify { flex-direction: column-reverse; align-items: flex-start; }
+    .r-table th, .r-table td { padding: 8px 7px; font-size: .82rem; }
+  }
+
+  /* ============================================================
+     PRINT — only the receipt sheet reaches the paper / PDF
+     ============================================================ */
+  @media print {
+    @page {
+      size: A4;
+      margin: 12mm 10mm;
+    }
+
+    html, body {
+      background: #fff !important;
+      height: auto !important;
+      overflow: visible !important;
+    }
+
+    body > *:not(.receipt-overlay) {
+      display: none !important;
+    }
+
+    .receipt-overlay {
+      position: static !important;
+      display: block !important;
+      background: none !important;
+      backdrop-filter: none !important;
+      padding: 0 !important;
+      overflow: visible !important;
+    }
+
+    .receipt-sheet {
+      box-shadow: none !important;
+      border-radius: 0 !important;
+      max-width: none !important;
+      margin: 0 !important;
+    }
+
+    .r-actions,
+    .no-print {
+      display: none !important;
+    }
+
+    .r-head {
+      /* keep the navy header in the PDF */
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .r-head, .r-table th, .r-pending, .r-note, .r-paid, .r-verify, .r-doctype .lbl {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .r-section,
+    .r-table tr {
+      page-break-inside: avoid;
+    }
+  }
+
   </style>
 </head>
 
@@ -6013,7 +6430,7 @@ p {
             </div>
             <div class="ms-body">
               <h3>تصفّح موردينا</h3>
-              <p>شبكة موردين في ٣ مدن رئيسية</p>
+              <p>شبكة موردين تغطي جميع مناطق المملكة</p>
             </div>
             <svg class="ms-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
           </a>
@@ -6045,12 +6462,12 @@ p {
       <div class="container">
         <div class="stats-strip-home">
           <div>
-            <div class="stat-num">٣ مدن</div>
-            <div class="stat-label">شبكة موردين في الرياض، جدة، والمدينة المنورة</div>
+            <div class="stat-num">جميع <span style="color:var(--amber-500);">المناطق</span></div>
+            <div class="stat-label">شبكة موردين تغطي جميع مناطق المملكة</div>
           </div>
           <div>
-            <div class="stat-num">١٠ <span style="color:var(--amber-500);">فئات</span></div>
-            <div class="stat-label">حديد • خرسانة • بلوك • طوب • عزل • رمل • إسمنت • أخشاب • سباكة • كهرباء</div>
+            <div class="stat-num">١١ <span style="color:var(--amber-500);">فئة</span></div>
+            <div class="stat-label">حديد • خرسانة • بلوك • طوب • عزل • رمل • إسمنت • أخشاب • سباكة • كهرباء • معدات ثقيلة</div>
           </div>
           <div>
             <div class="stat-num">٢٤ <span style="color:var(--amber-500);">ساعة</span></div>
@@ -7001,6 +7418,8 @@ p {
           <div class="row2">
             <div>
               <label>المدينة / موقع المشروع</label>
+              <!-- Covers all 13 regions so the form matches the
+                   "جميع مناطق المملكة" claim on the homepage. -->
               <select required name="city">
                 <option value="">اختر المدينة…</option>
                 <option>الرياض</option>
@@ -7009,9 +7428,26 @@ p {
                 <option>المدينة المنورة</option>
                 <option>الدمام</option>
                 <option>الخبر</option>
+                <option>الظهران</option>
+                <option>الجبيل</option>
+                <option>الأحساء</option>
                 <option>الطائف</option>
+                <option>ينبع</option>
                 <option>تبوك</option>
                 <option>أبها</option>
+                <option>خميس مشيط</option>
+                <option>نجران</option>
+                <option>جازان</option>
+                <option>الباحة</option>
+                <option>بريدة</option>
+                <option>عنيزة</option>
+                <option>حائل</option>
+                <option>سكاكا</option>
+                <option>عرعر</option>
+                <option>القريات</option>
+                <option>الخرج</option>
+                <option>حفر الباطن</option>
+                <option>أخرى — حدّدها في التفاصيل</option>
               </select>
             </div>
             <div>
@@ -7505,10 +7941,11 @@ p {
 
           <div class="zatca-card">
             <div style="text-align:right;">
-              <h4>فاتورة ضريبية متوافقة مع ZATCA</h4>
-              <p>هذه الفاتورة معتمدة ضريبيًا من هيئة الزكاة والضريبة والجمارك. امسح رمز QR للتحقق من صحتها.</p>
+              <h4>إيصال استلام الطلب</h4>
+              <p>احتفظ بإيصال طلبك — يتضمن رقم الطلب وتفاصيل ما طلبته. يمكنك طباعته أو حفظه بصيغة PDF.
+                عند وصول عرض السعر سيصدر لك إيصال محدَّث يتضمن المبالغ.</p>
               <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
-                <button class="btn btn-ghost" onclick="downloadInvoice()">تحميل الفاتورة (PDF)</button>
+                <button class="btn btn-primary" onclick="openLastReceipt()">عرض الإيصال / حفظ PDF</button>
                 <a id="confirmWA" target="_blank" rel="noopener" class="wa-btn">
                   <svg viewBox="0 0 24 24" fill="currentColor">
                     <path
@@ -10172,7 +10609,12 @@ p {
 
     function renderSuppliersHome() {
       const ids = ['s1', 's3', 's2', 's5', 's4', 's10'];
-      $('#suppliersHomeGrid').innerHTML = ids.map(id => {
+      // #suppliersHomeGrid was dropped from the markup at some point but this
+      // renderer was left behind. Without this guard it throws during BOOT and
+      // kills every statement after it — including the router.
+      const suppliersHost = $('#suppliersHomeGrid');
+      if (!suppliersHost) return;
+      suppliersHost.innerHTML = ids.map(id => {
         const s = SUPPLIERS[id];
         return `<a href="#supplier/${id}" data-link class="step-card" style="padding:22px 18px; text-align:center; text-decoration:none;">
       <div style="font-size: 2rem;">${s.logo}</div>
@@ -10701,6 +11143,10 @@ p {
                 </details>
 
                 <div style="display:flex; align-items:center; justify-content:flex-end; gap:12px; flex-wrap:wrap;">
+                  <button type="button" onclick="showReceiptForOrder('${escapeHtml(o.order_number)}')" style="display:inline-flex; align-items:center; gap:6px; background:transparent; color:var(--navy-900); border:1.5px solid rgba(212,165,99,.7); padding:9px 18px; border-radius:10px; font-weight:700; font-size:.9rem; cursor:pointer; font-family:inherit;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                    ${hasQuote ? 'إيصال عرض السعر' : 'إيصال الطلب'}
+                  </button>
                   <a href="https://wa.me/966920002362?text=${encodeURIComponent(waMsg)}" target="_blank" rel="noopener" style="display:inline-flex; align-items:center; gap:6px; background:#25D366; color:#fff; padding:10px 18px; border-radius:10px; text-decoration:none; font-weight:700; font-size:.9rem;">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24z"/></svg>
                     تواصل عبر واتساب
@@ -10762,33 +11208,47 @@ p {
     <div class="row" style="border-top: 1px dashed var(--gray-200); padding-top: 10px; margin-top: 6px; font-weight: 700; font-size: 1.1rem;"><span>الإجمالي المدفوع</span><span style="color: var(--amber-600);">${sar(total.toFixed(2))}</span></div>
   `;
 
-      // Generate ZATCA-style TLV QR
-      generateZATCAQR({
-        seller: 'مداد للبناء والخدمات اللوجستية',
-        vatNumber: '300012345600003',
-        timestamp: new Date().toISOString(),
-        total: total.toFixed(2),
-        vat: vat.toFixed(2),
-        invoiceRef: ref,
-      });
-
       $('#confirmWA').href = waLink('966920002362', `رقم الطلب ${ref} • الإجمالي ${sar(total.toFixed(2))} • طريقة الدفع: ${payLabel}`);
+
+      const cartSnapshot = state.cart.map(c => ({ id: c.id, name: c.name, price: c.price, qty: c.qty, supplierId: c.supplierId, unit: c.unit }));
+      const custName  = $('#custName')?.value || (state.user?.name || '');
+      const custPhone = $('#custPhone')?.value || (state.user?.phone || '');
+      const custEmail = $('#custEmail')?.value || (state.user?.email || '');
+      const custCity  = $('#addrCity')?.value || '';
 
       // Persist to backend if available
       if (window.apiPlaceOrder) {
         apiPlaceOrder({
-          items: state.cart.map(c => ({ id: c.id, name: c.name, price: c.price, qty: c.qty, supplierId: c.supplierId, unit: c.unit })),
+          items: cartSnapshot,
           subtotal, vat: +vat.toFixed(2), shipping, total: +total.toFixed(2),
           payMethod: state.payMethod,
-          city: $('#addrCity')?.value || '',
+          city: custCity,
           district: $('#addrDistrict')?.value || '',
           postal: $('#addrPostal')?.value || '',
           extra: $('#addrExtra')?.value || '',
           building: $('#addrBuilding')?.value || '',
-          customer: $('#custName')?.value || (state.user?.name || ''),
-          phone: $('#custPhone')?.value || (state.user?.phone || ''),
+          customer: custName,
+          phone: custPhone,
         }).then(res => {
-          if (res?.orderNo) { $('#orderRef').textContent = res.orderNo; }
+          const orderNo = res?.orderNo || ref;
+          $('#orderRef').textContent = orderNo;
+
+          // Build the receipt from what was actually saved.
+          const receipt = {
+            order_number: orderNo,
+            created_at: new Date().toISOString(),
+            status: res?.status || 'pending',
+            payment_status: 'pending',
+            subtotal, vat_amount: +vat.toFixed(2), delivery_fee: shipping,
+            discount: 0, total: +total.toFixed(2),
+            customerName: custName, customerPhone: custPhone,
+            customerEmail: custEmail, customerCity: custCity,
+            items: cartSnapshot,
+          };
+          window.__lastReceipt = receipt;
+          if (typeof emailReceipt === 'function' && custEmail) {
+            emailReceipt(rNormalise(receipt), custEmail);
+          }
         }).catch(() => { });
       }
 
@@ -10824,9 +11284,9 @@ p {
       }
     }
 
-    function downloadInvoice() {
-      toast('سيتم إعداد ملف الفاتورة PDF — يُرسل لبريدك خلال دقائق');
-    }
+    /* downloadInvoice() now lives in the RECEIPT block near the end of this
+       script. It opens a real printable receipt instead of showing a toast
+       that promised a PDF by email which was never actually sent. */
 
     /* ============================================================
        CONCRETE: live summary, calendar, hijri toggle
@@ -11152,9 +11612,35 @@ p {
       }
       if (typeof celebrate === 'function') celebrate();
       toast('تم إرسال طلب عرض السعر — سيتواصل معك أكثر من مورد خلال ٢٤ ساعة');
+
+      // Issue the "order received" receipt straight away.
+      const receipt = {
+        order_number: res.orderNo,
+        created_at: new Date().toISOString(),
+        status: 'pending',
+        payment_status: 'pending',
+        subtotal: 0, vat_amount: 0, delivery_fee: 0, discount: 0, total: 0,
+        customerName: data.contactName, customerPhone: data.phone,
+        customerEmail: data.email, customerCity: data.city,
+        customer_notes: [
+          ['الفئة', data.category], ['المعدات المطلوبة', data.equipment],
+          ['الكمية', data.qty], ['الجهة', data.company],
+          ['المطلوب بحلول', data.neededBy], ['التفاصيل', data.details],
+        ].filter(([, v]) => v && String(v).trim()).map(([k, v]) => `${k}: ${v}`).join('\n'),
+      };
+      window.__lastReceipt = receipt;
+
       f.reset();
       const eqw = document.getElementById('rfqEquipWrap'); if (eqw) eqw.style.display = 'none';
-      setTimeout(() => location.hash = '#home', 1200);
+
+      if (typeof openReceipt === 'function') {
+        setTimeout(() => openReceipt(receipt), 900);
+        if (typeof emailReceipt === 'function' && data.email) {
+          emailReceipt(rNormalise(receipt), data.email);
+        }
+      } else {
+        setTimeout(() => location.hash = '#home', 1200);
+      }
     }
 
     /* ============================================================
@@ -11364,11 +11850,22 @@ p {
           const validPays = ['mada','visa','mastercard','apple_pay','stc_pay','tabby','tamara','bank_transfer','cod'];
           const payment_method = validPays.includes(orderPayload.payMethod) ? orderPayload.payMethod : 'mada';
 
+          // A guest can't write order_items (it needs the order id, which RLS
+          // won't hand back), so fold the basket into the notes instead —
+          // otherwise the admin would see a total with no idea what was in it.
+          const isGuest = !window.currentUser?.id;
+          const basketLines = (isGuest && Array.isArray(orderPayload.items) && orderPayload.items.length)
+            ? '\nالأصناف:\n' + orderPayload.items
+                .map(it => `• ${it.name || 'منتج'} × ${it.qty || 1}${it.unit ? ' ' + it.unit : ''}` +
+                           (it.price ? ` — ${(it.qty || 1) * it.price} ر.س` : ''))
+                .join('\n')
+            : '';
+
           const customer_notes =
             `${orderPayload.customer || '-'} | ${orderPayload.phone || '-'}\n` +
             `${orderPayload.city || '-'} • ${orderPayload.district || '-'}\n` +
             `المبنى: ${orderPayload.building || '-'} | الرمز البريدي: ${orderPayload.postal || '-'}\n` +
-            `ملاحظات: ${orderPayload.extra || '-'}`;
+            `ملاحظات: ${orderPayload.extra || '-'}` + basketLines;
 
           const orderRow = {
             order_number: orderNo,
@@ -11382,9 +11879,22 @@ p {
             payment_method,
             customer_notes,
           };
-          const { data: order, error } = await window.supabaseClient
-            .from('orders').insert(orderRow).select().single();
-          if (error) throw error;
+          // Guests have no SELECT policy on orders, so INSERT..RETURNING is
+          // rejected by RLS and the whole insert is rolled back — the order
+          // would be silently lost. Same guard apiSubmitRFQ already uses.
+          let order = null;
+          if (window.currentUser?.id) {
+            const { data, error } = await window.supabaseClient
+              .from('orders').insert(orderRow).select().single();
+            if (error) throw error;
+            order = data;
+          } else {
+            const { error } = await window.supabaseClient
+              .from('orders').insert(orderRow);
+            if (error) throw error;
+            // No row comes back for a guest; the order number we generated
+            // above is the real one, and the admin sees the row.
+          }
 
           if (order && Array.isArray(orderPayload.items) && orderPayload.items.length) {
             const items = orderPayload.items.map(it => ({
@@ -11599,14 +12109,431 @@ p {
     /* ============================================================
        BOOT
        ============================================================ */
-    renderFeatured();
-    renderSuppliersHome();
-    renderCatalogFilters();
-    renderCatalog();
-    updateConcreteSummary();
-    updateCartBadge();
-    updateWishBadge();
-    go(location.hash || '#home');
+    // Each step is isolated: one renderer hitting a missing element must not
+    // take down the rest of boot (this is exactly how the router silently
+    // stopped running when #suppliersHomeGrid disappeared).
+    [
+      ['renderFeatured', renderFeatured],
+      ['renderSuppliersHome', renderSuppliersHome],
+      ['renderCatalogFilters', renderCatalogFilters],
+      ['renderCatalog', renderCatalog],
+      ['updateConcreteSummary', updateConcreteSummary],
+      ['updateCartBadge', updateCartBadge],
+      ['updateWishBadge', updateWishBadge],
+    ].forEach(([name, fn]) => {
+      try { fn(); } catch (e) { console.error('[boot] ' + name + ' failed:', e); }
+    });
+    try { go(location.hash || '#home'); } catch (e) { console.error('[boot] router failed:', e); }
+  
+    /* ============================================================
+       RECEIPT / الإيصال  (added Aug 2026)
+       ------------------------------------------------------------
+       Two documents, one renderer:
+         mode 'ack'   → إيصال استلام طلب — issued the moment the customer
+                        submits. Confirms WHAT was requested and that we
+                        have it. Carries no prices, because nothing has
+                        been quoted yet.
+         mode 'quote' → إيصال عرض سعر — issued once the admin has priced
+                        the order. Carries the full breakdown.
+
+       NOT a ZATCA tax invoice. Medad is not shown as VAT-registered
+       anywhere in this codebase, and nothing is submitted to ZATCA, so
+       neither document claims tax certification and neither carries a
+       VAT number. See RECEIPT_NOTES.md before changing that.
+       ============================================================ */
+
+    const MEDAD_BIZ = {
+      nameAr: 'مداد للبناء والخدمات اللوجستية',
+      tagline: 'منصة ربط المقاولين بموردي مواد البناء',
+      phone: '920002362',
+      whatsapp: '966920002362',
+      site: 'midad-ksa.com',
+      email: '',        // ← put the real support address here (see §3 of the audit)
+      crNumber: '',     // ← Commercial Registration, once you have it on hand
+      vatNumber: '',    // ← LEAVE EMPTY until genuinely ZATCA-registered
+    };
+
+    const rAr = s => String(s == null ? '' : s).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
+    const rMoney = v => rAr(parseFloat(v || 0).toFixed(2)) + ' ر.س';
+
+    function rDate(d) {
+      const dt = d ? new Date(d) : new Date();
+      if (isNaN(dt)) return '—';
+      try {
+        return dt.toLocaleDateString('ar-SA-u-ca-gregory', { day: 'numeric', month: 'long', year: 'numeric' });
+      } catch { return dt.toISOString().slice(0, 10); }
+    }
+
+    function rTime(d) {
+      const dt = d ? new Date(d) : new Date();
+      if (isNaN(dt)) return '';
+      try {
+        return dt.toLocaleTimeString('ar-SA-u-ca-gregory', { hour: '2-digit', minute: '2-digit' });
+      } catch { return ''; }
+    }
+
+    /* customer_notes is stored as "المفتاح: القيمة" lines — read it back
+       so the receipt shows the request in a structured way. */
+    function rParseNotes(notes) {
+      if (!notes) return [];
+      return String(notes)
+        .split('\n')
+        .map(l => l.trim())
+        .filter(Boolean)
+        .map(line => {
+          const clean = line.replace(/^[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]\s*/u, '');
+          const i = clean.indexOf(':');
+          const k = i === -1 ? '' : clean.slice(0, i).trim();
+          let v = i === -1 ? clean : clean.slice(i + 1).trim();
+          // notes carry raw ISO dates (2026-08-27) — show them in Arabic
+          if (/^\d{4}-\d{2}-\d{2}$/.test(v)) v = rDate(v + 'T00:00:00');
+          return [k, v];
+        })
+        .filter(([, v]) => v && v !== '-' && v !== '—');
+    }
+
+    const R_STATUS = {
+      pending:   { label: 'قيد المراجعة',   color: '#b8860b' },
+      confirmed: { label: 'مؤكَّد',          color: '#1f7a47' },
+      preparing: { label: 'قيد التجهيز',    color: '#2a65b3' },
+      shipped:   { label: 'في الطريق',      color: '#2a65b3' },
+      delivered: { label: 'تم التسليم',     color: '#1f7a47' },
+      cancelled: { label: 'ملغي',            color: '#c0392b' },
+      refunded:  { label: 'مُسترجع',         color: '#c0392b' },
+    };
+
+    /* Normalise either a live Supabase order row or a local checkout
+       payload into one shape the renderer understands. */
+    function rNormalise(src) {
+      const total = parseFloat(src.total || 0);
+      const priced = total > 0;
+      return {
+        mode: priced ? 'quote' : 'ack',
+        orderNo: src.order_number || src.orderNo || '—',
+        createdAt: src.created_at || src.createdAt || new Date().toISOString(),
+        quotedAt: src.quoted_at || null,
+        status: src.status || 'pending',
+        paymentStatus: src.payment_status || 'pending',
+        customer: {
+          name: src.customerName || '',
+          phone: src.customerPhone || '',
+          email: src.customerEmail || '',
+          city: src.customerCity || '',
+        },
+        requestLines: rParseNotes(src.customer_notes || src.customerNotes || ''),
+        items: Array.isArray(src.items) ? src.items : [],
+        subtotal: parseFloat(src.subtotal || 0),
+        vat: parseFloat(src.vat_amount != null ? src.vat_amount : (src.vat || 0)),
+        delivery: parseFloat(src.delivery_fee != null ? src.delivery_fee : (src.shipping || 0)),
+        discount: parseFloat(src.discount || 0),
+        total: total,
+        deliveryDate: src.delivery_date || null,
+        quoteNote: src.quote_note || '',
+      };
+    }
+
+    function buildReceiptHTML(d) {
+      const isQuote = d.mode === 'quote';
+      const st = R_STATUS[d.status] || R_STATUS.pending;
+
+      const contactRows = [
+        ['الاسم', d.customer.name],
+        ['الجوال', d.customer.phone],
+        ['البريد الإلكتروني', d.customer.email],
+        ['المدينة', d.customer.city],
+      ].filter(([, v]) => v);
+
+      /* If the checkout form filled contact fields we use those; otherwise
+         fall back to whatever the request lines carry. */
+      const fromNotes = k => (d.requestLines.find(([kk]) => kk === k) || [])[1] || '';
+      if (!contactRows.length) {
+        [['الاسم', fromNotes('الاسم')], ['الجوال', fromNotes('الجوال')],
+         ['البريد', fromNotes('البريد')], ['المدينة', fromNotes('المدينة')]]
+          .filter(([, v]) => v).forEach(r => contactRows.push(r));
+      }
+
+      const detailRows = d.requestLines.filter(([k]) =>
+        !['الاسم', 'الجوال', 'البريد', 'المدينة'].includes(k));
+
+      const contactHTML = contactRows.length ? `
+        <div class="r-section">
+          <h4>بيانات العميل</h4>
+          <div class="r-grid">
+            ${contactRows.map(([k, v]) => `
+              <div class="r-field"><span>${escapeHtml(k)}</span><span>${escapeHtml(v)}</span></div>`).join('')}
+          </div>
+        </div>` : '';
+
+      const detailsHTML = detailRows.length ? `
+        <div class="r-section">
+          <h4>تفاصيل الطلب</h4>
+          <div class="r-grid">
+            ${detailRows.map(([k, v]) => `
+              <div class="r-field"><span>${escapeHtml(k || 'ملاحظة')}</span><span>${escapeHtml(v)}</span></div>`).join('')}
+          </div>
+        </div>` : '';
+
+      const itemsHTML = d.items.length ? `
+        <div class="r-section">
+          <h4>الأصناف المطلوبة</h4>
+          <table class="r-table">
+            <thead>
+              <tr>
+                <th>الصنف</th>
+                <th class="num">الكمية</th>
+                ${isQuote ? '<th class="num">سعر الوحدة</th><th class="num">الإجمالي</th>' : ''}
+              </tr>
+            </thead>
+            <tbody>
+              ${d.items.map(it => `
+                <tr>
+                  <td>${escapeHtml(it.name || 'منتج')}</td>
+                  <td class="num">${rAr(it.qty || 1)}${it.unit ? ' ' + escapeHtml(it.unit) : ''}</td>
+                  ${isQuote ? `<td class="num">${rMoney(it.price || it.unit_price || 0)}</td>
+                  <td class="num">${rMoney(it.subtotal != null ? it.subtotal : (it.qty || 1) * (it.price || 0))}</td>` : ''}
+                </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>` : '';
+
+      const moneyHTML = isQuote ? `
+        <div class="r-section">
+          <h4>${'المبالغ'}</h4>
+          <div class="r-totals">
+            <div class="row"><span>السعر قبل الضريبة</span><span>${rMoney(d.subtotal)}</span></div>
+            ${d.delivery > 0 ? `<div class="row"><span>رسوم التوصيل</span><span>${rMoney(d.delivery)}</span></div>` : ''}
+            ${d.discount > 0 ? `<div class="row"><span>الخصم</span><span>− ${rMoney(d.discount)}</span></div>` : ''}
+            <div class="row"><span>ضريبة القيمة المضافة (١٥٪)</span><span>${rMoney(d.vat)}</span></div>
+            <div class="row grand"><span>الإجمالي شامل الضريبة</span><span>${rMoney(d.total)}</span></div>
+          </div>
+          ${d.paymentStatus === 'paid' ? '<div class="r-paid">✓ تم استلام الدفعة — شكرًا لك</div>' : ''}
+        </div>` : `
+        <div class="r-section">
+          <div class="r-pending">
+            طلبك وصلنا ومسجَّل باسمك برقم <b>${escapeHtml(d.orderNo)}</b>.<br>
+            فريق مداد يجمع الأسعار من الموردين الآن، وسيصلك عرض السعر الكامل خلال <b>٢٤ ساعة</b>.<br>
+            <span style="font-size:.86rem; color:#6b7a90;">هذا إيصال استلام طلب — لا يتضمن أسعارًا ولا يُعد مطالبة مالية.</span>
+          </div>
+        </div>`;
+
+      const dlvHTML = d.deliveryDate ? `
+        <div class="r-field" style="margin-top:10px;">
+          <span>التسليم المتوقع</span><span>${escapeHtml(rDate(d.deliveryDate))}</span>
+        </div>` : '';
+
+      const noteHTML = d.quoteNote ? `
+        <div class="r-section">
+          <h4>رسالة من فريق مداد</h4>
+          <div class="r-note">${escapeHtml(d.quoteNote)}</div>
+        </div>` : '';
+
+      return `
+        <div class="receipt-sheet" id="receiptSheet">
+          <div class="r-head">
+            <div class="r-head-top">
+              <div class="r-brand">
+                ${escapeHtml(MEDAD_BIZ.nameAr)}
+                <small>${escapeHtml(MEDAD_BIZ.tagline)}</small>
+              </div>
+              <div class="r-doctype">
+                <span class="lbl">${isQuote ? 'إيصال عرض سعر' : 'إيصال استلام طلب'}</span>
+                <div class="num">${escapeHtml(d.orderNo)}</div>
+                <div class="date">${escapeHtml(rDate(d.createdAt))} • ${escapeHtml(rTime(d.createdAt))}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="r-body">
+            <div class="r-section">
+              <div class="r-grid">
+                <div class="r-field"><span>حالة الطلب</span><span style="color:${st.color};">${st.label}</span></div>
+                <div class="r-field"><span>تاريخ الإصدار</span><span>${escapeHtml(rDate(isQuote && d.quotedAt ? d.quotedAt : d.createdAt))}</span></div>
+              </div>
+              ${dlvHTML}
+            </div>
+
+            ${contactHTML}
+            ${detailsHTML}
+            ${itemsHTML}
+            ${moneyHTML}
+            ${noteHTML}
+
+            <div class="r-section">
+              <div class="r-verify">
+                <div class="txt">
+                  <b>رمز التحقق من الطلب</b>
+                  امسح الرمز أو أرسل رقم الطلب لنا على واتساب للاطلاع على آخر تحديث لحالة طلبك.
+                </div>
+                <div class="r-qr" id="receiptQR"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="r-foot">
+            <div>
+              <b style="color:#10203c;">${escapeHtml(MEDAD_BIZ.nameAr)}</b><br>
+              واتساب: <a href="https://wa.me/${MEDAD_BIZ.whatsapp}" target="_blank" rel="noopener">${rAr(MEDAD_BIZ.phone)}</a><br>
+              ${MEDAD_BIZ.email ? `البريد: <a href="mailto:${escapeHtml(MEDAD_BIZ.email)}">${escapeHtml(MEDAD_BIZ.email)}</a><br>` : ''}
+              ${escapeHtml(MEDAD_BIZ.site)}
+              ${MEDAD_BIZ.crNumber ? `<br>س.ت: ${rAr(MEDAD_BIZ.crNumber)}` : ''}
+            </div>
+            <div class="legal">
+              ${isQuote
+                ? 'هذا المستند إيصال بعرض سعر صادر من منصة مداد ويُستخدم للمراجعة والتنسيق. الأسعار سارية لمدة ٧ أيام من تاريخ الإصدار ما لم يُذكر خلاف ذلك.'
+                : 'هذا المستند إثبات استلام طلب ولا يُعد فاتورة ولا مطالبة مالية.'}
+              ${MEDAD_BIZ.vatNumber ? '' : '<br>لا يُعد هذا المستند فاتورة ضريبية.'}
+            </div>
+          </div>
+
+          <div class="r-actions no-print">
+            <button class="btn btn-ghost" onclick="closeReceipt()">إغلاق</button>
+            <a class="wa-btn" id="receiptWA" target="_blank" rel="noopener" style="display:inline-flex; align-items:center; gap:6px;">إرسال عبر واتساب</a>
+            <button class="btn btn-primary" onclick="printReceipt()">طباعة / حفظ PDF</button>
+          </div>
+        </div>`;
+    }
+
+    let __receiptCurrent = null;
+
+    function openReceipt(src) {
+      const d = rNormalise(src || {});
+      __receiptCurrent = d;
+
+      let ov = document.getElementById('receiptOverlay');
+      if (!ov) {
+        ov = document.createElement('div');
+        ov.id = 'receiptOverlay';
+        ov.className = 'receipt-overlay';
+        ov.addEventListener('click', e => { if (e.target === ov) closeReceipt(); });
+        document.body.appendChild(ov);
+      }
+      ov.innerHTML = buildReceiptHTML(d);
+      ov.classList.add('open');
+      document.body.style.overflow = 'hidden';
+
+      const wa = document.getElementById('receiptWA');
+      if (wa) {
+        wa.href = waLink(MEDAD_BIZ.whatsapp,
+          d.mode === 'quote'
+            ? `مرحبًا، بخصوص عرض السعر لطلبي رقم ${d.orderNo} بإجمالي ${parseFloat(d.total).toFixed(2)} ر.س`
+            : `مرحبًا، بخصوص طلبي رقم ${d.orderNo}`);
+      }
+
+      const payload = [
+        MEDAD_BIZ.nameAr,
+        'رقم الطلب: ' + d.orderNo,
+        d.mode === 'quote' ? 'الإجمالي: ' + parseFloat(d.total).toFixed(2) + ' SAR' : 'إيصال استلام طلب',
+        'التاريخ: ' + String(d.createdAt).slice(0, 10),
+        'https://' + MEDAD_BIZ.site,
+      ].join('\n');
+
+      const draw = () => {
+        const box = document.getElementById('receiptQR');
+        if (!box || typeof QRCode === 'undefined') return;
+        box.innerHTML = '';
+        new QRCode(box, { text: payload, width: 104, height: 104, correctLevel: QRCode.CorrectLevel.M });
+      };
+      if (typeof QRCode !== 'undefined') draw();
+      else if (typeof ensureQR === 'function') ensureQR().then(draw).catch(() => {});
+    }
+
+    function closeReceipt() {
+      const ov = document.getElementById('receiptOverlay');
+      if (ov) ov.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    function printReceipt() {
+      const ov = document.getElementById('receiptOverlay');
+      if (!ov || !ov.classList.contains('open')) return;
+      window.print();
+    }
+
+    /* Pull a single order back from Supabase and show its receipt.
+       Used by the "تحميل الإيصال" button on the customer's order list. */
+    async function showReceiptForOrder(orderNumber) {
+      if (!window.supabaseClient) { toast('تعذّر فتح الإيصال'); return; }
+      try {
+        const { data: order, error } = await window.supabaseClient
+          .from('orders').select('*').eq('order_number', orderNumber).single();
+        if (error || !order) throw error || new Error('not found');
+
+        const { data: items } = await window.supabaseClient
+          .from('order_items').select('*').eq('order_id', order.id);
+
+        openReceipt({
+          ...order,
+          items: (items || []).map(it => ({
+            name: it.product_name_snapshot,
+            qty: it.quantity,
+            unit: it.unit_snapshot,
+            price: it.unit_price,
+            subtotal: it.subtotal,
+          })),
+        });
+      } catch (e) {
+        console.warn('receipt load failed', e);
+        toast('تعذّر تحميل الإيصال — حدّث الصفحة وحاول مجددًا', '');
+      }
+    }
+
+    /* Email a copy. Requires the send-receipt Edge Function + a provider
+       key; fails quietly so it can never block the customer's flow. */
+    async function emailReceipt(d, toAddress) {
+      const to = (toAddress || d.customer?.email || '').trim();
+      if (!to || !window.supabaseClient) return { ok: false, skipped: true };
+      try {
+        const { data, error } = await window.supabaseClient.functions.invoke('send-receipt', {
+          body: {
+            to,
+            orderNo: d.orderNo,
+            mode: d.mode,
+            createdAt: d.createdAt,
+            customerName: d.customer?.name || '',
+            requestLines: d.requestLines,
+            items: d.items,
+            subtotal: d.subtotal, vat: d.vat, delivery: d.delivery,
+            discount: d.discount, total: d.total,
+            quoteNote: d.quoteNote,
+          },
+        });
+        if (error) throw error;
+        return { ok: true, data };
+      } catch (e) {
+        console.warn('receipt email failed (function not deployed or key missing)', e);
+        return { ok: false, error: e };
+      }
+    }
+
+    /* Confirmation page button — shows the receipt for the order just placed. */
+    function openLastReceipt() {
+      if (window.__lastReceipt) { openReceipt(window.__lastReceipt); return; }
+      const ref = document.getElementById('orderRef')?.textContent?.trim();
+      if (ref && ref !== 'MEDAD-0000') { showReceiptForOrder(ref); return; }
+      toast('لا يوجد طلب لعرض إيصاله');
+    }
+
+    /* Replaces the old stub, which promised a PDF by email and did nothing. */
+    function downloadInvoice() {
+      if (__receiptCurrent) { printReceipt(); return; }
+      const ref = document.getElementById('orderRef')?.textContent?.trim();
+      if (ref && ref !== 'MEDAD-0000') { showReceiptForOrder(ref); return; }
+      toast('لا يوجد طلب لعرض إيصاله');
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeReceipt();
+    });
+
+    window.openLastReceipt = openLastReceipt;
+    window.rNormalise = rNormalise;
+    window.openReceipt = openReceipt;
+    window.closeReceipt = closeReceipt;
+    window.printReceipt = printReceipt;
+    window.showReceiptForOrder = showReceiptForOrder;
+    window.emailReceipt = emailReceipt;
+    window.downloadInvoice = downloadInvoice;
+
   </script>
 
 </body>
