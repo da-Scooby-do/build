@@ -12246,6 +12246,17 @@ p {
 
     const BOT_MIN_SECONDS = 3;      // a human cannot fill these forms faster
     const BOT_MAX_PER_HOUR = 4;     // per form, per browser
+    const TURNSTILE_WATCHDOG_MS = 12000;  // widget must produce a token by then
+
+    /* Set the moment Turnstile proves it cannot do its job. Everything below
+       then behaves exactly as if no site key were configured: layers 1 and 2
+       still run, but a broken challenge never blocks a paying customer. */
+    window.__turnstileBroken = false;
+    window.__turnstileFailed = function (code) {
+      window.__turnstileBroken = true;
+      console.warn('[botguard] turnstile failed (' + (code || 'unknown') + ') — failing open');
+      return true;   // tell Turnstile we handled it; don't retry-loop
+    };
 
     const __formOpenedAt = new WeakMap();
 
@@ -12273,8 +12284,23 @@ p {
         box.dataset.sitekey = TURNSTILE_SITE_KEY;
         box.dataset.theme = 'auto';
         box.dataset.language = 'ar';
+        // If the widget itself fails — bad key, wrong hostname, Cloudflare
+        // unreachable, ad-blocker — we must NOT hold the customer hostage.
+        box.dataset.errorCallback = '__turnstileFailed';
+        box.dataset.timeoutCallback = '__turnstileFailed';
         const btn = form.querySelector('button[type=submit]');
         btn ? btn.parentNode.insertBefore(box, btn) : form.appendChild(box);
+
+        // Watchdog: a Managed widget solves itself in a second or two. If no
+        // token has appeared well past that, treat Turnstile as unavailable
+        // rather than blocking every real submission.
+        setTimeout(() => {
+          const t = form.querySelector('[name="cf-turnstile-response"]')?.value;
+          if (!t) {
+            window.__turnstileBroken = true;
+            console.warn('[botguard] turnstile produced no token in time — failing open');
+          }
+        }, TURNSTILE_WATCHDOG_MS);
       }
     }
 
@@ -12319,10 +12345,19 @@ p {
           return { ok: false, msg: 'أرسلت عدة طلبات خلال ساعة. تواصل معنا عبر واتساب لمتابعة طلبك.' };
         }
 
-        // --- Turnstile (only when configured) ---
-        if (TURNSTILE_SITE_KEY) {
+        // --- Turnstile (only when configured AND actually working) ---
+        if (TURNSTILE_SITE_KEY && !window.__turnstileBroken) {
           const token = form.querySelector('[name="cf-turnstile-response"]')?.value;
-          if (!token) return { ok: false, msg: 'أكمل التحقق الأمني أعلى زر الإرسال ثم حاول مجددًا.' };
+          if (!token) {
+            // No widget in the DOM at all means it never loaded — that is our
+            // problem, not the customer's. Let the request through.
+            if (!form.querySelector('.cf-turnstile')) {
+              console.warn('[botguard] turnstile never rendered — failing open');
+              __recordSubmit(kind);
+              return { ok: true };
+            }
+            return { ok: false, msg: 'أكمل التحقق الأمني أعلى زر الإرسال ثم حاول مجددًا.' };
+          }
 
           if (window.supabaseClient) {
             try {
@@ -12359,6 +12394,8 @@ p {
       sc.id = 'cfTurnstileScript';
       sc.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
       sc.async = true; sc.defer = true;
+      // blocked by CSP, an ad-blocker, or an offline network → fail open
+      sc.onerror = () => window.__turnstileFailed('script blocked');
       document.head.appendChild(sc);
     }
 
