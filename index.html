@@ -26,9 +26,15 @@
   <meta property="og:title" content="مداد للبناء | اطلب مواد البناء بأفضل سعر في المملكة" />
   <meta property="og:description" content="أرسل احتياجك من مواد البناء — نتفاوض مع شبكة واسعة من الموردين ونوافيك بأفضل عرض: السعر، الكمية، ووقت التسليم." />
   <meta property="og:url" content="https://www.midad-ksa.com/" />
-  <meta property="og:image" content="https://www.midad-ksa.com/icon-512.png" />
+  <meta property="og:image" content="https://www.midad-ksa.com/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="مداد للبناء والخدمات اللوجستية — اطلب مواد البناء في كل المملكة" />
   <meta property="og:locale" content="ar_SA" />
-  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="مداد للبناء | اطلب مواد البناء بأفضل سعر في المملكة" />
+  <meta name="twitter:description" content="أرسل احتياجك من مواد البناء — نتفاوض مع شبكة واسعة من الموردين ونوافيك بأفضل عرض: السعر، الكمية، ووقت التسليم." />
+  <meta name="twitter:image" content="https://www.midad-ksa.com/og-image.png" />
   <style>
 /* ============================================
    مداد للبناء والخدمات اللوجستية — Saudi Construction Marketplace
@@ -7117,7 +7123,7 @@ p {
               </svg>
             </div>
             <h3>جودة مضمونة</h3>
-            <p>جميع المواد من مصانع معتمدة بشهادات SASO وسجلات تجارية سارية.</p>
+            <p>نطلب من كل مورد في شبكتنا سجلاً تجارياً سارياً، ونوفّر شهادات اختبار مختبرية عند الطلب.</p>
           </div>
           <div class="step-card" style="text-align:center; padding:32px 24px;">
             <div class="icon-box" style="margin:0 auto 18px;">
@@ -7127,7 +7133,7 @@ p {
               </svg>
             </div>
             <h3>أسعار تنافسية</h3>
-            <p>نتفاوض على أفضل الأسعار بسبب كميات الشراء الكبيرة — وفّر حتى ٢٠٪.</p>
+            <p>نتفاوض نيابةً عنك مع أكثر من مورد للحصول على أفضل عرض متاح.</p>
           </div>
           <div class="step-card" style="text-align:center; padding:32px 24px;">
             <div class="icon-box" style="margin:0 auto 18px;">
@@ -7777,54 +7783,11 @@ p {
                 <label>التاريخ</label>
                 <div class="cal">
                   <div class="cal-head">
-                    <button type="button" aria-label="السابق">‹</button>
-                    <span class="m-name" id="calMonthName">مايو ٢٠٢٦</span>
-                    <button type="button" aria-label="التالي">›</button>
+                    <button type="button" id="calPrev" aria-label="الشهر السابق">‹</button>
+                    <span class="m-name" id="calMonthName"></span>
+                    <button type="button" id="calNext" aria-label="الشهر التالي">›</button>
                   </div>
-                  <div class="cal-grid">
-                    <div class="dow">س</div>
-                    <div class="dow">ج</div>
-                    <div class="dow">خ</div>
-                    <div class="dow">ر</div>
-                    <div class="dow">ث</div>
-                    <div class="dow">ن</div>
-                    <div class="dow">ح</div>
-                    <div class="d muted">٣٠</div>
-                    <div class="d">١</div>
-                    <div class="d">٢</div>
-                    <div class="d">٣</div>
-                    <div class="d">٤</div>
-                    <div class="d">٥</div>
-                    <div class="d">٦</div>
-                    <div class="d">٧</div>
-                    <div class="d">٨</div>
-                    <div class="d">٩</div>
-                    <div class="d">١٠</div>
-                    <div class="d">١١</div>
-                    <div class="d">١٢</div>
-                    <div class="d">١٣</div>
-                    <div class="d active">١٤</div>
-                    <div class="d">١٥</div>
-                    <div class="d">١٦</div>
-                    <div class="d">١٧</div>
-                    <div class="d">١٨</div>
-                    <div class="d">١٩</div>
-                    <div class="d">٢٠</div>
-                    <div class="d">٢١</div>
-                    <div class="d">٢٢</div>
-                    <div class="d">٢٣</div>
-                    <div class="d">٢٤</div>
-                    <div class="d">٢٥</div>
-                    <div class="d">٢٦</div>
-                    <div class="d">٢٧</div>
-                    <div class="d">٢٨</div>
-                    <div class="d">٢٩</div>
-                    <div class="d">٣٠</div>
-                    <div class="d">٣١</div>
-                    <div class="d muted">١</div>
-                    <div class="d muted">٢</div>
-                    <div class="d muted">٣</div>
-                  </div>
+                  <div class="cal-grid" id="concreteCalGrid"></div>
                 </div>
               </div>
               <div class="fld">
@@ -7874,17 +7837,8 @@ p {
             <div class="trust-row">
               <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
                   stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                </svg>دفع آمن</span>
-              <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
-                  stroke-linecap="round" stroke-linejoin="round">
                   <polyline points="20 6 9 17 4 12" />
                 </svg>ضمان الجودة</span>
-              <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
-                  stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="12" cy="12" r="10" />
-                  <polyline points="12 6 12 12 16 14" />
-                </svg>تسليم فوري</span>
             </div>
           </aside>
         </div>
@@ -8199,7 +8153,7 @@ p {
 
         <div class="section-divider">المظهر والتفاصيل</div>
         <div class="form-grid">
-          <div class="fld"><label>وسم (مثل: فوري، معتمد SASO)</label><input type="text" name="tag_ar" placeholder="اختياري"></div>
+          <div class="fld"><label>وسم (مثل: فوري)</label><input type="text" name="tag_ar" placeholder="اختياري"></div>
           <div class="fld"><label>رابط الصورة الرئيسية</label><input type="url" name="main_image" placeholder="https://..."></div>
           <div class="fld"><label>الوصف</label><textarea name="description_ar" rows="3" placeholder="وصف قصير عن المنتج"></textarea></div>
         </div>
@@ -8339,15 +8293,14 @@ p {
 
           <h2>طريقة طلب الإرجاع</h2>
           <ul>
-            <li>تواصل مع خدمة العملاء عبر الواتساب على ٩٢٠٠٠٢٣٦٢ خلال ٤٨ ساعة من الاستلام.</li>
+            <li>تواصل مع خدمة العملاء عبر الواتساب خلال ٤٨ ساعة من الاستلام.</li>
             <li>أرفق صورًا توضح العيب أو المشكلة.</li>
             <li>سيتواصل معك فريق مداد خلال ٢٤ ساعة لإكمال إجراءات الاسترداد.</li>
             <li>يتم إرجاع المبلغ خلال ٧–١٤ يوم عمل إلى نفس وسيلة الدفع الأصلية.</li>
           </ul>
 
           <h2>الضمان وشهادات الجودة</h2>
-          <p>جميع المواد التي نوفّرها مطابقة لمواصفات SASO، ونصدر شهادات اختبار مختبرية للخرسانة
-            والحديد عند الطلب، وضمان مصنع للمنتجات الكهربائية والصحية.</p>
+          <p>نطلب من كل مورد في شبكتنا سجلاً تجارياً سارياً، ونوفّر شهادات اختبار مختبرية عند الطلب.</p>
 
           <h2>الشروط والأحكام</h2>
           <p>باستخدامك منصة مداد، فإنك توافق على أن العقد التجاري
@@ -8356,9 +8309,6 @@ p {
 
           <h2>الأسئلة الشائعة</h2>
           <p><b>هل تشمل الأسعار التوصيل؟</b><br />التوصيل يُحتسب بشكل منفصل لكل مورد ويظهر بوضوح في صفحة الدفع.</p>
-          <p><b>هل أستطيع تتبع شحنتي؟</b><br />نعم، ستصلك رسالة SMS وواتساب فيها رابط تتبع مباشر للشحنة.</p>
-          <p><b>هل تدعمون الدفع الآجل (BNPL)؟</b><br />نعم — نقبل تابي وتمارا للطلبات تحت ٥٠٫٠٠٠ ر.س لتقسيط الدفع على ٤
-            دفعات.</p>
           <p><b>كم يستغرق التوصيل؟</b><br />عادةً من ٢٤ إلى ٧٢ ساعة حسب المنتج والموقع. بعض المواد متوفّرة للتوصيل في نفس اليوم.
           </p>
         </div>
@@ -8425,22 +8375,13 @@ p {
         <div>
           <h4>تواصل معنا</h4>
           <ul class="footer-links">
-            <li>الرياض — حي العليا</li>
-            <li>٩٢٠ ٠٠٢ ٣٦٢</li>
+            <li>المملكة العربية السعودية</li>
             <li><a href="mailto:info@midad-ksa.com">info@midad-ksa.com</a></li>
-            <li style="display:flex; gap:8px; margin-top:10px;">
-              <span
-                style="background:#fff; color:#000; padding:4px 8px; border-radius:4px; font-size:.7rem; font-weight:700;">معتمد
-                ZATCA</span>
-              <span
-                style="background:#fff; color:#000; padding:4px 8px; border-radius:4px; font-size:.7rem; font-weight:700;">SASO</span>
-            </li>
           </ul>
         </div>
       </div>
       <div class="footer-bottom">
         <span>© ٢٠٢٦ مداد للبناء والخدمات اللوجستية — المملكة العربية السعودية. جميع الحقوق محفوظة.</span>
-        <span>سجل تجاري ١٠١٠٤٥٦٧٨٩ — ض.م.ق ٣٠٠٠١٢٣٤٥٦</span>
       </div>
     </div>
   </footer>
@@ -10420,16 +10361,16 @@ p {
        DATA: Suppliers
        ============================================================ */
     let SUPPLIERS = {
-      's1': { id: 's1', name: 'مورد معتمد 1', cities: ['الرياض', 'جدة', 'الدمام'], rating: 4.9, reviewCount: 1248, since: 2008, cr: '—', phone: '966920002362', verified: true, sasoBadge: true, fastDelivery: true, deliveryDays: '٢٤ ساعة', desc: 'أكبر مصنع خرسانة جاهزة في المملكة الوسطى — أكثر من ٤٥ شاحنة و١٢ مصنع توزيع.', logo: '' },
-      's2': { id: 's2', name: 'مورد معتمد 2', cities: ['المدينة المنورة', 'الرياض'], rating: 4.8, reviewCount: 687, since: 2014, cr: '—', phone: '966920002362', verified: true, sasoBadge: true, fastDelivery: false, deliveryDays: '٣ أيام', desc: 'مصنع متخصص في الطوب الأحمر والطوب المعزول حراريًا — جودة عالية بأسعار جملة.', logo: '' },
-      's3': { id: 's3', name: 'مورد معتمد 3', cities: ['الدمام', 'جدة', 'الرياض'], rating: 4.9, reviewCount: 1893, since: 1998, cr: '—', phone: '966920002362', verified: true, sasoBadge: true, fastDelivery: true, deliveryDays: '٤٨ ساعة', desc: 'موزع رسمي لمصانع الحديد في المملكة — كافة المقاسات والمواصفات SASO.', logo: '' },
+      's1': { id: 's1', name: 'مورد معتمد 1', cities: ['الرياض', 'جدة', 'الدمام'], rating: 4.9, reviewCount: 1248, since: 2008, cr: '—', phone: '966920002362', verified: true, sasoBadge: false, fastDelivery: true, deliveryDays: '٢٤ ساعة', desc: 'أكبر مصنع خرسانة جاهزة في المملكة الوسطى — أكثر من ٤٥ شاحنة و١٢ مصنع توزيع.', logo: '' },
+      's2': { id: 's2', name: 'مورد معتمد 2', cities: ['المدينة المنورة', 'الرياض'], rating: 4.8, reviewCount: 687, since: 2014, cr: '—', phone: '966920002362', verified: true, sasoBadge: false, fastDelivery: false, deliveryDays: '٣ أيام', desc: 'مصنع متخصص في الطوب الأحمر والطوب المعزول حراريًا — جودة عالية بأسعار جملة.', logo: '' },
+      's3': { id: 's3', name: 'مورد معتمد 3', cities: ['الدمام', 'جدة', 'الرياض'], rating: 4.9, reviewCount: 1893, since: 1998, cr: '—', phone: '966920002362', verified: true, sasoBadge: false, fastDelivery: true, deliveryDays: '٤٨ ساعة', desc: 'موزع رسمي لمصانع الحديد في المملكة — كافة المقاسات والمواصفات SASO.', logo: '' },
       's4': { id: 's4', name: 'مورد معتمد 4', cities: ['الرياض'], rating: 4.7, reviewCount: 412, since: 2011, cr: '—', phone: '966920002362', verified: true, sasoBadge: false, fastDelivery: true, deliveryDays: 'يومي', desc: 'تأجير وبيع المعدات الثقيلة والإنشائية مع فنيي تشغيل معتمدين.', logo: '' },
       's5': { id: 's5', name: 'مورد معتمد 5', cities: ['جدة', 'مكة المكرمة'], rating: 4.6, reviewCount: 298, since: 2005, cr: '—', phone: '966920002362', verified: true, sasoBadge: false, fastDelivery: false, deliveryDays: '٤ أيام', desc: 'مستودع متخصص في الأخشاب الطبيعية والمصنّعة — استيراد مباشر من ماليزيا وتركيا.', logo: '' },
       's6': { id: 's6', name: 'مورد معتمد 6', cities: ['الرياض', 'جدة'], rating: 4.5, reviewCount: 184, since: 2017, cr: '—', phone: '966920002362', verified: true, sasoBadge: false, fastDelivery: true, deliveryDays: '٤٨ ساعة', desc: 'أبواب داخلية وخارجية بتصاميم عصرية مع التركيب المجاني.', logo: '' },
-      's7': { id: 's7', name: 'مورد معتمد 7', cities: ['الرياض', 'بريدة'], rating: 4.8, reviewCount: 902, since: 1995, cr: '—', phone: '966920002362', verified: true, sasoBadge: true, fastDelivery: true, deliveryDays: '٤٨ ساعة', desc: 'مصنع أسمنت بورتلاندي عالي الجودة — توريد للمشاريع الكبرى والأفراد.', logo: '' },
-      's8': { id: 's8', name: 'مورد معتمد 8', cities: ['جدة', 'الرياض'], rating: 4.7, reviewCount: 521, since: 2002, cr: '—', phone: '966920002362', verified: true, sasoBadge: true, fastDelivery: false, deliveryDays: '٥ أيام', desc: 'تشكيلة واسعة من البلاط والسيراميك بأكثر من ٤٠ تشطيبًا.', logo: '' },
+      's7': { id: 's7', name: 'مورد معتمد 7', cities: ['الرياض', 'بريدة'], rating: 4.8, reviewCount: 902, since: 1995, cr: '—', phone: '966920002362', verified: true, sasoBadge: false, fastDelivery: true, deliveryDays: '٤٨ ساعة', desc: 'مصنع أسمنت بورتلاندي عالي الجودة — توريد للمشاريع الكبرى والأفراد.', logo: '' },
+      's8': { id: 's8', name: 'مورد معتمد 8', cities: ['جدة', 'الرياض'], rating: 4.7, reviewCount: 521, since: 2002, cr: '—', phone: '966920002362', verified: true, sasoBadge: false, fastDelivery: false, deliveryDays: '٥ أيام', desc: 'تشكيلة واسعة من البلاط والسيراميك بأكثر من ٤٠ تشطيبًا.', logo: '' },
       's9': { id: 's9', name: 'مورد معتمد 9', cities: ['الرياض', 'الدمام'], rating: 4.6, reviewCount: 156, since: 2009, cr: '—', phone: '966920002362', verified: true, sasoBadge: false, fastDelivery: false, deliveryDays: 'يومي', desc: 'تأجير الرافعات البرجية والشوكية لمشاريع المقاولات.', logo: '' },
-      's10': { id: 's10', name: 'مورد معتمد 10', cities: ['الرياض', 'جدة', 'الدمام'], rating: 4.9, reviewCount: 1102, since: 1990, cr: '—', phone: '966920002362', verified: true, sasoBadge: true, fastDelivery: true, deliveryDays: '٢٤ ساعة', desc: 'جوتن — العلامة الرائدة عالميًا في الدهانات والعوازل، مع توزيع شامل في المملكة.', logo: '' },
+      's10': { id: 's10', name: 'مورد معتمد 10', cities: ['الرياض', 'جدة', 'الدمام'], rating: 4.9, reviewCount: 1102, since: 1990, cr: '—', phone: '966920002362', verified: true, sasoBadge: false, fastDelivery: true, deliveryDays: '٢٤ ساعة', desc: 'جوتن — العلامة الرائدة عالميًا في الدهانات والعوازل، مع توزيع شامل في المملكة.', logo: '' },
     };
 
     /* ============================================================
@@ -10438,7 +10379,7 @@ p {
     let PRODUCTS = [
       { id: 'p1', name: 'خرسانة جاهزة C35', category: 'خرسانة', city: 'الرياض', supplierId: 's1', price: 220, unit: 'م٣', rating: 4.9, reviews: 584, tag: 'توصيل فوري', img: 'https://images.unsplash.com/photo-1585849132777-22ff9b8ed9ea?auto=format&fit=crop&w=800&q=70', gallery: ['https://images.unsplash.com/photo-1585849132777-22ff9b8ed9ea?auto=format&fit=crop&w=800&q=70', 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=70', 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&w=800&q=70', 'https://images.unsplash.com/photo-1581094277051-46e6e5e2f5b3?auto=format&fit=crop&w=800&q=70'], desc: 'خرسانة مسلحة عالية الجودة • توصيل خلال ٦ ساعات', specs: { 'قوة الكسر': '35 MPa', 'الفئة': 'مسلحة', 'الكثافة': '٢٤٠٠ كجم/م٣', 'زمن الصب': '٩٠ دقيقة', 'الإضافات': 'ألياف PP', 'الشهادة': 'SASO 9001-2025' }, tiers: [{ q: '1-9 م٣', p: 220 }, { q: '10-49 م٣', p: 210 }, { q: '50-99 م٣', p: 200 }, { q: '100+ م٣', p: 185 }] },
       { id: 'p2', name: 'طوب أحمر ٢٠×٢٠×٤٠', category: 'طوب', city: 'المدينة المنورة', supplierId: 's2', price: 1.2, unit: 'حبة', rating: 4.8, reviews: 312, tag: 'أكثر طلبًا', img: 'https://images.unsplash.com/photo-1590725175842-00d0f2e24e16?auto=format&fit=crop&w=800&q=70', gallery: ['https://images.unsplash.com/photo-1590725175842-00d0f2e24e16?auto=format&fit=crop&w=800&q=70', 'https://images.unsplash.com/photo-1604782206219-3b9576575203?auto=format&fit=crop&w=800&q=70', 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=70', 'https://images.unsplash.com/photo-1509391366360-2e959784a276?auto=format&fit=crop&w=800&q=70'], desc: 'طوب قوي متين متوفر بكميات كبيرة', specs: { 'الأبعاد': '٢٠×٢٠×٤٠ سم', 'الوزن': '١٤ كجم', 'مقاومة الضغط': '٧٫٥ نيوتن/مم٢', 'الامتصاص': '٨٪', 'الشهادة': 'SASO 1923' }, tiers: [{ q: '1-499 حبة', p: 1.2 }, { q: '500-1999 حبة', p: 1.1 }, { q: '2000-9999 حبة', p: 1.0 }, { q: '10000+ حبة', p: 0.85 }] },
-      { id: 'p3', name: 'حديد تسليح مضلع ١٢مم', category: 'حديد', city: 'الدمام', supplierId: 's3', price: 3750, unit: 'طن', rating: 4.9, reviews: 826, tag: 'معتمد SASO', img: 'https://images.unsplash.com/photo-1565372195458-9de0b320ef04?auto=format&fit=crop&w=800&q=70', gallery: ['https://images.unsplash.com/photo-1565372195458-9de0b320ef04?auto=format&fit=crop&w=800&q=70', 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=70', 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&w=800&q=70', 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=70'], desc: 'حديد تسليح مطابق لمواصفة SASO • شحن شامل', specs: { 'القطر': '١٢ مم', 'الطول': '١٢ متر', 'حد الخضوع': '٤٢٠ ميجاباسكال', 'الشد': '٦٠٠ ميجاباسكال', 'الشهادة': 'SASO 14 / B500B' }, tiers: [{ q: '1-4 طن', p: 3750 }, { q: '5-19 طن', p: 3650 }, { q: '20-49 طن', p: 3550 }, { q: '50+ طن', p: 3450 }] },
+      { id: 'p3', name: 'حديد تسليح مضلع ١٢مم', category: 'حديد', city: 'الدمام', supplierId: 's3', price: 3750, unit: 'طن', rating: 4.9, reviews: 826, tag: 'حديد تسليح', img: 'https://images.unsplash.com/photo-1565372195458-9de0b320ef04?auto=format&fit=crop&w=800&q=70', gallery: ['https://images.unsplash.com/photo-1565372195458-9de0b320ef04?auto=format&fit=crop&w=800&q=70', 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=70', 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&w=800&q=70', 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=70'], desc: 'حديد تسليح مطابق لمواصفة SASO • شحن شامل', specs: { 'القطر': '١٢ مم', 'الطول': '١٢ متر', 'حد الخضوع': '٤٢٠ ميجاباسكال', 'الشد': '٦٠٠ ميجاباسكال', 'الشهادة': 'SASO 14 / B500B' }, tiers: [{ q: '1-4 طن', p: 3750 }, { q: '5-19 طن', p: 3650 }, { q: '20-49 طن', p: 3550 }, { q: '50+ طن', p: 3450 }] },
       { id: 'p4', name: 'حفّارة هيدروليكية CAT 320', category: 'معدات', city: 'الرياض', supplierId: 's4', price: 2400, unit: 'يوم', rating: 4.7, reviews: 209, tag: 'تأجير يومي', img: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&w=800&q=70', gallery: ['https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&w=800&q=70', 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=70', 'https://images.unsplash.com/photo-1565372195458-9de0b320ef04?auto=format&fit=crop&w=800&q=70', 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=70'], desc: 'فنّي تشغيل متضمّن • تغطية جميع المناطق', specs: { 'الموديل': 'CAT 320', 'الحمولة': '٢٠ طن', 'القوة': '١٧٢ حصان', 'سنة الصنع': '٢٠٢٣', 'الفني': 'متضمن' }, tiers: [{ q: '1-3 أيام', p: 2400 }, { q: '4-10 أيام', p: 2200 }, { q: '11-30 يوم', p: 2000 }, { q: '30+ يوم', p: 1750 }] },
       { id: 'p5', name: 'ألواح خشب الزان للديكور', category: 'أخشاب', city: 'جدة', supplierId: 's5', price: 420, unit: 'م٢', rating: 4.6, reviews: 140, tag: 'خشب طبيعي', img: 'https://images.unsplash.com/photo-1591193686104-fddba4d0e4ff?auto=format&fit=crop&w=800&q=70', gallery: ['https://images.unsplash.com/photo-1591193686104-fddba4d0e4ff?auto=format&fit=crop&w=800&q=70', 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=800&q=70', 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=70', 'https://images.unsplash.com/photo-1604782206219-3b9576575203?auto=format&fit=crop&w=800&q=70'], desc: 'خشب طبيعي بدرجات متنوعة', specs: { 'النوع': 'زان أوروبي', 'السماكة': '١٨ مم', 'الأبعاد': '١٢٠×٦٠ سم', 'التشطيب': 'مصقول' }, tiers: [{ q: '1-19 م٢', p: 420 }, { q: '20-49 م٢', p: 395 }, { q: '50+ م٢', p: 370 }] },
       { id: 'p6', name: 'باب داخلي خشب MDF', category: 'أبواب', city: 'الرياض', supplierId: 's6', price: 950, unit: 'باب', rating: 4.5, reviews: 98, tag: 'تركيب مجاني', img: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=800&q=70', gallery: ['https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=800&q=70', 'https://images.unsplash.com/photo-1591193686104-fddba4d0e4ff?auto=format&fit=crop&w=800&q=70', 'https://images.unsplash.com/photo-1604782206219-3b9576575203?auto=format&fit=crop&w=800&q=70', 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=70'], desc: 'أبواب داخلية بتشطيب فاخر', specs: { 'المادة': 'MDF عالي الكثافة', 'السماكة': '٤٠ مم', 'الأبعاد': '٢١٠×٩٠ سم', 'الإطار': 'متضمن', 'التركيب': 'مجاني' }, tiers: [{ q: '1-4 أبواب', p: 950 }, { q: '5-19 باب', p: 880 }, { q: '20-49 باب', p: 820 }, { q: '50+ باب', p: 750 }] },
@@ -10459,7 +10400,7 @@ p {
     let REVIEWS = {
       p1: [{ n: 'عبدالله الحربي', r: 5, d: '٢٠٢٦/٠٣/١٠', t: 'وصلت الخرسانة في الموعد بدقة عالية. الجودة ممتازة وفريق المورد محترف.' }, { n: 'فهد القحطاني', r: 5, d: '٢٠٢٦/٠٢/١٨', t: 'استخدمتها في صب أساسات فيلا — قوة الكسر مطابقة تمامًا للمواصفات.' }, { n: 'محمد العتيبي', r: 4, d: '٢٠٢٦/٠١/٢٢', t: 'جودة عالية بس التوصيل تأخر ساعة عن الموعد المحدد.' }],
       p2: [{ n: 'أحمد الزهراني', r: 5, d: '٢٠٢٦/٠٣/٠٥', t: 'طوب ممتاز وأبعاد دقيقة. السعر منافس جدًا للكميات الكبيرة.' }, { n: 'سعد الشهري', r: 5, d: '٢٠٢٦/٠٢/١٤', t: 'طلبت ٥٠٠٠ حبة وكلها وصلت بحالة ممتازة بدون كسر.' }],
-      p3: [{ n: 'خالد الدوسري', r: 5, d: '٢٠٢٦/٠٣/٢٠', t: 'حديد معتمد وشهادة SASO مرفقة مع الشحنة. ثقة كاملة.' }, { n: 'يوسف القرني', r: 5, d: '٢٠٢٦/٠٣/٠١', t: 'الأسعار شفافة والشحن منتظم. تعاملت معهم في ٣ مشاريع.' }],
+      p3: [{ n: 'خالد الدوسري', r: 5, d: '٢٠٢٦/٠٣/٢٠', t: 'التعامل كان واضحاً والتسليم في الموعد.' }, { n: 'يوسف القرني', r: 5, d: '٢٠٢٦/٠٣/٠١', t: 'الأسعار شفافة والشحن منتظم. تعاملت معهم في ٣ مشاريع.' }],
     };
 
     /* ============================================================
@@ -10572,7 +10513,6 @@ p {
           <p class="sub">${sup.name} • ${p.city}<br/>${p.desc}</p>
           ${sup.verified ? `<div class="badge-row">
             <span class="badge-verified"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> مورد معتمد</span>
-            ${sup.sasoBadge ? '<span class="badge-verified">SASO</span>' : ''}
             ${sup.fastDelivery ? `<span class="badge-verified">${sup.deliveryDays}</span>` : ''}
           </div>` : ''}
           <div class="foot">
@@ -10622,7 +10562,6 @@ p {
       <p style="margin:6px 0 6px; color:var(--gray-500); font-size:0.82rem;">${s.cities.join(' • ')}</p>
       <div class="badge-row" style="justify-content:center;">
         <span class="badge-verified"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> ${s.rating} </span>
-        ${s.sasoBadge ? '<span class="badge-verified">SASO</span>' : ''}
       </div>
     </a>`;
       }).join('');
@@ -10758,7 +10697,6 @@ p {
 
         <div class="badge-row" style="margin-top:10px;">
           ${sup.verified ? '<span class="badge-verified"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> مورد معتمد</span>' : ''}
-          ${sup.sasoBadge ? '<span class="badge-verified">معتمد SASO</span>' : ''}
           ${sup.fastDelivery ? `<span class="badge-verified">توصيل ${sup.deliveryDays}</span>` : ''}
         </div>
 
@@ -10869,7 +10807,6 @@ p {
           </div>
           <div class="badge-row" style="margin-top:8px;">
             ${s.verified ? '<span class="badge-verified" style="background:#fff;">✓ معتمد</span>' : ''}
-            ${s.sasoBadge ? '<span class="badge-verified" style="background:#fff;">SASO</span>' : ''}
             ${s.fastDelivery ? `<span class="badge-verified" style="background:#fff;">${s.deliveryDays}</span>` : ''}
           </div>
         </div>
@@ -10978,8 +10915,6 @@ p {
       { id: 'visa', label: 'Visa / Master', sub: 'بطاقة ائتمان', cls: '' },
       { id: 'apple', label: 'Apple Pay', sub: 'دفع سريع', cls: 'apple' },
       { id: 'stcpay', label: 'STC Pay', sub: 'محفظة رقمية', cls: 'stcpay' },
-      { id: 'tabby', label: 'tabby', sub: '٤ دفعات بدون فوائد', cls: 'tabby' },
-      { id: 'tamara', label: 'tamara', sub: 'قسّط على ٣ شهور', cls: 'tamara' },
       { id: 'bank', label: 'تحويل بنكي', sub: 'للشركات والمشاريع', cls: 'bank' },
     ];
 
@@ -10993,9 +10928,7 @@ p {
 
       const subtotal = state.cart.reduce((s, c) => s + c.price * c.qty, 0);
       const note = $('#bnplNote');
-      if (state.payMethod === 'tabby') { note.innerHTML = `قسّط ${sar(subtotal)} على ٤ دفعات شهرية بدون فوائد عبر تابي.`; note.classList.remove('hidden'); }
-      else if (state.payMethod === 'tamara') { note.innerHTML = `قسّط ${sar(subtotal)} على ٣ دفعات بدون فوائد عبر تمارا.`; note.classList.remove('hidden'); }
-      else if (state.payMethod === 'bank') { note.innerHTML = `سيتم إرسال تفاصيل الحساب البنكي بعد الإرسال — مناسب للطلبات بأكثر من ٥٠٫٠٠٠ ر.س.`; note.classList.remove('hidden'); }
+      if (state.payMethod === 'bank') { note.innerHTML = `سيتم إرسال تفاصيل الحساب البنكي بعد الإرسال — مناسب للطلبات بأكثر من ٥٠٫٠٠٠ ر.س.`; note.classList.remove('hidden'); }
       else { note.classList.add('hidden'); }
     }
     function selectPay(id) { state.payMethod = id; renderPayMethods(); }
@@ -11326,17 +11259,9 @@ p {
 
     function setCalendar(mode) {
       state.calendarMode = mode;
-      $('#calGreg').classList.toggle('active', mode === 'greg');
-      $('#calHijri').classList.toggle('active', mode === 'hijri');
-      if (mode === 'hijri') {
-        try {
-          const fmtH = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura', { month: 'long', year: 'numeric' });
-          $('#calMonthName').textContent = fmtH.format(new Date());
-        } catch { $('#calMonthName').textContent = 'شوال ١٤٤٧'; }
-      } else {
-        $('#calMonthName').textContent = 'مايو ٢٠٢٦';
-      }
-      updateConcreteSummary();
+      $('#calGreg')?.classList.toggle('active', mode === 'greg');
+      $('#calHijri')?.classList.toggle('active', mode === 'hijri');
+      renderConcreteCal();
     }
 
     /* ============================================================
@@ -11673,13 +11598,6 @@ p {
       });
     });
 
-    $$('.cal-grid .d:not(.muted)').forEach(d => {
-      d.addEventListener('click', () => {
-        $$('.cal-grid .d').forEach(x => x.classList.remove('active'));
-        d.classList.add('active');
-        updateConcreteSummary();
-      });
-    });
 
     ['c-type', 'c-strength', 'q-amt', 'addFibers', 'addAccel', 'addSulf'].forEach(id => {
       const el = $('#' + id);
@@ -12124,6 +12042,142 @@ p {
       try { fn(); } catch (e) { console.error('[boot] ' + name + ' failed:', e); }
     });
     try { go(location.hash || '#home'); } catch (e) { console.error('[boot] router failed:', e); }
+
+    /* ============================================================
+       LAUNCH COUNTDOWN  (added Aug 2026)
+       The markup shipped with "--" placeholders and no script behind
+       it, so the counter never moved. Target: 1 Nov 2026, 00:00 KSA.
+       ============================================================ */
+    (function launchCountdown() {
+      const box = document.getElementById('launchCountdown');
+      if (!box) return;
+
+      const TARGET = new Date('2026-11-01T00:00:00+03:00').getTime();
+      const cell = k => box.querySelector('[data-cd="' + k + '"]');
+      const cells = { d: cell('d'), h: cell('h'), m: cell('m'), s: cell('s') };
+      if (!cells.d) return;
+
+      const pad = n => String(n).padStart(2, '0');
+      let timer = null;
+
+      function paint() {
+        const diff = TARGET - Date.now();
+
+        if (diff <= 0) {                       // launch day has arrived
+          cells.d.textContent = arabicDigits('0');
+          cells.h.textContent = arabicDigits('00');
+          cells.m.textContent = arabicDigits('00');
+          cells.s.textContent = arabicDigits('00');
+          if (timer) clearInterval(timer);
+          return;
+        }
+
+        cells.d.textContent = arabicDigits(Math.floor(diff / 86400000));
+        cells.h.textContent = arabicDigits(pad(Math.floor(diff / 3600000) % 24));
+        cells.m.textContent = arabicDigits(pad(Math.floor(diff / 60000) % 60));
+        cells.s.textContent = arabicDigits(pad(Math.floor(diff / 1000) % 60));
+      }
+
+      paint();
+      timer = setInterval(paint, 1000);
+    })();
+
+
+    /* ============================================================
+       CONCRETE DELIVERY CALENDAR  (added Aug 2026)
+       Was a hard-coded May-2026 grid, so it opened on a month in the
+       past and let customers book a delivery date that had already
+       been and gone. Now generated from today forward.
+       ============================================================ */
+    let __calYear = null, __calMonth = null;   // month currently on screen
+
+    function renderConcreteCal() {
+      const grid = document.getElementById('concreteCalGrid');
+      if (!grid) return;
+
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+      if (__calYear === null) { __calYear = today.getFullYear(); __calMonth = today.getMonth(); }
+
+      const first = new Date(__calYear, __calMonth, 1);
+      const daysInMonth = new Date(__calYear, __calMonth + 1, 0).getDate();
+
+      // Month label — Hijri or Gregorian depending on the toggle
+      const label = document.getElementById('calMonthName');
+      if (label) {
+        try {
+          const cal = state.calendarMode === 'hijri' ? 'islamic-umalqura' : 'gregory';
+          label.textContent = new Intl.DateTimeFormat('ar-SA-u-ca-' + cal,
+            { month: 'long', year: 'numeric' }).format(first);
+        } catch { label.textContent = (__calMonth + 1) + '/' + __calYear; }
+      }
+
+      // Sunday-first, so in RTL the rightmost column is الأحد
+      const dow = ['ح', 'ن', 'ث', 'ر', 'خ', 'ج', 'س'];
+      let html = dow.map(d => '<div class="dow">' + d + '</div>').join('');
+
+      // blanks before the 1st
+      for (let i = 0; i < first.getDay(); i++) html += '<div class="d muted"></div>';
+
+      let firstSelectable = null;
+      for (let day = 1; day <= daysInMonth; day++) {
+        const date = new Date(__calYear, __calMonth, day);
+        const isPast = date < today;
+        const iso = __calYear + '-' + String(__calMonth + 1).padStart(2, '0') + '-' + String(day).padStart(2, '0');
+        if (!isPast && firstSelectable === null) firstSelectable = iso;
+        html += '<div class="d' + (isPast ? ' muted is-past' : '') + '"'
+              + (isPast ? ' aria-disabled="true"' : ' data-date="' + iso + '" tabindex="0"')
+              + '>' + arabicDigits(day) + '</div>';
+      }
+
+      grid.innerHTML = html;
+
+      // keep the previous choice if it is still on screen and still valid,
+      // otherwise fall back to the first selectable day of this month
+      const keep = grid.querySelector('[data-date="' + window.__calChosen + '"]');
+      const pick = keep || (firstSelectable ? grid.querySelector('[data-date="' + firstSelectable + '"]') : null);
+      if (pick) { pick.classList.add('active'); window.__calChosen = pick.dataset.date; }
+
+      // can't go back past the current month
+      const prev = document.getElementById('calPrev');
+      if (prev) {
+        const atStart = __calYear === today.getFullYear() && __calMonth === today.getMonth();
+        prev.disabled = atStart;
+        prev.style.opacity = atStart ? '.35' : '';
+        prev.style.cursor = atStart ? 'not-allowed' : '';
+      }
+
+      if (typeof updateConcreteSummary === 'function') updateConcreteSummary();
+    }
+
+    function shiftConcreteMonth(delta) {
+      const now = new Date();
+      let y = __calYear, m = __calMonth + delta;
+      if (m < 0) { m = 11; y--; }
+      if (m > 11) { m = 0; y++; }
+      // never navigate to a month that is entirely in the past
+      if (y < now.getFullYear() || (y === now.getFullYear() && m < now.getMonth())) return;
+      __calYear = y; __calMonth = m;
+      renderConcreteCal();
+    }
+
+    // one delegated handler survives every re-render
+    document.addEventListener('click', e => {
+      const cellEl = e.target.closest && e.target.closest('#concreteCalGrid .d[data-date]');
+      if (!cellEl) return;
+      document.querySelectorAll('#concreteCalGrid .d').forEach(x => x.classList.remove('active'));
+      cellEl.classList.add('active');
+      window.__calChosen = cellEl.dataset.date;
+      if (typeof updateConcreteSummary === 'function') updateConcreteSummary();
+    });
+
+    document.getElementById('calPrev')?.addEventListener('click', () => shiftConcreteMonth(-1));
+    document.getElementById('calNext')?.addEventListener('click', () => shiftConcreteMonth(1));
+
+    renderConcreteCal();
+    window.renderConcreteCal = renderConcreteCal;
+
   
     /* ============================================================
        RECEIPT / الإيصال  (added Aug 2026)
