@@ -6215,6 +6215,138 @@ p {
     }
   }
 
+  
+
+
+
+
+  /* ============================================================
+     PHONE POLISH — Aug 2026
+     Fixes measured on a 390px viewport:
+       • the top bar rendered 411px wide, so every page scrolled
+         sideways by 21px and the fixed bottom bar sat off-centre
+       • ".city-pill span:nth-of-type(2)" never matched anything —
+         the pill has one <span> and two <svg>, so the label was
+         never actually hidden and it kept 126px of the header
+       • ".hero h1 br { display:none }" glued "البناء" to "في"
+         because the markup had no space around the <br>
+       • the hero opened with 40px of empty navy above the headline
+     ============================================================ */
+
+  @media (max-width: 720px) {
+
+    /* Nothing may make the document wider than the screen. */
+    html, body { max-width: 100%; overflow-x: hidden; }
+
+    /* ---------- top bar ---------- */
+    .top-bar > .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 5px !important;
+      padding-inline: 10px !important;
+      min-width: 0;
+    }
+
+    .top-bar .logo { flex: 0 1 auto; min-width: 0; gap: 8px !important; padding-inline-start: 6px; }
+    .top-bar .logo-text { min-width: 0; }
+    .top-bar .logo-text b { font-size: .92rem !important; white-space: nowrap; }
+    .top-bar .logo-text span { font-size: .62rem !important; white-space: nowrap; }
+
+    .auth-buttons { gap: 5px !important; flex-shrink: 0; min-width: 0; }
+
+    /* ---------- the empty navy strip under the header ----------
+       .main-nav is the desktop menu row. On phones its links are hidden but
+       the bar itself still rendered — 58px of solid navy between the header
+       and the hero, which is the "dead space" on the screenshot. Collapse the
+       row, but keep .main-nav itself so the mobile drawer inside it still
+       has a positioning context. */
+    .main-nav { background: transparent !important; border: 0 !important; box-shadow: none !important; }
+    .main-nav > .container { display: none !important; }
+
+    /* the wordmark must not slide underneath the city pill */
+    .top-bar .logo-text b,
+    .top-bar .logo-text span { display: block; }
+
+
+    .city-pill {
+      padding: 7px 10px !important;
+      font-size: .8rem !important;
+      gap: 5px !important;
+    }
+    /* the label is the part that overflows — clip it, don't drop it,
+       so the customer can still see which city is selected */
+    #cityPillLabel { white-space: nowrap; }
+
+    .auth-buttons .theme-toggle {
+      width: 32px !important;
+      height: 32px !important;
+      flex-shrink: 0;
+    }
+    /* duplicated by the دخول button and by the bottom tab bar */
+    .auth-buttons .mobile-account-pill { display: none !important; }
+    .auth-buttons .btn-primary {
+      padding: 8px 11px !important;
+      font-size: .79rem !important;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* ---------- hero ---------- */
+    .hero { padding-top: 10px !important; padding-bottom: 26px !important; }
+
+    .hero h1 {
+      font-size: 1.62rem !important;
+      line-height: 1.32 !important;
+      text-wrap: balance;
+      margin-bottom: 0 !important;
+    }
+
+    /* ---------- countdown ---------- */
+    .countdown {
+      gap: 7px !important;
+      margin-top: 20px !important;
+      display: grid !important;
+      grid-template-columns: repeat(4, 1fr);
+    }
+    .countdown .cd-box {
+      min-width: 0 !important;
+      padding: 11px 4px !important;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .countdown .cd-box > div:first-child {
+      font-size: 1.5rem !important;
+      font-variant-numeric: tabular-nums;
+      line-height: 1 !important;
+    }
+    .countdown .cd-box > div:last-child {
+      font-size: .68rem !important;
+      margin-top: 5px !important;
+      white-space: nowrap;
+    }
+
+
+    /* stop single-word orphans in the service cards ("سعر" alone on a line) */
+    .ms-body p, .ms-body h3 { text-wrap: pretty; }
+    .ms-body p { font-size: .84rem; line-height: 1.6; }
+
+    /* ---------- hero CTAs ---------- */
+    .hero-ctas { gap: 10px !important; margin-top: 22px !important; }
+    .hero-ctas .btn { width: 100%; justify-content: center; }
+  }
+
+  /* Very small phones (iPhone SE, older Androids) */
+  @media (max-width: 400px) {
+    .top-bar .logo-text span { display: none; }
+    .city-pill { max-width: 96px; }
+    .hero h1 { font-size: 1.58rem !important; }
+    .countdown .cd-box > div:first-child { font-size: 1.32rem !important; }
+    .countdown .cd-box > div:last-child { font-size: .62rem !important; }
+  }
+
   </style>
 </head>
 
@@ -6370,7 +6502,7 @@ p {
           </svg>
           الافتتاح الرسمي ١ نوفمبر ٢٠٢٦ — استقبال الطلبات بدأ مبكرًا
         </span>
-        <h1 class="reveal d1">احتياجك من <em>مواد البناء</em><br/>في كل المملكة — اطلب، قارن، واختار المناسب.</h1>
+        <h1 class="reveal d1">احتياجك من <em>مواد البناء</em> <br/>في كل المملكة — اطلب، قارن، واختار المناسب.</h1>
         <p class="lead reveal d2">أرسل لنا احتياجك — النوع، الكمية، وموعد التسليم — ونتواصل بالنيابة عنك مع شبكة واسعة من المصانع والموردين في الرياض، جدة، والمدينة المنورة، نتفاوض على أفضل سعر، ونوافيك بعرض كامل: السعر، الكمية المتوفرة، ووقت التسليم.</p>
 
         <div class="countdown reveal d3" id="launchCountdown" aria-label="عدّاد الافتتاح الرسمي" style="display:flex; gap:14px; flex-wrap:wrap; margin-top:32px; justify-content:flex-end;">
