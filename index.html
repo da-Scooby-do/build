@@ -6347,6 +6347,11 @@ p {
     .countdown .cd-box > div:last-child { font-size: .62rem !important; }
   }
 
+  
+  /* honeypot — off-screen rather than display:none, which many bots skip */
+  .hp-wrap { position: absolute; left: -9999px; top: auto; width: 1px; height: 1px; overflow: hidden; }
+  .cf-turnstile { margin: 14px 0 4px; display: flex; justify-content: center; }
+
   </style>
 </head>
 
@@ -11692,6 +11697,9 @@ p {
         neededBy: f.querySelector('[name=neededBy]')?.value || '',
         details: f.querySelector('[name=details]')?.value || '',
       };
+      const guard = await botGuard(f, 'rfq');
+      if (!guard.ok) { toast(guard.msg, ''); return; }
+
       const res = window.apiSubmitRFQ ? await apiSubmitRFQ(data) : { ok: false };
       if (!res || res.ok === false) {
         // Be honest with the customer — don't pretend it was saved.
@@ -12134,6 +12142,9 @@ p {
       }
       if (!window.supabaseClient) { toast('لا يوجد اتصال — حاول مرة أخرى', ''); return; }
 
+      const guard = await botGuard(f, 'supplier');
+      if (!guard.ok) { toast(guard.msg, ''); return; }
+
       const btn = document.getElementById('sregSubmitBtn');
       const btnHtml = btn.innerHTML;
       btn.disabled = true;
@@ -12207,6 +12218,153 @@ p {
       try { fn(); } catch (e) { console.error('[boot] ' + name + ' failed:', e); }
     });
     try { go(location.hash || '#home'); } catch (e) { console.error('[boot] router failed:', e); }
+
+    /* ============================================================
+       BOT GUARD — Aug 2026
+       ------------------------------------------------------------
+       The RFQ and supplier-registration endpoints accept anonymous
+       writes by design (that is what makes guest orders work), so
+       anything that can reach them can flood them.
+
+       Three layers, in order of how much they cost you:
+
+       1. Honeypot + time-trap + throttle  — active right now, no
+          account and no keys. Stops naive form-spam bots.
+       2. Cloudflare Turnstile             — set TURNSTILE_SITE_KEY
+          below and the invisible widget renders itself.
+       3. Server-side verification         — the `verify-turnstile`
+          Edge Function checks the token with Cloudflare. Only once
+          anonymous INSERT is revoked (see docs/BOT_PROTECTION.md)
+          is the door actually shut; until then layers 1–2 are a
+          deterrent, not a lock.
+       ============================================================ */
+
+    // ← paste your Cloudflare Turnstile SITE key here to switch on layer 2.
+    //    The site key is public and safe in this file. The SECRET key is not —
+    //    it goes in Supabase → Edge Functions → Secrets as TURNSTILE_SECRET_KEY.
+    const TURNSTILE_SITE_KEY = '0x4AAAAAAEYrwBTTSumz3UId';
+
+    const BOT_MIN_SECONDS = 3;      // a human cannot fill these forms faster
+    const BOT_MAX_PER_HOUR = 4;     // per form, per browser
+
+    const __formOpenedAt = new WeakMap();
+
+    /* Mark when the visitor first touched the form — that is the clock the
+       time-trap measures against, not page load, so slow readers are fine. */
+    function armBotGuard(form) {
+      if (!form || __formOpenedAt.has(form)) return;
+      __formOpenedAt.set(form, Date.now());
+
+      // honeypot: positioned off-screen rather than display:none, because a
+      // fair number of bots skip fields that are display:none
+      if (!form.querySelector('.hp-wrap')) {
+        const hp = document.createElement('div');
+        hp.className = 'hp-wrap';
+        hp.setAttribute('aria-hidden', 'true');
+        hp.innerHTML = '<label>اترك هذا الحقل فارغًا</label>' +
+                       '<input type="text" name="company_website" tabindex="-1" autocomplete="off">';
+        form.appendChild(hp);
+      }
+
+      // Turnstile mount point (only used when a site key is configured)
+      if (TURNSTILE_SITE_KEY && !form.querySelector('.cf-turnstile')) {
+        const box = document.createElement('div');
+        box.className = 'cf-turnstile';
+        box.dataset.sitekey = TURNSTILE_SITE_KEY;
+        box.dataset.theme = 'auto';
+        box.dataset.language = 'ar';
+        const btn = form.querySelector('button[type=submit]');
+        btn ? btn.parentNode.insertBefore(box, btn) : form.appendChild(box);
+      }
+    }
+
+    function __throttleKey(kind) { return 'medad_submits_' + kind; }
+
+    function __recentSubmits(kind) {
+      try {
+        const raw = localStorage.getItem(__throttleKey(kind));
+        const list = raw ? JSON.parse(raw) : [];
+        const cutoff = Date.now() - 3600000;
+        return Array.isArray(list) ? list.filter(t => t > cutoff) : [];
+      } catch { return []; }
+    }
+
+    function __recordSubmit(kind) {
+      try {
+        const list = __recentSubmits(kind);
+        list.push(Date.now());
+        localStorage.setItem(__throttleKey(kind), JSON.stringify(list));
+      } catch { /* private mode — throttle simply doesn't persist */ }
+    }
+
+    /* Returns { ok:true } or { ok:false, msg:'…' } with an Arabic reason.
+       Never throws — a broken guard must not block a real customer. */
+    async function botGuard(form, kind) {
+      try {
+        // --- honeypot ---
+        const hp = form.querySelector('[name=company_website]');
+        if (hp && hp.value.trim() !== '') {
+          console.warn('[botguard] honeypot filled');
+          return { ok: false, msg: 'تعذّر إرسال الطلب. حدّث الصفحة وحاول مجددًا.' };
+        }
+
+        // --- time trap ---
+        const opened = __formOpenedAt.get(form);
+        if (opened && (Date.now() - opened) < BOT_MIN_SECONDS * 1000) {
+          return { ok: false, msg: 'خذ لحظة لمراجعة البيانات ثم أرسل الطلب.' };
+        }
+
+        // --- throttle ---
+        if (__recentSubmits(kind).length >= BOT_MAX_PER_HOUR) {
+          return { ok: false, msg: 'أرسلت عدة طلبات خلال ساعة. تواصل معنا عبر واتساب لمتابعة طلبك.' };
+        }
+
+        // --- Turnstile (only when configured) ---
+        if (TURNSTILE_SITE_KEY) {
+          const token = form.querySelector('[name="cf-turnstile-response"]')?.value;
+          if (!token) return { ok: false, msg: 'أكمل التحقق الأمني أعلى زر الإرسال ثم حاول مجددًا.' };
+
+          if (window.supabaseClient) {
+            try {
+              const { data, error } = await window.supabaseClient.functions
+                .invoke('verify-turnstile', { body: { token, kind } });
+              if (error) throw error;
+              if (!data?.ok) return { ok: false, msg: 'فشل التحقق الأمني. حدّث الصفحة وحاول مجددًا.' };
+            } catch (e) {
+              // Function not deployed / no secret yet — don't punish the customer.
+              console.warn('[botguard] turnstile verification unavailable', e?.message || e);
+            }
+          }
+        }
+
+        __recordSubmit(kind);
+        return { ok: true };
+      } catch (e) {
+        console.warn('[botguard] guard error, letting the request through', e);
+        return { ok: true };
+      }
+    }
+
+    // Arm both public forms as soon as the visitor interacts with them
+    ['rfqForm', 'supplierRegForm'].forEach(id => {
+      const f = document.getElementById(id);
+      if (!f) return;
+      armBotGuard(f);
+      f.addEventListener('focusin', () => armBotGuard(f), { once: true });
+    });
+
+    // Load the Turnstile script only if a key is configured
+    if (TURNSTILE_SITE_KEY && !document.getElementById('cfTurnstileScript')) {
+      const sc = document.createElement('script');
+      sc.id = 'cfTurnstileScript';
+      sc.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+      sc.async = true; sc.defer = true;
+      document.head.appendChild(sc);
+    }
+
+    window.botGuard = botGuard;
+    window.armBotGuard = armBotGuard;
+
 
     /* ============================================================
        LAUNCH COUNTDOWN  (added Aug 2026)
