@@ -7939,6 +7939,9 @@ p {
 
     <div class="container" style="padding:32px 0;">
 
+      <!-- Shown only when the stats could not be read — stops a silent ٠ -->
+      <div id="adminStatsMsg" role="status" style="display:none; background:#fdf0e8; border:1px solid #e8a87c; color:#8a3b12; padding:12px 16px; border-radius:10px; margin-bottom:18px; font-weight:600; font-size:.92rem;"></div>
+
       <!-- Stats cards -->
       <div class="admin-stats" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:18px; margin-bottom:28px;">
         <div class="stat-card" style="background:var(--white); border:1px solid var(--gray-150); border-radius:var(--radius-lg); padding:22px; box-shadow:var(--shadow-xs);">
@@ -8713,6 +8716,12 @@ p {
         if (typeof window.onAuthChange === 'function') {
           window.onAuthChange(session?.user || null);
         }
+        // The session may land AFTER the dashboard first rendered. Recompute the
+        // stat cards now that requests will actually carry a token — otherwise
+        // they sit on the hard-coded ٠ they shipped with.
+        if (session && window.isAdmin && typeof window.loadAdminStats === 'function') {
+          setTimeout(() => window.loadAdminStats(0), 200);
+        }
       });
     } else {
       console.warn('[bena] Supabase SDK failed to load — falling back to offline mode');
@@ -8859,32 +8868,76 @@ p {
       }
       const fmtSAR = v => arSAR(Math.round(v));
       const fmtN = v => arEN(Math.round(v));
-      async function loadAdminStats(retry) {
+      /* ------------------------------------------------------------------
+         The old version fired straight away. On a hard refresh at #admin the
+         request left BEFORE Supabase finished restoring the session, so it
+         went out unauthenticated: PostgREST answers 200 with an empty array
+         (RLS simply filters everything out), the maths produced 0 for every
+         card, and the only trace was a console.warn nobody sees. Because the
+         cards are hard-coded to ٠ in the HTML, "no session yet" and "no orders"
+         looked identical.
+
+         Now: wait for a real session, retry with backoff, and never leave a ٠
+         standing when the truth is "we could not read your data".
+         ------------------------------------------------------------------ */
+      function setStatsMessage(msg) {
+        const host = document.getElementById('adminStatsMsg');
+        if (!host) return;
+        host.textContent = msg || '';
+        host.style.display = msg ? 'block' : 'none';
+      }
+
+      async function loadAdminStats(attempt = 0) {
+        const MAX = 5;
         try {
-          const { data: orders, error } = await window.supabaseClient
-            .from('orders').select('total, status, created_at');
+          // 1. don't ask for data until we actually have a session
+          const { data: sess } = await window.supabaseClient.auth.getSession();
+          if (!sess?.session) {
+            if (attempt < MAX) return setTimeout(() => loadAdminStats(attempt + 1), 400 * Math.pow(2, attempt));
+            setStatsMessage('انتهت الجلسة — سجّل الدخول مرة أخرى لعرض الإحصائيات.');
+            return;
+          }
+
+          // 2. ask for an exact count so "empty" is distinguishable from "blocked"
+          const { data: orders, error, count } = await window.supabaseClient
+            .from('orders').select('total, status, created_at', { count: 'exact' });
           if (error) throw error;
+
+          const list = orders || [];
+
+          // 3. an admin seeing zero rows while orders exist means the request
+          //    was not authorised — say so instead of showing a silent ٠
+          if (list.length === 0 && count === 0 && window.isAdmin) {
+            if (attempt < MAX) return setTimeout(() => loadAdminStats(attempt + 1), 400 * Math.pow(2, attempt));
+            setStatsMessage('تعذّر قراءة الطلبات بصلاحية المالك — حدّث الصفحة أو سجّل الدخول مجدداً.');
+            return;
+          }
+
+          setStatsMessage('');
+
           const now = new Date();
           const todayKey = now.toISOString().slice(0, 10);
           const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
           const active = o => !['cancelled', 'refunded'].includes(o.status);
           const amt = o => parseFloat(o.total) || 0;
-          const list = orders || [];
+
           countUp('statRevToday', list.filter(o => active(o) && String(o.created_at).slice(0, 10) === todayKey).reduce((s, o) => s + amt(o), 0), fmtSAR);
           countUp('statRevMonth', list.filter(o => active(o) && new Date(o.created_at) >= monthStart).reduce((s, o) => s + amt(o), 0), fmtSAR);
           countUp('statRevTotal', list.filter(active).reduce((s, o) => s + amt(o), 0), fmtSAR);
           countUp('statOrdersMonth', list.filter(o => new Date(o.created_at) >= monthStart).length, fmtN);
           countUp('statPendingOrders', list.filter(o => ['pending', 'confirmed', 'preparing', 'shipped'].includes(o.status)).length, fmtN);
           countUp('statAwaitingQuote', list.filter(o => amt(o) === 0 && ['pending', 'confirmed'].includes(o.status)).length, fmtN);
+
           const { count: customers } = await window.supabaseClient
             .from('profiles').select('id', { count: 'exact', head: true });
           countUp('statCustomers', customers || 0, fmtN);
         } catch (e) {
           console.warn('stats load failed', e?.message || e);
-          // One retry — covers the session-restore race right after page load
-          if (!retry) setTimeout(() => loadAdminStats(true), 1600);
+          if (attempt < MAX) { setTimeout(() => loadAdminStats(attempt + 1), 400 * Math.pow(2, attempt)); return; }
+          setStatsMessage('تعذّر تحميل الإحصائيات: ' + (e?.message || 'خطأ غير معروف'));
         }
       }
+      window.loadAdminStats = loadAdminStats;
       loadAdminStats();
       try {
         const { count: pendingApps } = await window.supabaseClient
@@ -9527,10 +9580,6 @@ p {
       // Brief delay for the new view to render
       setTimeout(() => {
         applyReveal();
-        // Animate stat cards if we're on the admin view
-        if (hash === '#admin' || hash?.startsWith('#admin')) {
-          requestAnimationFrame(() => animateAllStatCards());
-        }
         // Scroll to top of new view smoothly
         window.scrollTo({ top: 0, behavior: __reduceMotion ? 'auto' : 'smooth' });
       }, 60);
@@ -9538,25 +9587,12 @@ p {
     };
 
     // 6. Stat-card animated counters (admin dashboard)
-    function animateAllStatCards() {
-      document.querySelectorAll('#view-admin [id^="stat"]').forEach(el => {
-        // Parse current numeric value from displayed text
-        const raw = (el.textContent || '').replace(/[^\d.]/g, '');
-        const num = parseFloat(raw) || 0;
-        // Reset and animate from 0
-        el.dataset.curVal = '0';
-        animateNum(el, num, 1200);
-      });
-    }
-
-    // Patch loadAdminDashboard so stats animate after fetching
-    if (typeof loadAdminDashboard === 'function') {
-      const __origLoadDashboard = loadAdminDashboard;
-      window.loadAdminDashboard = async function() {
-        await __origLoadDashboard.apply(this, arguments);
-        setTimeout(animateAllStatCards, 100);
-      };
-    }
+    /* animateAllStatCards() removed — it was the reason every stat card read ٠.
+       It re-read each card's own text to find its current value, but the cards
+       render Arabic-Indic digits (٧٬٢٤٠) and JavaScript's \d only matches ASCII
+       0-9, so the parse produced NaN → 0 and it animated every card down to
+       zero, 100 ms after loadAdminDashboard() and again on every #admin visit.
+       countUp() inside loadAdminStats already animates these cards correctly. */
 
     // 7. Cart bounce when something is added
     document.addEventListener('cart:added', () => {
