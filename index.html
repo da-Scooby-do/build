@@ -4,7 +4,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>مداد للبناء والخدمات اللوجستية | منصة ربط المقاولين بموردي مواد البناء — المملكة العربية السعودية</title>
+  <title>مداد للبناء | موردو مواد البناء في السعودية</title>
+  <link rel="canonical" href="https://www.midad-ksa.com/" />
   <meta name="description"
     content="مداد للبناء والخدمات اللوجستية تربط المقاولين والأفراد بأفضل موردي مواد البناء في المملكة العربية السعودية." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -35,6 +36,29 @@
   <meta name="twitter:title" content="مداد للبناء | اطلب، قارن، واختار المناسب" />
   <meta name="twitter:description" content="أرسل احتياجك من مواد البناء — نتفاوض مع شبكة واسعة من الموردين ونوافيك بأفضل عرض: السعر، الكمية، ووقت التسليم." />
   <meta name="twitter:image" content="https://www.midad-ksa.com/og-image.png" />
+
+  <!-- Structured data: helps Google tell مداد للبناء apart from the other
+       Saudi companies using the name مداد. -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "مداد للبناء والخدمات اللوجستية",
+    "alternateName": "Medad Construction & Logistics",
+    "url": "https://www.midad-ksa.com/",
+    "logo": "https://www.midad-ksa.com/icon-512.png",
+    "image": "https://www.midad-ksa.com/og-image.png",
+    "description": "منصة سعودية تربط المقاولين والأفراد بموردي مواد البناء — اطلب، قارن، واختار المناسب.",
+    "slogan": "اطلب، قارن، واختار المناسب",
+    "email": "info@midad-ksa.com",
+    "areaServed": { "@type": "Country", "name": "المملكة العربية السعودية" },
+    "address": { "@type": "PostalAddress", "addressCountry": "SA" },
+    "sameAs": [
+      "https://x.com/midad_ksa",
+      "https://www.tiktok.com/@midad.ksa"
+    ]
+  }
+  </script>
   <style>
 /* ============================================
    مداد للبناء والخدمات اللوجستية — Saudi Construction Marketplace
@@ -5729,11 +5753,9 @@ p {
     integrity="sha384-0w2KAL2YHP6wKOkUDzkCDGgVvfmHnj02DHeQ6XcHOgTfFsGyonKOpShMH1x6nk9o"
     crossorigin="anonymous"></script>
 
-  <!-- Leaflet (free map library — OpenStreetMap, no API key needed) -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <!-- Leaflet is NOT loaded here. The map is used on the address page only, so
+       loading it in <head> cost every visitor ~150 KB they would never use.
+       ensureLeaflet() below injects it the first time a map is actually drawn. -->
 
   <!-- ===== Fable additions: splash opener + supplier registration + micro-interactions ===== -->
   <style id="fableAdditions">
@@ -6349,13 +6371,62 @@ p {
 
   
   /* honeypot — off-screen rather than display:none, which many bots skip */
-  .hp-wrap { position: absolute; left: -9999px; top: auto; width: 1px; height: 1px; overflow: hidden; }
+  /* Honeypot: hidden from people, still filled by bots. NOT display:none —
+     many bots skip those. NOT left:-9999px either: in an RTL document that
+     stretched the page ~10,000px wide and put a horizontal scrollbar on
+     every form page. clip-path takes it out of the paint, not the layout. */
+  /* ---------- accessibility ---------- */
+  /* Five headings skipped a level (h1 → h3), which breaks the outline a screen
+     reader announces. They are now correctly ranked; these classes preserve the
+     original visual size so nothing moves on screen. */
+  h2.as-h3 { font-size: 1.25rem; font-weight: 700; }
+  h3.as-h4 { font-size: 1.05rem; font-weight: 700; }
+
+  .skip-link {
+    position: absolute;
+    inset-inline-start: -9999px;
+    top: 0;
+    z-index: 10000;
+    background: var(--navy-900, #08152a);
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 0 0 8px 0;
+    font-weight: 700;
+    text-decoration: none;
+  }
+  .skip-link:focus {
+    inset-inline-start: 0;
+    outline: 3px solid var(--amber-600, #d4a563);
+    outline-offset: 2px;
+  }
+
+  /* Footer links rendered 18px tall — below the 24px minimum for a comfortable
+     tap on a phone. Padding raises the hit area without moving the text. */
+  @media (max-width: 720px) {
+    .site-footer a,
+    .footer-col a,
+    .footer-links a {
+      display: inline-block;
+      padding-block: 7px;
+      min-height: 32px;
+      line-height: 1.5;
+    }
+    .city-pill { min-height: 34px; }
+  }
+
+  .hp-wrap { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+             overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%);
+             white-space: nowrap; border: 0; }
   .cf-turnstile { margin: 14px 0 4px; display: flex; justify-content: center; }
 
   </style>
 </head>
 
 <body>
+
+  <!-- Keyboard users land on the header's nav on every page load; this lets
+       them jump straight to the content instead of tabbing through it. -->
+  <a href="#mainContent" class="skip-link">تخطَّ إلى المحتوى</a>
 
   <!-- ============================================================
      HEADER
@@ -6497,6 +6568,7 @@ p {
   <!-- ============================================================
      VIEW: HOME
      ============================================================ -->
+  <div id="mainContent" tabindex="-1"></div>
   <section class="view active" id="view-home">
 
     <section class="hero">
@@ -7368,7 +7440,7 @@ p {
     <section class="catalog-shell" style="padding-top:0;">
       <div class="container">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-          <h3 style="margin:0;">عناوينك</h3>
+          <h2 class="as-h3" style="margin:0;">عناوينك</h2>
           <button class="btn btn-amber" onclick="openAddressEditor()">+ إضافة عنوان جديد</button>
         </div>
         <div id="addressesList" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:16px;">
@@ -7503,7 +7575,7 @@ p {
             <path
               d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
           </svg>
-          <h3>قائمة المفضلة فارغة</h3>
+          <h2 class="as-h3">قائمة المفضلة فارغة</h2>
           <p>اضغط على القلب أعلى أي منتج لإضافته هنا.</p>
           <a href="#catalog" data-link class="btn btn-amber" style="margin-top:14px;">تصفّح الكتالوج</a>
         </div>
@@ -7612,7 +7684,7 @@ p {
                 <line x1="12" y1="3" x2="12" y2="15" />
               </svg>
               <div>اسحب الملفات هنا أو اضغط للاختيار</div>
-              <input type="file" multiple style="display:none;" />
+              <input type="file" multiple style="display:none;" aria-label="إرفاق ملفات المخططات أو المواصفات" />
             </div>
           </div>
           <div class="row2">
@@ -7946,7 +8018,7 @@ p {
           </div>
 
           <aside class="summary-card">
-            <h3><span class="head-label">ملخص الطلب التقديري</span></h3>
+            <h2 class="as-h3"><span class="head-label">ملخص الطلب التقديري</span></h2>
             <div class="product-name">خرسانة جاهزة</div>
             <div class="sum-row"><span>الكمية</span><span id="sumQty">٨٥ م٣</span></div>
             <div class="sum-row"><span>نوع الخرسانة</span><span id="sumType">C35 مسلحة</span></div>
@@ -8032,7 +8104,7 @@ p {
 
           <div class="zatca-card">
             <div style="text-align:right;">
-              <h4>إيصال استلام الطلب</h4>
+              <h3 class="as-h4">إيصال استلام الطلب</h3>
               <p>احتفظ بإيصال طلبك — يتضمن رقم الطلب وتفاصيل ما طلبته. يمكنك طباعته أو حفظه بصيغة PDF.
                 عند وصول عرض السعر سيصدر لك إيصال محدَّث يتضمن المبالغ.</p>
               <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
@@ -8124,7 +8196,7 @@ p {
       <!-- ORDERS TAB -->
       <div class="admin-panel" id="adminPanel-orders">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-          <h3 style="margin:0;">طلبات العملاء — سعّرها وأرسل العرض</h3>
+          <h2 class="as-h3" style="margin:0;">طلبات العملاء — سعّرها وأرسل العرض</h2>
           <button class="btn btn-ghost" onclick="refreshAdminData()">تحديث</button>
         </div>
         <div style="overflow-x:auto; background:var(--white); border:1px solid var(--gray-150); border-radius:var(--radius-lg);">
@@ -8838,7 +8910,6 @@ p {
           flowType: 'pkce'
         }
       });
-      console.log('[bena] Supabase client initialized');
 
       // Restore session on page load
       window.supabaseClient.auth.getSession().then(({ data: { session } }) => {
@@ -8849,7 +8920,6 @@ p {
 
       // Listen for auth state changes (login, logout, token refresh)
       window.supabaseClient.auth.onAuthStateChange((event, session) => {
-        console.log('[bena] auth event:', event);
         if (typeof window.onAuthChange === 'function') {
           window.onAuthChange(session?.user || null);
         }
@@ -8918,7 +8988,6 @@ p {
         }
 
         if (window.isAdmin) {
-          console.log('[bena] Logged in as ADMIN');
           document.body.classList.add('is-admin');
         } else {
           document.body.classList.remove('is-admin');
@@ -9363,9 +9432,20 @@ p {
       if (isEdit) {
         result = await window.supabaseClient.from('products').update(data).eq('id', f.id.value);
       } else {
-        // Generate a new product ID
-        const { data: existing } = await window.supabaseClient.from('products').select('id').order('id', { ascending: false }).limit(1);
-        const lastNum = existing?.[0]?.id ? parseInt(existing[0].id.replace(/\D/g,'')) : 0;
+        // Generate a new product ID.
+        // Two bugs were fixed here:
+        //   1. .order('id') sorts TEXT, so with p9 and p10 present it returned
+        //      p9 and regenerated the already-taken p10. We now read every id
+        //      and take the true numeric maximum.
+        //   2. The query error was discarded, so a failed read silently reset
+        //      the counter to 0 and collided with p1.
+        const { data: existing, error: idErr } = await window.supabaseClient
+          .from('products').select('id');
+        if (idErr) { toast('تعذّر توليد رقم المنتج: ' + idErr.message, ''); return; }
+        const lastNum = (existing || []).reduce((max, row) => {
+          const n = parseInt(String(row.id).replace(/\D/g, ''), 10);
+          return Number.isFinite(n) && n > max ? n : max;
+        }, 0);
         data.id = 'p' + (lastNum + 1);
         result = await window.supabaseClient.from('products').insert(data);
       }
@@ -9862,11 +9942,22 @@ p {
       document.getElementById('addressMapPlaceholder').style.display = 'grid';
 
       // Populate cities
+      // city_code is a required field, so a silent failure here is a dead end:
+      // the customer sees an empty dropdown and cannot save an address at all.
       try {
-        const { data: cities } = await window.supabaseClient.from('cities').select('code, name_ar').order('name_ar');
+        const { data: cities, error: citiesError } = await window.supabaseClient
+          .from('cities').select('code, name_ar').order('name_ar');
         const sel = form.city_code;
-        sel.innerHTML = '<option value="">اختر مدينة</option>' + (cities || []).map(c => `<option value="${escapeHtml(c.code)}">${escapeHtml(c.name_ar)}</option>`).join('');
-      } catch {}
+        if (citiesError) throw citiesError;
+        if (!cities || !cities.length) throw new Error('empty city list');
+        sel.innerHTML = '<option value="">اختر مدينة</option>' +
+          cities.map(c => `<option value="${escapeHtml(c.code)}">${escapeHtml(c.name_ar)}</option>`).join('');
+      } catch (e) {
+        console.warn('[addresses] city list failed', e?.message || e);
+        const sel = form.city_code;
+        if (sel) sel.innerHTML = '<option value="">تعذّر تحميل المدن</option>';
+        toast('تعذّر تحميل قائمة المدن. حدّث الصفحة وحاول مجددًا.', '');
+      }
 
       if (address && typeof address === 'object') {
         form.id.value = address.id;
@@ -9900,7 +9991,39 @@ p {
       });
     }
 
-    function renderAddressMap(lat, lng) {
+    /* Inject Leaflet's CSS + JS once, the first time a map is drawn.
+       Resolves immediately on later calls. */
+    let __leafletPromise = null;
+    function ensureLeaflet() {
+      if (window.L) return Promise.resolve();
+      if (__leafletPromise) return __leafletPromise;
+      __leafletPromise = new Promise((resolve, reject) => {
+        const css = document.createElement('link');
+        css.rel = 'stylesheet';
+        css.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+        css.integrity = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=';
+        css.crossOrigin = '';
+        document.head.appendChild(css);
+
+        const js = document.createElement('script');
+        js.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+        js.integrity = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';
+        js.crossOrigin = '';
+        js.onload = () => resolve();
+        js.onerror = () => { __leafletPromise = null; reject(new Error('leaflet failed to load')); };
+        document.head.appendChild(js);
+      });
+      return __leafletPromise;
+    }
+
+    async function renderAddressMap(lat, lng) {
+      try {
+        await ensureLeaflet();
+      } catch (e) {
+        console.warn('[map]', e.message);
+        toast('تعذّر تحميل الخريطة. يمكنك إدخال العنوان يدويًا.', '');
+        return;
+      }
       const mapDiv = document.getElementById('addressMap');
       document.getElementById('addressMapPlaceholder').style.display = 'none';
       mapDiv.classList.add('has-map');
@@ -9951,13 +10074,20 @@ p {
       document.getElementById('addressCoords').textContent = `${lat.toFixed(5)}, ${lng.toFixed(5)} — اسحب الدبوس لتعديل الموقع`;
     }
 
-    function centerMapOnSaudi() {
+    async function centerMapOnSaudi() {
       // Try to use selected city if any
       const cityCode = document.querySelector('#addressForm select[name="city_code"]')?.value;
       const c = cityCode ? SAUDI_CITIES[cityCode] : null;
       if (c) {
         renderAddressMap(c.lat, c.lng);
       } else {
+        try {
+          await ensureLeaflet();
+        } catch (e) {
+          console.warn('[map]', e.message);
+          toast('تعذّر تحميل الخريطة. يمكنك إدخال العنوان يدويًا.', '');
+          return;
+        }
         // Center on Saudi Arabia at low zoom
         const mapDiv = document.getElementById('addressMap');
         document.getElementById('addressMapPlaceholder').style.display = 'none';
@@ -10165,19 +10295,25 @@ p {
         }
         if (result.error) throw result.error;
 
-        // If marked default, clear other defaults
+        // If marked default, clear other defaults.
+        // supabase-js RESOLVES with { error } instead of throwing, so the
+        // surrounding try/catch never saw these failures. Unchecked, a failed
+        // clear plus a successful set left two rows with is_default = true and
+        // delivery went to whichever one came back first.
         if (data.is_default) {
-          await window.supabaseClient.from('addresses')
+          const { error: clearError } = await window.supabaseClient.from('addresses')
             .update({ is_default: false })
             .neq('id', f.id.value || -1)
             .eq('user_id', window.currentUser.id);
+          if (clearError) throw clearError;
           // Re-set on the newly-saved row if it was an insert
           if (!f.id.value) {
-            await window.supabaseClient.from('addresses')
+            const { error: setError } = await window.supabaseClient.from('addresses')
               .update({ is_default: true })
               .eq('user_id', window.currentUser.id)
               .order('created_at', { ascending: false })
               .limit(1);
+            if (setError) throw setError;
           }
         }
 
@@ -10201,10 +10337,13 @@ p {
     }
 
     async function makeAddressDefault(id) {
-      // Clear all defaults, then set this one
-      await window.supabaseClient.from('addresses')
+      // Clear all defaults, then set this one. The clear was unchecked before:
+      // if it failed and the set succeeded, the user ended up with two default
+      // addresses. Bail out rather than create that state.
+      const { error: clearError } = await window.supabaseClient.from('addresses')
         .update({ is_default: false })
         .eq('user_id', window.currentUser.id);
+      if (clearError) { toast(clearError.message, ''); return; }
       const { error } = await window.supabaseClient.from('addresses')
         .update({ is_default: true })
         .eq('id', id);
@@ -10616,7 +10755,68 @@ p {
     }
 
     function getSupplier(id) { return SUPPLIERS[id] || { name: 'مورد معتمد', cities: [], rating: 4.5, reviewCount: 0, phone: '966920002362', verified: true, deliveryDays: '٤٨ ساعة', desc: '', logo: '' }; }
-    function waLink(phone, message) { return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`; }
+    /* The support number lived in 12 places across two conventions, so changing
+       it meant 12 edits. It now lives here only. Static hrefs in the markup are
+       rewritten from this constant at boot by syncWhatsAppLinks(). */
+    const MEDAD_WA = '966920002362';
+    function waLink(phone, message) {
+      return `https://wa.me/${phone || MEDAD_WA}?text=${encodeURIComponent(message)}`;
+    }
+
+    /* ============================================================
+       ACCESSIBLE FIELD LABELS
+       The markup uses <label>text</label><input> as siblings, which LOOKS
+       labelled but is not connected: a screen reader announced 67 of the 119
+       fields as an unnamed "text field". This links each one to its visible
+       label, and falls back to the placeholder when there is no label at all.
+       A MutationObserver re-runs it for forms rendered later (admin editors,
+       modals), so nothing has to remember to call it.
+       ============================================================ */
+    let __labelSeq = 0;
+    function linkFieldLabels(root) {
+      const scope = root && root.querySelectorAll ? root : document;
+      scope.querySelectorAll('input, select, textarea').forEach(field => {
+        if (field.type === 'hidden') return;
+        if (field.getAttribute('aria-label') || field.getAttribute('aria-labelledby')) return;
+        if (field.closest('label')) return;
+        if (field.id && document.querySelector(`label[for="${CSS.escape(field.id)}"]`)) return;
+
+        // the visible label is the previous sibling, or the first <label> in
+        // the field's wrapper div
+        let lbl = field.previousElementSibling;
+        if (!lbl || lbl.tagName !== 'LABEL') {
+          lbl = field.parentElement ? field.parentElement.querySelector(':scope > label') : null;
+        }
+
+        if (lbl && !lbl.htmlFor) {
+          if (!field.id) field.id = 'fld-' + (++__labelSeq);
+          lbl.htmlFor = field.id;
+        } else if (field.placeholder) {
+          field.setAttribute('aria-label', field.placeholder);
+        }
+      });
+
+      // the 8 one-character PIN boxes have neither label nor placeholder
+      const pins = (scope.querySelectorAll ? scope : document).querySelectorAll('#verifyForm input[type="text"]');
+      pins.forEach((el, i) => {
+        if (!el.getAttribute('aria-label')) el.setAttribute('aria-label', `الخانة ${i + 1} من رمز التحقق`);
+      });
+    }
+
+    if (typeof MutationObserver === 'function') {
+      let __labelTimer = null;
+      new MutationObserver(() => {
+        clearTimeout(__labelTimer);
+        __labelTimer = setTimeout(() => linkFieldLabels(document), 120);
+      }).observe(document.body, { childList: true, subtree: true });
+    }
+
+    /* Point every hard-coded wa.me/… href in the markup at MEDAD_WA. */
+    function syncWhatsAppLinks() {
+      document.querySelectorAll('a[href*="wa.me/"]').forEach(a => {
+        a.href = a.getAttribute('href').replace(/wa\.me\/\d+/, 'wa.me/' + MEDAD_WA);
+      });
+    }
 
     /* ============================================================
        ROUTING (with parameters: #product/p1, #supplier/s2)
@@ -10628,6 +10828,9 @@ p {
       let target = views.includes(route) ? route : 'home';
       // catalog / product no longer exist — redirect to home (or directory for product)
       if (route === 'catalog' || route === 'product') target = 'home';
+      // #view-supplier is CSS-hidden from the public (reseller model), so routing
+      // a visitor there rendered a blank page. Send non-admins home instead.
+      if (route === 'supplier' && !document.body.classList.contains('is-admin')) target = 'home';
       if (route === 'about' || route === 'suppliers' || route === 'suppliers-directory') target = 'home';
 
       views.forEach(v => { const el = $('#view-' + v); if (el) el.classList.toggle('active', v === target); });
@@ -10770,17 +10973,20 @@ p {
       $('#activeChips').innerHTML = chips.join('');
     }
 
-    function clearSearch() { state.filters.search = ''; $('#searchBox').value = ''; renderCatalog(); }
-    function clearMin() { state.filters.minPrice = null; $('#minPrice').value = ''; renderCatalog(); }
-    function clearMax() { state.filters.maxPrice = null; $('#maxPrice').value = ''; renderCatalog(); }
+    /* The catalog filter markup was removed in the brokerage redesign, so every
+       $('#…') below can be null. Optional chaining keeps these safe if anything
+       ever calls them again. */
+    function clearSearch() { state.filters.search = ''; const el = $('#searchBox'); if (el) el.value = ''; renderCatalog(); }
+    function clearMin() { state.filters.minPrice = null; const el = $('#minPrice'); if (el) el.value = ''; renderCatalog(); }
+    function clearMax() { state.filters.maxPrice = null; const el = $('#maxPrice'); if (el) el.value = ''; renderCatalog(); }
 
     function toggleFilter(kind, val) {
       const s = state.filters[kind];
       if (s.has(val)) s.delete(val); else s.add(val);
       renderCatalog();
     }
-    function toggleVerified() { state.filters.verifiedOnly = !state.filters.verifiedOnly; $('#filterVerified').checked = state.filters.verifiedOnly; renderCatalog(); }
-    function toggleFastDelivery() { state.filters.fastDeliveryOnly = !state.filters.fastDeliveryOnly; $('#filterFastDelivery').checked = state.filters.fastDeliveryOnly; renderCatalog(); }
+    function toggleVerified() { state.filters.verifiedOnly = !state.filters.verifiedOnly; const el = $('#filterVerified'); if (el) el.checked = state.filters.verifiedOnly; renderCatalog(); }
+    function toggleFastDelivery() { state.filters.fastDeliveryOnly = !state.filters.fastDeliveryOnly; const el = $('#filterFastDelivery'); if (el) el.checked = state.filters.fastDeliveryOnly; renderCatalog(); }
 
     function clearFilters() {
       state.filters.categories.clear();
@@ -10790,8 +10996,8 @@ p {
       state.filters.maxPrice = null;
       state.filters.verifiedOnly = false;
       state.filters.fastDeliveryOnly = false;
-      $('#searchBox').value = ''; $('#minPrice').value = ''; $('#maxPrice').value = '';
-      $('#filterVerified').checked = false; $('#filterFastDelivery').checked = false;
+      ['#searchBox', '#minPrice', '#maxPrice'].forEach(sel => { const el = $(sel); if (el) el.value = ''; });
+      ['#filterVerified', '#filterFastDelivery'].forEach(sel => { const el = $(sel); if (el) el.checked = false; });
       renderCatalogFilters();
       renderCatalog();
     }
@@ -10924,7 +11130,7 @@ p {
 
     function renderTabSpecs(p) {
       return `<table class="specs-table">${Object.entries(p.specs).map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join('')}</table>
-  <p style="margin-top:14px; color: var(--gray-500); font-size:.85rem;"><a href="#" onclick="event.preventDefault(); toast('سيتم تنزيل ملف PDF بالمواصفات الكاملة');">تحميل بطاقة المواصفات الفنية (PDF)</a></p>`;
+  <p style="margin-top:14px; color: var(--gray-500); font-size:.85rem;">لطلب بطاقة المواصفات الفنية كاملة، تواصل معنا عبر واتساب.</p>`;
     }
     function renderTabTiers(p) {
       return `<p style="margin: 0 0 8px; color: var(--gray-700);">احصل على خصومات أفضل عند طلب الكميات الكبيرة:</p>
@@ -10980,7 +11186,7 @@ p {
             ${s.fastDelivery ? `<span class="badge-verified" style="background:#fff;">${s.deliveryDays}</span>` : ''}
           </div>
         </div>
-        <a class="wa-btn" href="${waLink('966920002362', `مرحبًا، أرغب بطلب عرض سعر من ${s.name}`)}" target="_blank" rel="noopener" style="padding:10px 18px; font-size:.92rem;">
+        <a class="wa-btn" href="${waLink(MEDAD_WA, `مرحبًا، أرغب بطلب عرض سعر من ${s.name}`)}" target="_blank" rel="noopener" style="padding:10px 18px; font-size:.92rem;">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24z"/></svg>
           اتصل عبر واتساب
         </a>
@@ -11088,20 +11294,11 @@ p {
       { id: 'bank', label: 'تحويل بنكي', sub: 'للشركات والمشاريع', cls: 'bank' },
     ];
 
-    function renderPayMethods() {
-      $('#payGrid').innerHTML = PAY_METHODS.map(m => `
-    <div class="pay-method ${m.cls} ${state.payMethod === m.id ? 'active' : ''}" onclick="selectPay('${m.id}')">
-      <div class="pay-logo">${m.label}</div>
-      <div class="pay-sub">${m.sub}</div>
-    </div>
-  `).join('');
-
-      const subtotal = state.cart.reduce((s, c) => s + c.price * c.qty, 0);
-      const note = $('#bnplNote');
-      if (state.payMethod === 'bank') { note.innerHTML = `سيتم إرسال تفاصيل الحساب البنكي بعد الإرسال — مناسب للطلبات بأكثر من ٥٠٫٠٠٠ ر.س.`; note.classList.remove('hidden'); }
-      else { note.classList.add('hidden'); }
-    }
-    function selectPay(id) { state.payMethod = id; renderPayMethods(); }
+    /* renderPayMethods() and selectPay() were removed in the Aug 2026 audit.
+       They wrote to #payGrid and #bnplNote, neither of which exists in the
+       markup any more, and each was the other's only caller — so the pair was
+       unreachable and would have thrown on the first line if it were ever
+       reached. PAY_METHODS above is kept: the receipt still names the method. */
 
     function renderCart() {
       // Brokerage redesign: cart page is now the customer order tracker.
@@ -11289,8 +11486,29 @@ p {
     /* ============================================================
        CHECKOUT + ZATCA QR
        ============================================================ */
+    /* ============================================================
+       checkout() — CURRENTLY UNWIRED. Nothing calls this.
+       The site runs a brokerage model: customers submit an RFQ and the owner
+       prices it, so the cart page is an order tracker (see renderCart) and
+       there is no self-serve checkout button anywhere.
+
+       Do not wire a button to this without reading the guard below. The form
+       fields it reads (#custName, #custPhone, #custEmail, #addrDistrict,
+       #addrPostal, #addrExtra, #addrBuilding) do NOT exist in the markup. Left
+       as it was, those four address fields would post as empty strings into
+       customer_notes — the only record of a guest's delivery address.
+       ============================================================ */
     function checkout() {
       if (!state.cart.length) { toast('عربتك فارغة'); return; }
+
+      // Refuse to run half-blind rather than quietly losing the address.
+      if (!$('#custName') || !$('#addrDistrict')) {
+        console.error('[checkout] address form markup is missing — refusing to ' +
+                      'submit an order with empty delivery fields. ' +
+                      'Build the form before wiring this up.');
+        toast('نموذج الطلب غير مكتمل. تواصل معنا عبر واتساب لإتمام طلبك.', '');
+        return;
+      }
       const subtotal = state.cart.reduce((s, c) => s + c.price * c.qty, 0);
       const supplierIds = new Set(state.cart.map(c => c.supplierId));
       const shipping = Math.min(250 * supplierIds.size, Math.round(subtotal * 0.02 * supplierIds.size));
@@ -11311,7 +11529,7 @@ p {
     <div class="row" style="border-top: 1px dashed var(--gray-200); padding-top: 10px; margin-top: 6px; font-weight: 700; font-size: 1.1rem;"><span>الإجمالي المدفوع</span><span style="color: var(--amber-600);">${sar(total.toFixed(2))}</span></div>
   `;
 
-      $('#confirmWA').href = waLink('966920002362', `رقم الطلب ${ref} • الإجمالي ${sar(total.toFixed(2))} • طريقة الدفع: ${payLabel}`);
+      $('#confirmWA').href = waLink(MEDAD_WA, `رقم الطلب ${ref} • الإجمالي ${sar(total.toFixed(2))} • طريقة الدفع: ${payLabel}`);
 
       const cartSnapshot = state.cart.map(c => ({ id: c.id, name: c.name, price: c.price, qty: c.qty, supplierId: c.supplierId, unit: c.unit }));
       const custName  = $('#custName')?.value || (state.user?.name || '');
@@ -11424,7 +11642,7 @@ p {
       $('#sumTotal').textContent = sar(total);
 
       const wa = $('#concreteWA');
-      if (wa) wa.href = waLink('966920002362', `طلب خرسانة: ${type} (${qty} م٣) لتاريخ ${dayText} ${monthName} الساعة ${timeText} • السعر التقديري ${sar(total)}`);
+      if (wa) wa.href = waLink(MEDAD_WA, `طلب خرسانة: ${type} (${qty} م٣) لتاريخ ${dayText} ${monthName} الساعة ${timeText} • السعر التقديري ${sar(total)}`);
     }
 
     function setCalendar(mode) {
@@ -11555,11 +11773,11 @@ p {
             // Security: NEVER store the password in localStorage (was a P0 audit finding).
             // The dev fallback only remembers non-secret profile fields; if Supabase is
             // unavailable the flow simply can't authenticate the user — which is correct.
-            localStorage.setItem('bena_pending_signup', JSON.stringify({ email, fullName, phone }));
+            localStorage.setItem('medad_pending_signup', JSON.stringify({ email, fullName, phone }));
             toast('وضع تجريبي — استخدم الرمز ٠٠٠٠٠٠ للتأكيد', '');
             showAuthStep2(email);
           } else {
-            const stored = JSON.parse(localStorage.getItem('bena_user') || 'null');
+            const stored = JSON.parse(localStorage.getItem('medad_user') || 'null');
             if (stored && stored.email === email) {
               toast('تم تسجيل الدخول (وضع تجريبي)', '✓');
               closeAuth();
@@ -11604,9 +11822,9 @@ p {
         } else {
           // Dev fallback
           if (code === '000000') {
-            const pending = JSON.parse(localStorage.getItem('bena_pending_signup') || '{}');
-            localStorage.setItem('bena_user', JSON.stringify(pending));
-            localStorage.removeItem('bena_pending_signup');
+            const pending = JSON.parse(localStorage.getItem('medad_pending_signup') || '{}');
+            localStorage.setItem('medad_user', JSON.stringify(pending));
+            localStorage.removeItem('medad_pending_signup');
             toast('تم تفعيل الحساب (وضع تجريبي)', '✓');
             closeAuth();
           } else {
@@ -11659,12 +11877,22 @@ p {
     }
 
     async function signOut() {
-      if (window.supabaseClient) {
-        await window.supabaseClient.auth.signOut();
+      // The local session must be cleared whether or not the network call
+      // succeeds. Before, a rejected signOut() left the user logged in with
+      // no toast and no UI change — they believed they had signed out.
+      try {
+        if (window.supabaseClient) {
+          const { error } = await window.supabaseClient.auth.signOut();
+          if (error) console.warn('[auth] remote signOut failed', error.message);
+        }
+      } catch (e) {
+        console.warn('[auth] remote signOut threw', e?.message || e);
+      } finally {
+        localStorage.removeItem('medad_user');
+        localStorage.removeItem('bena_user');   // legacy key, kept for old sessions
+        toast('تم تسجيل الخروج', '✓');
+        if (typeof onAuthChange === 'function') onAuthChange(null);
       }
-      localStorage.removeItem('bena_user');
-      toast('تم تسجيل الخروج', '✓');
-      if (typeof onAuthChange === 'function') onAuthChange(null);
     }
 
     function translateAuthError(msg) {
@@ -11704,7 +11932,7 @@ p {
       if (!res || res.ok === false) {
         // Be honest with the customer — don't pretend it was saved.
         toast('تعذّر حفظ الطلب — أرسله لنا مباشرة عبر واتساب وسنخدمك فورًا', '');
-        window.open(waLink('966920002362',
+        window.open(waLink(MEDAD_WA,
           `طلب عرض سعر:\nالمادة: ${data.category}\nالكمية: ${data.qty}\nالمدينة: ${data.city}\nالاسم: ${data.contactName}\nالجوال: ${data.phone}`), '_blank', 'noopener');
         return;
       }
@@ -11750,13 +11978,9 @@ p {
     /* ============================================================
        INIT LISTENERS
        ============================================================ */
-    $('#heroSearch')?.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const mat = $('#material').value;
-      if (mat) state.filters.categories = new Set([mat]);
-      else state.filters.categories.clear();
-      location.hash = '#catalog';
-    });
+    /* The #heroSearch listener was removed in the Aug 2026 audit: neither
+       #heroSearch nor #material exists, and it navigated to #catalog, a route
+       deleted in the brokerage redesign. */
 
     $('#searchBox')?.addEventListener('input', (e) => { state.filters.search = e.target.value.trim(); renderCatalog(); });
     $('#minPrice')?.addEventListener('input', (e) => { state.filters.minPrice = e.target.value ? parseFloat(e.target.value) : null; renderCatalog(); });
@@ -11891,15 +12115,20 @@ p {
 
           // 4) One synthetic order_item describing the requested material
           if (order) {
-            try {
-              await window.supabaseClient.from('order_items').insert({
+            // Deliberately best-effort: the RFQ itself is already saved above,
+            // and this synthetic line item is only a convenience for the admin
+            // view. The old `catch {}` here could never fire — supabase-js
+            // resolves with { error } rather than throwing — so the failure was
+            // invisible. Now it is at least logged.
+            const { error: itemError } = await window.supabaseClient
+              .from('order_items').insert({
                 order_id: order.id,
                 product_name_snapshot: `${payload.category || 'طلب عام'} — ${payload.qty || ''}`.trim(),
                 quantity: 1,
                 unit_price: 0,
                 subtotal: 0,
               });
-            } catch {/* order_items insert is best-effort */}
+            if (itemError) console.warn('[rfq] synthetic order_item skipped', itemError.message);
           }
 
           // 5) Mirror into rfqs for record-keeping (best-effort, non-blocking)
@@ -11998,12 +12227,28 @@ p {
               unit_price: it.price || 0,
               subtotal: (it.qty || 1) * (it.price || 0),
             }));
-            await window.supabaseClient.from('order_items').insert(items);
+            // Unchecked before: a rejected insert left the order header with a
+            // money total and an empty basket, and the customer was still told
+            // the order succeeded.
+            const { error: itemsError } = await window.supabaseClient
+              .from('order_items').insert(items);
+            if (itemsError) {
+              console.error('order_items insert failed for ' + orderNo, itemsError);
+              return { ok: false, orderNo, status: 'failed', error: itemsError.message };
+            }
           }
-          return { orderNo, status: 'pending' };
-        } catch (e) { console.warn('order save failed', e); }
+          return { ok: true, orderNo, status: 'pending' };
+        } catch (e) {
+          // Previously this fell through to the shared return below and handed
+          // back a made-up order number with status 'confirmed' — a STRONGER
+          // status than the success path returns. A customer whose order was
+          // never saved was told it was confirmed.
+          console.error('order save failed', e);
+          return { ok: false, orderNo, status: 'failed', error: e?.message || 'order save failed' };
+        }
       }
-      return { orderNo: 'MEDAD-' + Date.now().toString().slice(-8), status: 'confirmed' };
+      // No Supabase client at all — offline/dev only. Say so honestly.
+      return { ok: false, orderNo, status: 'offline', error: 'no database connection' };
     }
 
     /* ===== Admin realtime: customer orders + RFQs surface instantly ===== */
@@ -12027,7 +12272,7 @@ p {
             if (typeof toast === 'function') toast('طلب انضمام مورد جديد!', '');
             try { if (typeof loadAdminApplications === 'function') loadAdminApplications(); } catch{}
           })
-          .subscribe(status => console.log('[admin realtime]', status));
+          .subscribe();
       } catch (e) { console.warn('realtime setup failed', e); window.__adminRealtimeSetup = false; }
     }
     // (No polling interval — onAuthChange wires this up when an admin signs in.)
@@ -12214,6 +12459,8 @@ p {
       ['updateConcreteSummary', updateConcreteSummary],
       ['updateCartBadge', updateCartBadge],
       ['updateWishBadge', updateWishBadge],
+      ['syncWhatsAppLinks', syncWhatsAppLinks],
+      ['linkFieldLabels', () => linkFieldLabels(document)],
     ].forEach(([name, fn]) => {
       try { fn(); } catch (e) { console.error('[boot] ' + name + ' failed:', e); }
     });
