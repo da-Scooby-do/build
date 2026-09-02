@@ -13,6 +13,9 @@
 
   <!-- PWA / mobile-pro -->
   <link rel="manifest" href="/manifest.webmanifest" />
+  <!-- SVG first: one 0.8 KB file covers every size, from the 16px tab icon to
+       a retina bookmark. The PNG stays as the fallback for older browsers. -->
+  <link rel="icon" type="image/svg+xml" href="/icon.svg" />
   <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <meta name="theme-color" media="(prefers-color-scheme: light)" content="#faf6f0" />
@@ -1764,14 +1767,14 @@ p {
 }
 
 .logo-mark {
-  width: 38px;
-  height: 38px;
-  display: grid;
-  place-items: center;
-  border-radius: 8px;
-  background: linear-gradient(135deg, var(--navy-800), var(--navy-600));
-  color: var(--white);
-  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, .15);
+  /* The mark is the traced brand artwork, loaded as a file so icon.svg is the
+     single source of truth for every place it appears. Its navy is invisible
+     on a navy surface, so dark contexts get the on-dark variant below. */
+  width: 40px;
+  height: 40px;
+  display: block;
+  flex-shrink: 0;
+  background: url("/icon.svg") center/contain no-repeat;
 }
 
 .logo-text {
@@ -2486,9 +2489,12 @@ p {
   color: #8ea5c6;
 }
 
+/* On-dark variant: the footer is navy, so the mark's own navy tile would
+   vanish into it. Drop the tile and let the amber/white M sit directly on the
+   background — the same mark, without a box it doesn't need. */
 .site-footer .logo-mark {
-  background: linear-gradient(135deg, var(--amber-400), var(--amber-500));
-  color: var(--navy-900);
+  /* the footer is navy — the standard mark's navy half would disappear */
+  background-image: url("/icon-dark.svg");
 }
 
 .site-footer p {
@@ -3899,7 +3905,7 @@ p {
 
 /* Logo mark icon */
 [data-theme="dark"] .logo-mark {
-  color: var(--amber-400);
+  background-image: url("/icon-dark.svg");
 }
 
 /* Apple Pay logo - black text invisible on dark card */
@@ -5166,8 +5172,7 @@ p {
       /* ----- Top bar ----- */
       .top-bar { padding: 10px 0; }
       .top-bar > .container { gap: 8px; }
-      .logo .logo-mark { width: 36px !important; height: 36px !important; }
-      .logo .logo-mark svg { width: 18px !important; height: 18px !important; }
+      .logo .logo-mark { width: 34px !important; height: 34px !important; }
       .logo-text b { font-size: .98rem !important; line-height: 1.15 !important; }
       .logo-text span { font-size: .68rem !important; }
 
@@ -6536,14 +6541,7 @@ p {
     <div class="top-bar">
       <div class="container">
         <a href="#home" class="logo" data-link aria-label="مداد للبناء والخدمات اللوجستية - الصفحة الرئيسية">
-          <span class="logo-mark" aria-hidden="true">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-              stroke-linecap="round" stroke-linejoin="round">
-              <path d="M3 21V8l9-5 9 5v13" />
-              <path d="M9 21V12h6v9" />
-              <path d="M3 21h18" />
-            </svg>
-          </span>
+          <span class="logo-mark" aria-hidden="true"></span>
           <span class="logo-text">
             <b>مداد للبناء</b>
             <span>والخدمات اللوجستية</span>
@@ -8634,14 +8632,7 @@ p {
       <div class="footer-grid">
         <div>
           <a href="#home" data-link class="logo">
-            <span class="logo-mark" aria-hidden="true">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                stroke-linecap="round" stroke-linejoin="round">
-                <path d="M3 21V8l9-5 9 5v13" />
-                <path d="M9 21V12h6v9" />
-                <path d="M3 21h18" />
-              </svg>
-            </span>
+            <span class="logo-mark" aria-hidden="true"></span>
             <span class="logo-text"><b>مداد للبناء</b><span>والخدمات اللوجستية</span></span>
           </a>
           <p>منصة سعودية تربط المقاولين والأفراد بأفضل موردي مواد البناء في جميع مناطق المملكة.</p>
