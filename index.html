@@ -2014,7 +2014,14 @@ p {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(115deg, rgba(7, 26, 51, .92) 5%, rgba(7, 26, 51, .55) 45%, rgba(7, 26, 51, .25) 75%), url("https://images.unsplash.com/photo-1590725175842-00d0f2e24e16?auto=format&fit=crop&w=1800&q=75") center/cover no-repeat;
+  /* This is frame 3.2s of media/hero.mp4, so the still and the footage
+     are the same shot — the video fades in without a visible jump. It also
+     removes a third-party hotlink from the critical path. */
+  /* Mirrored for RTL: the dense end of the scrim now sits behind the Arabic
+     headline on the right, where the sky is brightest. Before this the
+     gradient darkened the empty left side and left the lead paragraph
+     sitting on a pale sunrise. */
+  background: linear-gradient(245deg, rgba(7, 26, 51, .93) 5%, rgba(7, 26, 51, .70) 42%, rgba(7, 26, 51, .34) 78%), url("media/hero-poster.webp") center/cover no-repeat;
   z-index: -1;
 }
 
@@ -6375,6 +6382,91 @@ p {
      many bots skip those. NOT left:-9999px either: in an RTL document that
      stretched the page ~10,000px wide and put a horizontal scrollbar on
      every form page. clip-path takes it out of the paint, not the layout. */
+  /* ============================================================
+     CINEMATIC LAYER — Sept 2026
+     A video hero, depth, and motion that behave on a phone on
+     mobile data as well as on a laptop. Three rules govern it:
+       • the poster image carries the hero on its own — video is
+         an enhancement that is never required for the page to read
+       • no video is fetched on a small screen or a metered
+         connection; a Ken Burns drift on the poster stands in
+       • every motion here is off under prefers-reduced-motion
+     ============================================================ */
+
+  .hero { isolation: isolate; }
+
+  /* The video sits behind .hero::before, which keeps its navy scrim
+     so the Arabic headline never loses contrast against footage. */
+  .hero-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -2;
+    opacity: 0;
+    transition: opacity 1.2s ease;
+    pointer-events: none;
+  }
+  .hero-video.is-playing { opacity: 1; }
+
+  /* Poster drift — the cinematic feel on phones, at zero bytes. */
+  @media (prefers-reduced-motion: no-preference) {
+    .hero::before { animation: heroDrift 26s ease-in-out infinite alternate; }
+  }
+  @keyframes heroDrift {
+    from { transform: scale(1)    translate3d(0, 0, 0); }
+    to   { transform: scale(1.07) translate3d(1.2%, -1.2%, 0); }
+  }
+  /* Once real footage is playing the still must stop moving, or the
+     two drift against each other. */
+  .hero.has-video::before { animation: none; }
+
+  /* Vignette + a faint grain: the two cheapest things that read as
+     "filmed" rather than "web page". Both are pure CSS. */
+  .hero::after {
+    box-shadow: inset 0 0 180px 40px rgba(4, 14, 28, .55);
+  }
+  .hero > .container { position: relative; z-index: 1; }
+
+  /* Section entrances — deeper and slower than the old reveal, so
+     the page feels composed rather than jumpy. */
+  .cine {
+    opacity: 0;
+    transform: translateY(26px) scale(.995);
+    transition: opacity .85s cubic-bezier(.22,.61,.36,1),
+                transform .85s cubic-bezier(.22,.61,.36,1);
+    will-change: opacity, transform;
+  }
+  .cine.is-in { opacity: 1; transform: none; }
+
+  /* Cards lift toward the reader instead of just changing colour. */
+  .ms-card, .product-card, .cd-box, .sup-card {
+    transition: transform .45s cubic-bezier(.22,.61,.36,1),
+                box-shadow .45s cubic-bezier(.22,.61,.36,1);
+  }
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .ms-card:hover, .product-card:hover, .sup-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 22px 48px -18px rgba(8, 21, 42, .38);
+    }
+  }
+
+  /* Route changes cross-fade instead of snapping. */
+  .view.active { animation: viewIn .5s cubic-bezier(.22,.61,.36,1) both; }
+  @keyframes viewIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  /* One switch turns the whole thing off. */
+  @media (prefers-reduced-motion: reduce) {
+    .hero-video { display: none !important; }
+    .cine { opacity: 1 !important; transform: none !important; transition: none !important; }
+    .view.active { animation: none !important; }
+    .ms-card, .product-card, .sup-card { transition: none !important; }
+  }
+
   /* ---------- accessibility ---------- */
   /* Five headings skipped a level (h1 → h3), which breaks the outline a screen
      reader announces. They are now correctly ranked; these classes preserve the
@@ -6572,6 +6664,12 @@ p {
   <section class="view active" id="view-home">
 
     <section class="hero">
+      <!-- Loaded by initCinematicHero() only on a wide screen with an
+           unmetered connection. src is deliberately absent: an empty
+           <video src> would still cost a request. -->
+      <video class="hero-video" id="heroVideo"
+             muted loop playsinline preload="none"
+             aria-hidden="true" tabindex="-1"></video>
       <div class="container">
         <span class="hero-eyebrow reveal">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -10811,6 +10909,68 @@ p {
       }).observe(document.body, { childList: true, subtree: true });
     }
 
+    /* ============================================================
+       CINEMATIC HERO
+       The poster image already carries the hero. Video is added only
+       when it costs the visitor nothing they would mind:
+         • screen at least 900px wide (a phone gets the poster drift)
+         • Network Information API does not report save-data or a slow
+           connection
+         • the visitor has not asked for reduced motion
+       If any check fails, or the file 404s, nothing changes on screen.
+       ============================================================ */
+    const HERO_VIDEO_SRC = 'media/hero.mp4';   // add the file to enable
+
+    function initCinematicHero() {
+      const v = document.getElementById('heroVideo');
+      const hero = v && v.closest('.hero');
+      if (!v || !hero) return;
+
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      if (!window.matchMedia('(min-width: 900px)').matches) return;
+
+      const net = navigator.connection;
+      if (net && (net.saveData || /^(slow-)?2g$/.test(net.effectiveType || ''))) return;
+
+      // webm is ~40% smaller; browsers that can't play it fall through to mp4
+      [['media/hero.webm', 'video/webm'], [HERO_VIDEO_SRC, 'video/mp4']]
+        .forEach(([src, type]) => {
+          const el = document.createElement('source');
+          el.src = src; el.type = type;
+          v.appendChild(el);
+        });
+      v.load();
+      v.addEventListener('canplay', () => {
+        v.play().then(() => {
+          v.classList.add('is-playing');
+          hero.classList.add('has-video');
+        }).catch(() => { /* autoplay refused — poster stays, nothing breaks */ });
+      }, { once: true });
+      v.addEventListener('error', () => {
+        // file missing, or the network dropped it: silently keep the poster
+        v.replaceChildren();
+      }, { once: true });
+    }
+
+    /* Section entrances. Reuses the existing reduced-motion flag. */
+    function initCinematicReveals() {
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      const targets = document.querySelectorAll(
+        '.section > .container > *, .ms-card, .cd-box, .sup-card, .policy-block');
+      if (!targets.length || typeof IntersectionObserver !== 'function') return;
+
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((e, i) => {
+          if (!e.isIntersecting) return;
+          // a short stagger reads as choreography rather than a pop
+          setTimeout(() => e.target.classList.add('is-in'), Math.min(i, 5) * 70);
+          io.unobserve(e.target);
+        });
+      }, { rootMargin: '0px 0px -12% 0px', threshold: 0.06 });
+
+      targets.forEach(t => { t.classList.add('cine'); io.observe(t); });
+    }
+
     /* Point every hard-coded wa.me/… href in the markup at MEDAD_WA. */
     function syncWhatsAppLinks() {
       document.querySelectorAll('a[href*="wa.me/"]').forEach(a => {
@@ -12461,6 +12621,8 @@ p {
       ['updateWishBadge', updateWishBadge],
       ['syncWhatsAppLinks', syncWhatsAppLinks],
       ['linkFieldLabels', () => linkFieldLabels(document)],
+      ['initCinematicHero', initCinematicHero],
+      ['initCinematicReveals', initCinematicReveals],
     ].forEach(([name, fn]) => {
       try { fn(); } catch (e) { console.error('[boot] ' + name + ' failed:', e); }
     });

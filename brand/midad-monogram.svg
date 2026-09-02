@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="مداد">
+  <title>مداد</title>
+  <!-- ===========================================================
+       MIDAD — compact monogram (the "two M's")
+       Two mirrored M-halves sharing one central peak. Built to stay
+       readable at 16×16: no windows, no arc, thick strokes only.
+       Use for: favicon, app icon, social avatar, stamp on receipts.
+       =========================================================== -->
+  <rect width="256" height="256" rx="56" fill="#1D3E63"/>
+
+  <!-- left half — amber -->
+  <path fill="#E08A2E"
+        d="M56 196 L56 60 L128 128 L128 172 L92 138 L92 196 Z"/>
+  <!-- right half — white, so the pair reads as one M on the navy tile -->
+  <path fill="#FFFFFF"
+        d="M200 196 L200 60 L128 128 L128 172 L164 138 L164 196 Z"/>
+</svg>
