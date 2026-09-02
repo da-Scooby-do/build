@@ -6388,6 +6388,59 @@ p {
      stretched the page ~10,000px wide and put a horizontal scrollbar on
      every form page. clip-path takes it out of the paint, not the layout. */
   /* ============================================================
+     EDITORIAL RHYTHM — Sept 2026
+     Measured off wheniwillmeetyou.net, which the owner picked as the
+     reference. Four things carry that style, and none of them is colour:
+
+       1. AIR. Sections breathe at 7.8rem, not 4.4rem. That single change
+          does more than any decoration.
+       2. A REAL TYPE SCALE. Headings step 2.6rem → 2.1rem → 1.35rem with
+          tight leading; body sits at 1.85 leading, which is loose for
+          Latin and correct for Arabic.
+       3. BILINGUAL LABELS. Every section is titled in Arabic with a small
+          English line beneath it — the device that makes the page read
+          as considered rather than translated.
+       4. CALM. Sharp-cornered full-bleed imagery, small quiet buttons,
+          almost no scroll animation.
+     ============================================================ */
+
+  /* ---------- 1. air ---------- */
+  .section { padding: clamp(72px, 9vw, 125px) 0; }
+  .section--tight { padding: clamp(56px, 6vw, 83px) 0; }
+
+  /* ---------- 2. type scale ---------- */
+  body { line-height: 1.85; }
+
+  h1 { font-size: clamp(2.1rem, 4.2vw, 2.9rem); line-height: 1.24; letter-spacing: -.015em; }
+  h2 { font-size: clamp(1.5rem, 2.9vw, 2.1rem); line-height: 1.3; letter-spacing: -.012em; }
+  h3 { line-height: 1.4; }
+
+  .lead, .section-head p { font-size: 1.02rem; line-height: 1.9; }
+
+  /* ---------- 3. bilingual section titles ---------- */
+  .section-head { align-items: flex-start; }
+  .section-head .kicker {
+    display: block;
+    order: 2;                      /* the English line sits UNDER the Arabic */
+    margin-top: 6px;
+    font-size: .74rem;
+    font-weight: 500;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    opacity: .75;
+  }
+  .section-head > div { display: flex; flex-direction: column; }
+
+  /* ---------- 4. calm ---------- */
+  /* Full-bleed imagery is sharp-cornered on the reference; rounded photos
+     read as "web template", square ones read as editorial. */
+  .hero, .ms-media, .work-shot { border-radius: 0; }
+
+  /* The scroll choreography is dialled back rather than removed: the
+     reference animates almost nothing, and restraint is the point. */
+  .cine { transform: translateY(14px); transition-duration: .6s; }
+
+  /* ============================================================
      CINEMATIC LAYER — Sept 2026
      A video hero, depth, and motion that behave on a phone on
      mobile data as well as on a laptop. Three rules govern it:
