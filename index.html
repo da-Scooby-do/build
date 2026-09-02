@@ -9446,15 +9446,15 @@ p {
       if (!adminTableGuard(tbody, data, error, { colspan: 7, emptyMsg: 'لا توجد منتجات' })) return;
       tbody.innerHTML = data.map(p => `
         <tr style="border-top:1px solid var(--gray-150);">
-          <td style="padding:8px;">${p.main_image ? `<img src="${escapeHtml(p.main_image)}" onerror="this.style.display='none'" style="width:48px; height:48px; object-fit:cover; border-radius:6px;">` : '—'}</td>
+          <td style="padding:8px;">${p.main_image ? `<img src="${escapeHtml(p.main_image)}" alt="${escapeHtml(p.name_ar||'')}" onerror="this.style.display='none'" style="width:48px; height:48px; object-fit:cover; border-radius:6px;">` : '—'}</td>
           <td style="padding:12px; font-weight:600;">${escapeHtml(p.name_ar)}</td>
           <td style="padding:12px; color:var(--gray-600); font-size:.85rem;">${escapeHtml(p.categories?.name_ar || '—')}</td>
           <td style="padding:12px; font-weight:700;">${arSAR(p.price)} / ${escapeHtml(p.unit_ar||'')}</td>
           <td style="padding:12px;">${p.stock_quantity != null ? arEN(p.stock_quantity) : '—'}</td>
           <td style="padding:12px; color:var(--gray-600); font-size:.85rem;">${escapeHtml(p.cities?.name_ar || '—')}</td>
           <td style="padding:12px; white-space:nowrap;">
-            <button class="btn btn-ghost" onclick='openProductEditor(${JSON.stringify(p).replace(/</g,"\\u003c").replace(/'/g,"&#39;")})' style="padding:6px 10px; font-size:.8rem;"></button>
-            <button class="btn btn-ghost" onclick="deleteProduct('${escapeHtml(p.id)}', '${(p.name_ar||'').replace(/'/g,"\\'").replace(/</g,"&lt;")}')" style="padding:6px 10px; font-size:.8rem; color:#d33;"></button>
+            <button class="btn btn-ghost" onclick='openProductEditor(${JSON.stringify(p).replace(/</g,"\\u003c").replace(/'/g,"&#39;")})' style="padding:6px 10px; font-size:.8rem;">تعديل</button>
+            <button class="btn btn-ghost" onclick="deleteProduct('${escapeHtml(p.id)}', '${(p.name_ar||'').replace(/'/g,"\\'").replace(/</g,"&lt;")}')" style="padding:6px 10px; font-size:.8rem; color:#d33;">حذف</button>
           </td>
         </tr>
       `).join('');
@@ -9556,10 +9556,10 @@ p {
           <td style="padding:12px; color:var(--gray-600); font-size:.85rem;">${escapeHtml(s.cr_number || '—')}</td>
           <td style="padding:12px; color:var(--gray-600); font-size:.85rem;">${escapeHtml(s.phone || '—')}</td>
           <td style="padding:12px;">${escapeHtml(s.rating || '0')} (${arEN(s.review_count||0)})</td>
-          <td style="padding:12px;">${s.is_verified ? '' : '—'}</td>
+          <td style="padding:12px;">${s.is_verified ? '✓' : '—'}</td>
           <td style="padding:12px; white-space:nowrap;">
-            <button class="btn btn-ghost" onclick='openSupplierEditor(${JSON.stringify(s).replace(/</g,"\\u003c").replace(/'/g,"&#39;")})' style="padding:6px 10px; font-size:.8rem;"></button>
-            <button class="btn btn-ghost" onclick="deleteSupplier('${escapeHtml(s.id)}', '${(s.name_ar||'').replace(/'/g,"\\'").replace(/</g,"&lt;")}')" style="padding:6px 10px; font-size:.8rem; color:#d33;"></button>
+            <button class="btn btn-ghost" onclick='openSupplierEditor(${JSON.stringify(s).replace(/</g,"\\u003c").replace(/'/g,"&#39;")})' style="padding:6px 10px; font-size:.8rem;">تعديل</button>
+            <button class="btn btn-ghost" onclick="deleteSupplier('${escapeHtml(s.id)}', '${(s.name_ar||'').replace(/'/g,"\\'").replace(/</g,"&lt;")}')" style="padding:6px 10px; font-size:.8rem; color:#d33;">حذف</button>
           </td>
         </tr>
       `).join('');
@@ -9631,7 +9631,7 @@ p {
           <div style="color:var(--gray-500); font-size:.82rem;">${c.name_en || ''} • ${c.id}</div>
           <div style="display:flex; gap:6px; margin-top:6px;">
             <button class="btn btn-ghost" onclick="renameCategory('${c.id}', '${(c.name_ar||'').replace(/'/g,"\\'")}')" style="padding:6px 10px; font-size:.78rem;">تعديل</button>
-            <button class="btn btn-ghost" onclick="deleteCategory('${c.id}', '${(c.name_ar||'').replace(/'/g,"\\'")}')" style="padding:6px 10px; font-size:.78rem; color:#d33;"></button>
+            <button class="btn btn-ghost" onclick="deleteCategory('${c.id}', '${(c.name_ar||'').replace(/'/g,"\\'")}')" style="padding:6px 10px; font-size:.78rem; color:#d33;">حذف</button>
           </div>
         </div>
       `).join('');
