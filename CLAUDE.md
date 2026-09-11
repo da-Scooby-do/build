@@ -24,8 +24,10 @@ Edge Functions: `send-receipt`, `verify-turnstile`.
 
 ## Working rules
 
-**Give git commands; don't run them.** The owner commits and pushes himself.
-Do the file edits, then hand over `git add / commit / push`.
+**Claude commits and pushes.** The owner delegated git on 2026-09-11: after
+making and verifying edits, run `git add / commit / push` directly. A push to
+`main` auto-deploys via Vercel, so push only work that is complete and has
+passed `node --check`. Always show the diff and report the deploy in the reply.
 
 **Never invent claims.** This site publishes to a Saudi audience and the owner
 is personally liable for false statements. A previous pass removed a fabricated
