@@ -6796,6 +6796,7 @@ p {
          MEDINA SUPPLIER DIRECTORY
          ===================================================== -->
     <section class="section" id="suppliers-directory" style="background:linear-gradient(180deg, #faf6f0 0%, #ffffff 100%); padding-block:80px;">
+      <div class="cat-bg" aria-hidden="true"><img id="dirCatImg" alt="" decoding="async"></div>
       <div class="container">
         <div class="section-head" style="margin-bottom:30px; flex-direction:column; align-items:flex-start;">
           <div>
@@ -6820,6 +6821,54 @@ p {
       </div>
     </section>
 
+    <style id="cat-bg-styles">
+      /* Category background layer — RFQ header + suppliers directory. Photos live
+         in media/categories/<slug>.webp; a missing file falls back to the gradient. */
+      .cat-bg { position:absolute; inset:0; z-index:0; pointer-events:none; }
+      .cat-bg img { width:100%; height:100%; object-fit:cover; object-position:center; opacity:0; transition:opacity .5s ease; display:block; }
+      .cat-bg img.is-loaded { opacity:1; }
+
+      #suppliers-directory { position:relative; overflow:hidden; isolation:isolate; }
+      #suppliers-directory > .container { position:relative; z-index:2; }
+      #suppliers-directory .cat-bg::after { content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(250,246,240,.90) 0%, rgba(255,255,255,.94) 100%); }
+
+      #rfqIntro.cat-hero { position:relative; overflow:hidden; isolation:isolate; background:linear-gradient(135deg,#0a1830 0%, #16294a 100%); padding-bottom:30px; }
+      #rfqIntro.cat-hero > .container { position:relative; z-index:2; }
+      #rfqIntro .cat-bg::after { content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(8,21,42,.72) 0%, rgba(8,21,42,.88) 100%); }
+      #rfqIntro.cat-hero .breadcrumb a, #rfqIntro.cat-hero .breadcrumb .sep, #rfqIntro.cat-hero .breadcrumb .current, #rfqIntro.cat-hero h1 { color:#fdf9f1 !important; }
+      #rfqIntro.cat-hero .sub { color:#c9d4e6 !important; }
+    </style>
+    <script>
+      /* Shared category → background-photo helper (used by RFQ form + directory). */
+      (function(){
+        const MAP = [
+          [/حديد/, 'rebar'],
+          [/بلوك|إنترلوك|انترلوك/, 'blocks'],
+          [/خرسان/, 'concrete'],
+          [/طوب/, 'brick'],
+          [/عزل/, 'insulation'],
+          [/رمل|بحص|حصى|حصو/, 'aggregate'],
+          [/سمنت/, 'cement'],
+          [/خشب|أخشاب/, 'timber'],
+          [/سباك|أنابيب|مواسير|صرف/, 'plumbing'],
+          [/كهرب|إنارة|انارة/, 'electrical'],
+          [/معدات|ثقيل|حفر|ردم|رفع|تمهيد|سفلت|شاحن|مركبات/, 'machinery'],
+          [/سيراميك|بلاط/, 'ceramic'],
+          [/أبواب|باب/, 'doors'],
+        ];
+        window.catBgSlug = function(label){ const s=String(label||''); for (const [re,slug] of MAP) if (re.test(s)) return slug; return ''; };
+        window.catBgImagePath = function(label){ const slug=window.catBgSlug(label); return slug ? ('media/categories/'+slug+'.webp') : ''; };
+        window.setCatBg = function(imgEl, label){
+          if (!imgEl) return;
+          const path = window.catBgImagePath(label);
+          imgEl.classList.remove('is-loaded');
+          if (!path){ imgEl.removeAttribute('src'); return; }
+          imgEl.onload  = function(){ imgEl.classList.add('is-loaded'); };
+          imgEl.onerror = function(){ imgEl.classList.remove('is-loaded'); imgEl.removeAttribute('src'); };
+          imgEl.src = path;
+        };
+      })();
+    </script>
     <script>
       (function(){
         const DIR_CITIES = {
@@ -7294,6 +7343,7 @@ p {
           const data = getActiveData();
           const cats = Object.keys(data);
           if (!cats.includes(activeCat)) activeCat = cats[0];
+          try { window.setCatBg(document.getElementById('dirCatImg'), activeCat); } catch(e){}
           const total = cats.reduce((s, c) => s + data[c].length, 0);
           const cityLabel = activeCity === ALL_LABEL ? 'جميع مناطق المملكة' : activeCity;
           if (dirHead) dirHead.innerHTML = `شبكة موردينا في <span style="color:var(--gold-500);">${cityLabel}</span>`;
@@ -7683,7 +7733,8 @@ p {
      VIEW: RFQ (Request for Quote)
      ============================================================ -->
   <section class="view" id="view-rfq">
-    <section class="page-intro">
+    <section class="page-intro cat-hero" id="rfqIntro">
+      <div class="cat-bg" aria-hidden="true"><img id="rfqCatImg" alt="" decoding="async"></div>
       <div class="container">
         <nav class="breadcrumb">
           <a href="#home" data-link>الرئيسية</a>
@@ -7704,7 +7755,7 @@ p {
           <div class="row2">
             <div>
               <label>المادة المطلوبة</label>
-              <select required id="rfq-cat" name="category">
+              <select required id="rfq-cat" name="category" onchange="setCatBg(document.getElementById('rfqCatImg'), this.value)">
                 <option value="">اختر المادة…</option>
                 <option>خرسانة جاهزة</option>
                 <option>طوب</option>
