@@ -6801,7 +6801,7 @@ p {
         <div class="section-head" style="margin-bottom:30px; flex-direction:column; align-items:flex-start;">
           <div>
             <div class="kicker">دليل الموردين</div>
-            <h2 id="dirHead">شبكة موردينا في الرياض</h2>
+            <h2 id="dirHead">كل ما يحتاجه مشروعك الإنشائي في <span style="color:var(--gold-500);">مكان واحد</span></h2>
             <p class="sub">نصل إلى شبكة واسعة من الموردين والمصانع في كل المملكة — اختر <b>كل المملكة</b> لعرضهم جميعاً، أو اختر مدينة بعينها (<b>الرياض</b>، <b>جدة</b>، <b>المدينة المنورة</b>) من الزر الذهبي أعلى الصفحة.</p>
           </div>
         </div>
@@ -7371,7 +7371,7 @@ p {
           try { window.setCatBg(document.getElementById('dirCatImg'), activeCat); } catch(e){}
           const total = cats.reduce((s, c) => s + data[c].length, 0);
           const cityLabel = activeCity === ALL_LABEL ? 'جميع مناطق المملكة' : activeCity;
-          if (dirHead) dirHead.innerHTML = `شبكة موردينا في <span style="color:var(--gold-500);">${cityLabel}</span>`;
+          if (dirHead) dirHead.innerHTML = `كل ما يحتاجه مشروعك الإنشائي في <span style="color:var(--gold-500);">مكان واحد</span>`;
           if (pillLabel) pillLabel.textContent = activeCity;
           if (cityMenu) cityMenu.querySelectorAll('button[data-city]').forEach(b => b.classList.toggle('active', b.dataset.city === activeCity));
           tabs.innerHTML = cats.map(c => {
