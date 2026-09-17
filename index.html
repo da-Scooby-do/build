@@ -6806,7 +6806,7 @@ p {
           </div>
         </div>
 
-        <div id="dirTabs" style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:28px; padding-bottom:14px; border-bottom:1px solid rgba(212,165,99,.25);"></div>
+        <div id="dirTabs" class="dir-cat-grid"></div>
 
         <div id="dirContent"></div>
 
@@ -6841,6 +6841,20 @@ p {
       #rfqIntro .cat-bg::after { content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(8,21,42,.46) 0%, rgba(8,21,42,.74) 100%); }
       #rfqIntro.cat-hero .breadcrumb a, #rfqIntro.cat-hero .breadcrumb .sep, #rfqIntro.cat-hero .breadcrumb .current, #rfqIntro.cat-hero h1 { color:#fdf9f1 !important; text-shadow:0 1px 4px rgba(0,0,0,.5); }
       #rfqIntro.cat-hero .sub { color:#e7edf6 !important; text-shadow:0 1px 4px rgba(0,0,0,.5); }
+
+      /* Category photo-tile grid — the suppliers directory picker. */
+      .dir-cat-grid { display:grid; grid-template-columns:repeat(6, 1fr); gap:14px; margin-bottom:30px; }
+      .dir-cat-card { position:relative; aspect-ratio:16/11; border-radius:14px; overflow:hidden; cursor:pointer; padding:0;
+        border:2px solid transparent; background:var(--navy-900); box-shadow:0 4px 14px rgba(8,21,42,.14);
+        transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease; -webkit-tap-highlight-color:transparent; }
+      .dir-cat-card:hover { transform:translateY(-3px); box-shadow:0 12px 28px rgba(8,21,42,.24); }
+      .dir-cat-card img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; }
+      .dir-cat-card::after { content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(8,21,42,0) 28%, rgba(8,21,42,.86) 100%); }
+      .dir-cat-card .lbl { position:absolute; left:0; right:0; bottom:0; z-index:2; padding:9px 8px 11px; text-align:center;
+        color:#fff; font-weight:800; font-size:.94rem; line-height:1.3; text-shadow:0 1px 5px rgba(0,0,0,.7); }
+      .dir-cat-card.active { border-color:var(--gold-500, #E08A2E); box-shadow:0 12px 30px rgba(224,138,46,.42); }
+      @media (max-width:900px) { .dir-cat-grid { grid-template-columns:repeat(3, 1fr); gap:11px; } .dir-cat-card .lbl { font-size:.86rem; } }
+      @media (max-width:520px) { .dir-cat-grid { grid-template-columns:repeat(2, 1fr); gap:9px; } }
     </style>
     <script>
       /* Shared category → background-photo helper (used by RFQ form + directory). */
@@ -7360,11 +7374,13 @@ p {
           if (dirHead) dirHead.innerHTML = `شبكة موردينا في <span style="color:var(--gold-500);">${cityLabel}</span>`;
           if (pillLabel) pillLabel.textContent = activeCity;
           if (cityMenu) cityMenu.querySelectorAll('button[data-city]').forEach(b => b.classList.toggle('active', b.dataset.city === activeCity));
-          tabs.innerHTML = cats.map(c => `<button onclick="window.__setDirCat('${esc(c)}')" style="display:flex; align-items:center; gap:8px; padding:11px 18px; background:${c===activeCat?'var(--navy-900)':'#fff'}; color:${c===activeCat?'#fff':'var(--navy-900)'}; border:1px solid ${c===activeCat?'var(--navy-900)':'rgba(212,165,99,.4)'}; border-radius:999px; font-weight:700; font-size:.92rem; cursor:pointer; transition:all .2s; box-shadow:${c===activeCat?'0 6px 16px rgba(8,21,42,.18)':'none'};">
-            <span style="font-size:1.1rem;">${ICONS[c]||''}</span>
-            <span>${c}</span>
-            
-          </button>`).join('');
+          tabs.innerHTML = cats.map(c => {
+            const img = window.catBgImagePath ? window.catBgImagePath(c) : '';
+            return `<button class="dir-cat-card${c===activeCat?' active':''}" onclick="window.__setDirCat('${esc(c)}')" aria-pressed="${c===activeCat}" title="${c}">
+              ${img ? `<img src="${img}" alt="${c}" loading="lazy" decoding="async">` : ''}
+              <span class="lbl">${c}</span>
+            </button>`;
+          }).join('');
           const items = data[activeCat] || [];
           const areas = [...new Set(items.map(s => String(s.area || '').trim()).filter(Boolean))];
           const shownAreas = areas.slice(0, 12);
