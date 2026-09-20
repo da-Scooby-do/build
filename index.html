@@ -6777,8 +6777,8 @@ p {
             <div class="stat-label">شبكة موردين تغطي جميع مناطق المملكة</div>
           </div>
           <div>
-            <div class="stat-num">١١ <span style="color:var(--amber-500);">فئة</span></div>
-            <div class="stat-label">حديد • خرسانة • بلوك • طوب • عزل • رمل • إسمنت • أخشاب • سباكة • كهرباء • معدات ثقيلة</div>
+            <div class="stat-num">١٦ <span style="color:var(--amber-500);">فئة</span></div>
+            <div class="stat-label">حديد • خرسانة • بلوك • طوب • عزل • رمل • إسمنت • أخشاب • سباكة وكهرباء • معدات ثقيلة • بلاط وسيراميك ورخام • جبس • أبواب ونوافذ • تكييف وتهوية • معدات سلامة • سقالات وشدّات</div>
           </div>
           <div>
             <div class="stat-num">٢٤ <span style="color:var(--amber-500);">ساعة</span></div>
@@ -6870,9 +6870,13 @@ p {
           [/خشب|أخشاب/, 'timber'],
           [/سباك|أنابيب|مواسير|صرف/, 'plumbing'],
           [/كهرب|إنارة|انارة/, 'electrical'],
+          [/سلامة|سلامه|وقاية|وقايه/, 'safety'],
           [/معدات|ثقيل|حفر|ردم|رفع|تمهيد|سفلت|شاحن|مركبات/, 'machinery'],
-          [/سيراميك|بلاط/, 'ceramic'],
-          [/أبواب|باب/, 'doors'],
+          [/سيراميك|بلاط|رخام/, 'ceramic'],
+          [/أبواب|باب|نوافذ|نافذة|ألمنيوم|المنيوم|المونيوم/, 'doors'],
+          [/جبس/, 'gypsum'],
+          [/تكييف|تكيف|تهوية|تهويه/, 'hvac'],
+          [/سقالات|سقالة|سقاله|شدّات|شدات|شدة/, 'scaffold'],
         ];
         window.catBgSlug = function(label){ const s=String(label||''); for (const [re,slug] of MAP) if (re.test(s)) return slug; return ''; };
         window.catBgImagePath = function(label){ const slug=window.catBgSlug(label); return slug ? ('media/categories/'+slug+'.webp') : ''; };
@@ -7097,7 +7101,7 @@ p {
               {area:'حي السلي'},
               {area:'صناعية الشفاء'},
             ],
-            'السباكة': [
+            'السباكة والكهرباء': [
               {area:'شارع التخصصي'},
               {area:'شارع الفرزدق (الملز)'},
               {area:'حي السلي / الملز'},
@@ -7118,8 +7122,6 @@ p {
               {area:'حي العزيزية'},
               {area:'طريق الخرج'},
               {area:'صناعية الشفاء'},
-            ],
-            'الكهرباء': [
               {area:'المدينة الصناعية الثانية'},
               {area:'حي الملز'},
               {area:'طريق خريص / الملز'},
@@ -7334,6 +7336,9 @@ p {
           'المدينة المنورة': ['المدينة الصناعية','طريق الصناعية','المنطقة الصناعية – طريق خالد بن الوليد','طريق تبوك','طريق الهجرة','طريق المطار','الدائري الثالث'],
         };
         for (const _c in HEAVY_AREAS){ if (DIR_CITIES[_c]) DIR_CITIES[_c]['معدات ثقيلة'] = HEAVY_AREAS[_c].map(a => ({ area: a })); }
+        // Newer categories — shown as directory tiles (photo only, no area chips yet).
+        const EXTRA_CATS = ['البلاط والسيراميك والرخام','الجبس والجبس بورد','الأبواب والنوافذ والألمنيوم','التكييف والتهوية','معدات السلامة والوقاية','السقالات والشدّات'];
+        for (const _c in DIR_CITIES){ for (const _cat of EXTRA_CATS){ if (!DIR_CITIES[_c][_cat]) DIR_CITIES[_c][_cat] = []; } }
         const ICONS = { 'الرمل والبحص':'','الحديد':'','الخرسانة الجاهزة':'','البلوك والإنترلوك':'','الطوب الأحمر':'','مواد العزل':'','الإسمنت':'','الأخشاب ومواد البناء':'','السباكة':'','الكهرباء':'','معدات ثقيلة':'' };
         const ALL_LABEL = 'كل المملكة';
         let activeCity = localStorage.getItem('medad_city') || ALL_LABEL;
@@ -7788,10 +7793,15 @@ p {
                 <option>طوب</option>
                 <option>حديد تسليح</option>
                 <option>أخشاب</option>
-                <option>أبواب</option>
-                <option>معدات ثقيلة</option>
-                <option>سيراميك</option>
                 <option>أسمنت</option>
+                <option>معدات ثقيلة</option>
+                <option>سباكة وكهرباء</option>
+                <option>بلاط وسيراميك ورخام</option>
+                <option>جبس وجبس بورد</option>
+                <option>أبواب ونوافذ وألمنيوم</option>
+                <option>تكييف وتهوية</option>
+                <option>معدات سلامة ووقاية</option>
+                <option>سقالات وشدّات</option>
                 <option>أخرى</option>
               </select>
             </div>
@@ -7968,6 +7978,12 @@ p {
             <label class="cat-chip"><input type="checkbox" name="cats" value="مواد سباكة وعزل"><span class="box">✓</span><span class="txt">مواد سباكة وعزل</span></label>
             <label class="cat-chip"><input type="checkbox" name="cats" value="مواد كهرباء وإنارة"><span class="box">✓</span><span class="txt">مواد كهرباء وإنارة</span></label>
             <label class="cat-chip"><input type="checkbox" name="cats" value="معدات ثقيلة" id="sregHeavyChk"><span class="box">✓</span><span class="txt">معدات ثقيلة</span></label>
+            <label class="cat-chip"><input type="checkbox" name="cats" value="بلاط وسيراميك ورخام"><span class="box">✓</span><span class="txt">بلاط وسيراميك ورخام</span></label>
+            <label class="cat-chip"><input type="checkbox" name="cats" value="جبس وجبس بورد"><span class="box">✓</span><span class="txt">جبس وجبس بورد</span></label>
+            <label class="cat-chip"><input type="checkbox" name="cats" value="أبواب ونوافذ وألمنيوم"><span class="box">✓</span><span class="txt">أبواب ونوافذ وألمنيوم</span></label>
+            <label class="cat-chip"><input type="checkbox" name="cats" value="تكييف وتهوية"><span class="box">✓</span><span class="txt">تكييف وتهوية</span></label>
+            <label class="cat-chip"><input type="checkbox" name="cats" value="معدات سلامة ووقاية"><span class="box">✓</span><span class="txt">معدات سلامة ووقاية</span></label>
+            <label class="cat-chip"><input type="checkbox" name="cats" value="سقالات وشدّات"><span class="box">✓</span><span class="txt">سقالات وشدّات</span></label>
             <label class="cat-chip"><input type="checkbox" name="cats" value="أخرى" id="sregOtherChk"><span class="box">✓</span><span class="txt">أخرى</span></label>
           </div>
           <div id="sregEquipWrap" style="display:none;">
