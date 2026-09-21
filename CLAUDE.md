@@ -2,7 +2,7 @@
 
 Saudi B2B construction-materials brokerage. Contractors send a request; the
 owner negotiates with suppliers and returns one complete quote. **Launch:
-1 November 2026.**
+1 December 2026.**
 
 Arabic-first, RTL. The audience is Saudi contractors, often on mobile data.
 

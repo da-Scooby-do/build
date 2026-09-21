@@ -6531,7 +6531,7 @@ p {
   <!-- ===== Sitewide launch banner ===== -->
   <div class="launch-banner" id="launchBanner" role="status" aria-live="polite">
     <div class="container" style="display:flex; align-items:center; justify-content:center; gap:14px; flex-wrap:wrap; padding:0 16px;">
-      <span style="font-weight:700;">الافتتاح الرسمي ١ نوفمبر ٢٠٢٦</span>
+      <span style="font-weight:700;">الافتتاح الرسمي ١ ديسمبر ٢٠٢٦</span>
       <span style="opacity:.85; font-size:.86rem;">— استقبال الطلبات بدأ مبكرًا</span>
       <a href="#rfq" data-link style="background:rgba(212,165,99,.25); color:#fff; padding:5px 14px; border-radius:999px; text-decoration:none; font-weight:700; font-size:.84rem; border:1px solid rgba(212,165,99,.55);">اطلب الآن ←</a>
     </div>
@@ -6673,7 +6673,7 @@ p {
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 2l2.39 7.36H22l-6.19 4.5L18.18 22 12 17.27 5.82 22l2.37-8.14L2 9.36h7.61z" />
           </svg>
-          الافتتاح الرسمي ١ نوفمبر ٢٠٢٦ — استقبال الطلبات بدأ مبكرًا
+          الافتتاح الرسمي ١ ديسمبر ٢٠٢٦ — استقبال الطلبات بدأ مبكرًا
         </span>
         <h1 class="reveal d1">احتياجك من <em>مواد البناء</em> <br/>في كل المملكة — اطلب، قارن، واختار المناسب.</h1>
         <p class="lead reveal d2">أرسل لنا احتياجك — النوع، الكمية، وموعد التسليم — ونتواصل بالنيابة عنك مع شبكة واسعة من المصانع والموردين في الرياض، جدة، والمدينة المنورة، نتفاوض على أفضل سعر، ونوافيك بعرض كامل: السعر، الكمية المتوفرة، ووقت التسليم.</p>
@@ -6785,7 +6785,7 @@ p {
             <div class="stat-label">متوسط زمن الرد على الطلبات</div>
           </div>
           <div>
-            <div class="stat-num">٠١ <span style="color:var(--amber-500);">نوفمبر</span></div>
+            <div class="stat-num">٠١ <span style="color:var(--amber-500);">ديسمبر</span></div>
             <div class="stat-label">الافتتاح الرسمي ٢٠٢٦</div>
           </div>
         </div>
@@ -7434,13 +7434,13 @@ p {
         render();
 
         /* ===== LAUNCH COUNTDOWN to 1 Nov 2026 ===== */
-        const target = new Date('2026-11-01T00:00:00+03:00').getTime();
+        const target = new Date('2026-12-01T00:00:00+03:00').getTime();
         const cdRoot = document.getElementById('launchCountdown');
         if (cdRoot){
           function tick(){
             const ms = target - Date.now();
             if (ms <= 0){
-              cdRoot.innerHTML = '<div style="font-family:var(--font-display); font-size:1.6rem; color:#fff; font-weight:700; background:rgba(212,165,99,.35); padding:20px 32px; border-radius:14px;">تم الافتتاح الرسمي — ١ نوفمبر ٢٠٢٦</div>';
+              cdRoot.innerHTML = '<div style="font-family:var(--font-display); font-size:1.6rem; color:#fff; font-weight:700; background:rgba(212,165,99,.35); padding:20px 32px; border-radius:14px;">تم الافتتاح الرسمي — ١ ديسمبر ٢٠٢٦</div>';
               return;
             }
             const pad = n => String(n).padStart(2,'0');
@@ -13137,7 +13137,7 @@ p {
       const box = document.getElementById('launchCountdown');
       if (!box) return;
 
-      const TARGET = new Date('2026-11-01T00:00:00+03:00').getTime();
+      const TARGET = new Date('2026-12-01T00:00:00+03:00').getTime();
       const cell = k => box.querySelector('[data-cd="' + k + '"]');
       const cells = { d: cell('d'), h: cell('h'), m: cell('m'), s: cell('s') };
       if (!cells.d) return;
