@@ -6778,7 +6778,7 @@ p {
           </div>
           <div>
             <div class="stat-num">١٦ <span style="color:var(--amber-500);">فئة</span></div>
-            <div class="stat-label">حديد • خرسانة • بلوك • طوب • عزل • رمل • إسمنت • أخشاب • سباكة وكهرباء • معدات ثقيلة • بلاط وسيراميك ورخام • جبس • أبواب ونوافذ • تكييف وتهوية • معدات سلامة • سقالات وشدّات</div>
+            <div class="stat-label">معدات ثقيلة • حديد • خرسانة • بلوك • طوب • عزل • رمل • إسمنت • أخشاب • سباكة وكهرباء • بلاط وسيراميك ورخام • جبس • أبواب ونوافذ • تكييف وتهوية • معدات سلامة • سقالات وشدّات</div>
           </div>
           <div>
             <div class="stat-num">٢٤ <span style="color:var(--amber-500);">ساعة</span></div>
@@ -7339,6 +7339,15 @@ p {
         // Newer categories — shown as directory tiles (photo only, no area chips yet).
         const EXTRA_CATS = ['البلاط والسيراميك والرخام','الجبس والجبس بورد','الأبواب والنوافذ والألمنيوم','التكييف والتهوية','معدات السلامة والوقاية','السقالات والشدّات'];
         for (const _c in DIR_CITIES){ for (const _cat of EXTRA_CATS){ if (!DIR_CITIES[_c][_cat]) DIR_CITIES[_c][_cat] = []; } }
+        // Show معدات ثقيلة first in every city (drives grid + tab order).
+        for (const _c in DIR_CITIES){
+          const _city = DIR_CITIES[_c];
+          if (_city['معدات ثقيلة']){
+            const _re = { 'معدات ثقيلة': _city['معدات ثقيلة'] };
+            for (const _k in _city){ if (_k !== 'معدات ثقيلة') _re[_k] = _city[_k]; }
+            DIR_CITIES[_c] = _re;
+          }
+        }
         const ICONS = { 'الرمل والبحص':'','الحديد':'','الخرسانة الجاهزة':'','البلوك والإنترلوك':'','الطوب الأحمر':'','مواد العزل':'','الإسمنت':'','الأخشاب ومواد البناء':'','السباكة':'','الكهرباء':'','معدات ثقيلة':'' };
         const ALL_LABEL = 'كل المملكة';
         let activeCity = localStorage.getItem('medad_city') || ALL_LABEL;
