@@ -5141,6 +5141,8 @@ body:has(.modal-backdrop.open) .bottom-tab-bar { display: none !important; }
     }
     [data-theme="dark"] .city-menu-search { background: #16243d; border-color: rgba(212,165,99,.35); color: #e8eef8; }
     [data-theme="dark"] .city-menu-region { color: #d4a563; }
+    .city-menu button.city-menu-back { color: #a4762e; font-weight: 800; border-bottom: 1px dashed rgba(212,165,99,.4); border-radius: 10px 10px 0 0; margin-bottom: 4px; }
+    [data-theme="dark"] .city-menu button.city-menu-back { color: #d4a563; }
 
     /* ===== Supplier goal + no-fee note ===== */
     .supplier-goal {
@@ -6608,10 +6610,8 @@ body:has(.modal-backdrop.open) .bottom-tab-bar { display: none !important; }
             <div class="city-menu" id="cityMenu" role="menu">
               <div class="city-menu-head">اختر المنطقة</div>
               <input type="search" class="city-menu-search" id="cityMenuSearch" placeholder="ابحث عن مدينتك…" aria-label="ابحث عن مدينة" autocomplete="off">
-              <div class="city-menu-list" id="cityMenuList">
-                <button onclick="setCity('كل المملكة')" data-city="كل المملكة"><span>كل المملكة</span></button>
-                <!-- Every city, grouped by region — filled from SA_REGIONS at boot. -->
-              </div>
+              <!-- Regions, then the chosen region's cities — rendered from SA_REGIONS. -->
+              <div class="city-menu-list" id="cityMenuList"></div>
             </div>
           </div>
           <button class="theme-toggle" onclick="toggleTheme()" aria-label="تبديل الوضع الداكن"
@@ -7447,25 +7447,41 @@ body:has(.modal-backdrop.open) .bottom-tab-bar { display: none !important; }
         const cityMenu = document.getElementById('cityMenu');
         const cityMenuList = document.getElementById('cityMenuList');
         const cityMenuSearch = document.getElementById('cityMenuSearch');
+        // Two steps: the menu lists the 13 regions; tapping one shows its cities.
+        // Typing in the search box lists matching cities from every region.
+        const markActiveCity = () => { if (cityMenu) cityMenu.querySelectorAll('button[data-city]').forEach(b => b.classList.toggle('active', b.dataset.city === activeCity)); };
+        const cityBtn = c => `<button type="button" onclick="setCity('${c}')" data-city="${c}"><span>${c}</span></button>`;
+        const allBtn = cityBtn(ALL_LABEL);
+        const showRegions = () => {
+          if (!cityMenuList) return;
+          cityMenuList.innerHTML = allBtn + window.SA_REGIONS.map(([region, cities], i) =>
+            `<button type="button" data-region-idx="${i}"><span>${region}</span><span class="count">${toAR(cities.length)} ‹</span></button>`).join('');
+          markActiveCity();
+        };
+        const showCities = i => {
+          const [region, cities] = window.SA_REGIONS[i];
+          cityMenuList.innerHTML = `<button type="button" class="city-menu-back" data-back><span>→ ${region}</span><span class="count">كل المناطق</span></button>` + cities.map(cityBtn).join('');
+          markActiveCity();
+        };
+        window.__cityMenuReset = () => { if (cityMenuSearch) cityMenuSearch.value = ''; showRegions(); };
         if (cityMenuList) {
-          cityMenuList.insertAdjacentHTML('beforeend', window.SA_REGIONS.map(([region, cities]) =>
-            `<div class="city-menu-region" data-region>${region}</div>` +
-            cities.map(c => `<button type="button" onclick="setCity('${c}')" data-city="${c}"><span>${c}</span></button>`).join('')
-          ).join(''));
+          showRegions();
+          cityMenuList.addEventListener('click', e => {
+            // The list is re-rendered on these clicks; stop them reaching the
+            // outside-click closer, which would see a detached target.
+            const r = e.target.closest('[data-region-idx]');
+            if (r) { e.stopPropagation(); showCities(+r.dataset.regionIdx); return; }
+            if (e.target.closest('[data-back]')) { e.stopPropagation(); showRegions(); }
+          });
         }
         if (cityMenuSearch && cityMenuList) {
           const norm = t => String(t).replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').trim();
           cityMenuSearch.addEventListener('input', () => {
             const q = norm(cityMenuSearch.value);
-            let header = null, headerHasMatch = false;
-            const flush = () => { if (header) header.style.display = headerHasMatch ? '' : 'none'; };
-            for (const el of cityMenuList.children) {
-              if (el.hasAttribute('data-region')) { flush(); header = el; headerHasMatch = false; continue; }
-              const hit = !q || norm(el.dataset.city).includes(q);
-              el.style.display = hit ? '' : 'none';
-              if (hit && header) headerHasMatch = true;
-            }
-            flush();
+            if (!q) { showRegions(); return; }
+            const hits = window.SA_REGIONS.flatMap(r => r[1]).filter(c => norm(c).includes(q));
+            cityMenuList.innerHTML = hits.length ? hits.map(cityBtn).join('') : '<div class="city-menu-region">لا توجد نتائج</div>';
+            markActiveCity();
           });
         }
         if (!tabs || !content) return;
@@ -7523,6 +7539,7 @@ body:has(.modal-backdrop.open) .bottom-tab-bar { display: none !important; }
           if (!cityMenu) return;
           const pill = document.getElementById('cityPill');
           if (pill) cityMenu.style.setProperty('--city-menu-top', (pill.getBoundingClientRect().bottom + 8) + 'px');
+          if (!cityMenu.classList.contains('open') && window.__cityMenuReset) window.__cityMenuReset();
           cityMenu.classList.toggle('open');
         };
         document.addEventListener('click', (e) => {
@@ -7532,17 +7549,34 @@ body:has(.modal-backdrop.open) .bottom-tab-bar { display: none !important; }
         });
         render();
 
-        // Quote-form + supplier-form city dropdowns: one optgroup per region, "أخرى" kept last.
+        // Form city dropdowns: pick a region first, then the city select appears
+        // with that region's cities. The region select has no name, so only
+        // the city is submitted. The trailing "أخرى" option stays a choice.
         document.addEventListener('DOMContentLoaded', () => {
           for (const sel of [document.getElementById('rfqCitySelect'), document.getElementById('sregCitySelect'), document.getElementById('waCitySelect')]) {
             if (!sel) continue;
-            const other = sel.lastElementChild;
-            for (const [region, cities] of window.SA_REGIONS) {
-              const g = document.createElement('optgroup');
-              g.label = region;
-              for (const c of cities) g.appendChild(new Option(c, c));
-              sel.insertBefore(g, other);
-            }
+            const otherLabel = sel.lastElementChild.textContent;
+            const regionSel = document.createElement('select');
+            regionSel.required = true;
+            regionSel.className = sel.className;
+            regionSel.setAttribute('aria-label', 'المنطقة');
+            regionSel.innerHTML = '<option value="">اختر المنطقة…</option>' +
+              window.SA_REGIONS.map(([region], i) => `<option value="${i}">${region}</option>`).join('') +
+              `<option value="other">${otherLabel}</option>`;
+            sel.parentNode.insertBefore(regionSel, sel);
+            sel.style.marginTop = '10px';
+            const sync = () => {
+              const v = regionSel.value;
+              if (v === '' ) { sel.innerHTML = '<option value="">اختر المدينة…</option>'; sel.disabled = true; sel.style.display = 'none'; return; }
+              if (v === 'other') { sel.innerHTML = `<option>${otherLabel}</option>`; sel.disabled = false; sel.style.display = 'none'; return; }
+              const cities = window.SA_REGIONS[+v][1];
+              sel.innerHTML = '<option value="">اختر المدينة…</option>' + cities.map(c => `<option>${c}</option>`).join('');
+              sel.disabled = false; sel.style.display = '';
+            };
+            regionSel.addEventListener('change', sync);
+            // form.reset() puts the region back to its placeholder; follow it.
+            sel.form?.addEventListener('reset', () => setTimeout(sync, 0));
+            sync();
           }
         });
 
