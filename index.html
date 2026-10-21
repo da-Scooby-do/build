@@ -5141,9 +5141,8 @@ p {
     [data-theme="dark"] .city-menu-region { color: #d4a563; }
 
     /* ===== Supplier goal + no-fee note ===== */
-    .supplier-goal-sec { padding-block: 28px 0; }
     .supplier-goal {
-      max-width: 760px; margin-inline: auto;
+      max-width: 560px; margin-top: 22px;
       background: #fff; border: 1px solid rgba(212,165,99,.35);
       border-radius: 16px; padding: 20px 22px;
       box-shadow: 0 6px 18px rgba(8,21,42,.05);
@@ -6742,6 +6741,20 @@ p {
           </div>
         </div>
 
+        <!-- Supplier goal — the number is the live count of approved supplier
+             applications (rpc joined_supplier_count), never a timer. -->
+        <div class="supplier-goal" id="supplierGoal">
+          <div class="sg-head">
+            <span class="sg-num" id="sgNumWrap" hidden><b id="sgCount">٠</b> / ١٥٠</span>
+            <span class="sg-label"><span id="sgJoined" hidden>مورد انضموا إلى شبكة مداد — </span>هدفنا ١٥٠ موردًا</span>
+          </div>
+          <div class="sg-bar" id="sgBar" hidden role="progressbar" aria-valuemin="0" aria-valuemax="150" aria-valuenow="0" aria-label="عدد الموردين المنضمين من أصل ١٥٠"><span id="sgFill"></span></div>
+          <p class="no-fee-note">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+            مداد لا يأخذ أي رسوم إضافية على طلبك
+          </p>
+        </div>
+
         <div class="hero-ctas reveal d4" style="display:flex; gap:14px; flex-wrap:wrap; margin-top:34px;">
           <a href="#rfq" data-link class="btn btn-amber" style="padding:15px 30px; font-size:1.05rem; gap:10px; align-items:center; display:inline-flex;">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
@@ -6833,24 +6846,6 @@ p {
             <div class="stat-num">٠١ <span style="color:var(--amber-500);">ديسمبر</span></div>
             <div class="stat-label">الافتتاح الرسمي ٢٠٢٦</div>
           </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Supplier goal — the number is the live count of approved supplier
-         applications (rpc joined_supplier_count), never a timer. -->
-    <section class="section supplier-goal-sec">
-      <div class="container">
-        <div class="supplier-goal" id="supplierGoal">
-          <div class="sg-head">
-            <span class="sg-num" id="sgNumWrap" hidden><b id="sgCount">٠</b> / ١٥٠</span>
-            <span class="sg-label"><span id="sgJoined" hidden>مورد انضموا إلى شبكة مداد — </span>هدفنا ١٥٠ موردًا</span>
-          </div>
-          <div class="sg-bar" id="sgBar" hidden role="progressbar" aria-valuemin="0" aria-valuemax="150" aria-valuenow="0" aria-label="عدد الموردين المنضمين من أصل ١٥٠"><span id="sgFill"></span></div>
-          <p class="no-fee-note">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-            مداد لا يأخذ أي رسوم إضافية على طلبك
-          </p>
         </div>
       </div>
     </section>
@@ -6956,10 +6951,10 @@ p {
       })();
     </script>
     <script>
-      // Every Saudi city (governorate seats), grouped by the 13 regions.
+      // Saudi cities (no small towns), grouped by the 13 regions.
       // Single source for the header city menu and the quote-form dropdown;
-      // the same 140 names live in public.cities for the address forms.
-      window.SA_REGIONS = [["منطقة الرياض",["الرياض","الخرج","الدرعية","المجمعة","الزلفي","الدوادمي","وادي الدواسر","شقراء","عفيف","القويعية","الأفلاج","حوطة بني تميم","السليل","المزاحمية","ضرما","رماح","ثادق","حريملاء","الغاط","الحريق","مرات","الدلم"]],["منطقة مكة المكرمة",["مكة المكرمة","جدة","الطائف","رابغ","القنفذة","الليث","الجموم","خليص","الكامل","بحرة","رنية","تربة","الخرمة","المويه","ميسان","أضم","العرضيات"]],["منطقة المدينة المنورة",["المدينة المنورة","ينبع","العلا","بدر","خيبر","المهد","الحناكية","العيص","وادي الفرع"]],["منطقة القصيم",["بريدة","عنيزة","الرس","المذنب","البكيرية","البدائع","الأسياح","النبهانية","الشماسية","عيون الجواء","رياض الخبراء","عقلة الصقور","ضرية"]],["المنطقة الشرقية",["الدمام","الخبر","الظهران","الأحساء","الجبيل","القطيف","حفر الباطن","الخفجي","رأس تنورة","بقيق","النعيرية","قرية العليا","العديد"]],["منطقة عسير",["أبها","خميس مشيط","بيشة","محايل عسير","النماص","رجال ألمع","سراة عبيدة","ظهران الجنوب","تثليث","أحد رفيدة","بلقرن","المجاردة","البرك"]],["منطقة تبوك",["تبوك","الوجه","ضباء","تيماء","أملج","حقل","البدع"]],["منطقة حائل",["حائل","بقعاء","الغزالة","الشنان","الحائط","السليمي","الشملي","موقق"]],["منطقة الحدود الشمالية",["عرعر","رفحاء","طريف","العويقيلة"]],["منطقة جازان",["جازان","صبيا","أبو عريش","صامطة","بيش","الدرب","العارضة","أحد المسارحة","فرسان","الداير","العيدابي","الحرث","ضمد","الريث","الطوال"]],["منطقة نجران",["نجران","شرورة","حبونا","بدر الجنوب","يدمة","ثار","خباش"]],["منطقة الباحة",["الباحة","بلجرشي","المندق","المخواة","العقيق","قلوة","القرى","بني حسن"]],["منطقة الجوف",["سكاكا","القريات","دومة الجندل","طبرجل"]]];
+      // the same names live in public.cities for the address forms.
+      window.SA_REGIONS = [["منطقة الرياض",["الرياض","الخرج","الدرعية","المجمعة","الزلفي","الدوادمي","وادي الدواسر","عفيف","شقراء","الأفلاج","القويعية"]],["منطقة مكة المكرمة",["مكة المكرمة","جدة","الطائف","رابغ","القنفذة","الليث","الجموم"]],["منطقة المدينة المنورة",["المدينة المنورة","ينبع","العلا","بدر","خيبر"]],["منطقة القصيم",["بريدة","عنيزة","الرس","المذنب","البكيرية","البدائع"]],["المنطقة الشرقية",["الدمام","الخبر","الظهران","الأحساء","الجبيل","القطيف","حفر الباطن","الخفجي","رأس تنورة","بقيق","النعيرية"]],["منطقة عسير",["أبها","خميس مشيط","بيشة","محايل عسير","النماص","أحد رفيدة"]],["منطقة تبوك",["تبوك","الوجه","ضباء","تيماء","أملج","حقل"]],["منطقة حائل",["حائل","بقعاء"]],["منطقة الحدود الشمالية",["عرعر","رفحاء","طريف"]],["منطقة جازان",["جازان","صبيا","أبو عريش","صامطة","بيش"]],["منطقة نجران",["نجران","شرورة"]],["منطقة الباحة",["الباحة","بلجرشي"]],["منطقة الجوف",["سكاكا","القريات","دومة الجندل"]]];
       (function(){
         const DIR_CITIES = {
           'الرياض': {
@@ -7577,10 +7572,7 @@ p {
             };
             requestAnimationFrame(step);
           };
-          if ('IntersectionObserver' in window) {
-            const io = new IntersectionObserver(es => { if (es.some(x => x.isIntersecting)) { io.disconnect(); show(); } });
-            io.observe(box);
-          } else show();
+          show();
         });
 
         /* ===== LAUNCH COUNTDOWN to 1 Nov 2026 ===== */
@@ -9890,7 +9882,7 @@ p {
       const [cats, sups, cits] = await Promise.all([
         window.supabaseClient.from('categories').select('id, name_ar').order('sort_order'),
         window.supabaseClient.from('suppliers').select('id, name_ar').order('name_ar'),
-        window.supabaseClient.from('cities').select('code, name_ar').order('name_ar')
+        window.supabaseClient.from('cities').select('code, name_ar').eq('is_active', true).order('name_ar')
       ]);
       const catSel = form.category_id;
       const supSel = form.supplier_id;
@@ -10447,7 +10439,7 @@ p {
       // the customer sees an empty dropdown and cannot save an address at all.
       try {
         const { data: cities, error: citiesError } = await window.supabaseClient
-          .from('cities').select('code, name_ar').order('name_ar');
+          .from('cities').select('code, name_ar').eq('is_active', true).order('name_ar');
         const sel = form.city_code;
         if (citiesError) throw citiesError;
         if (!cities || !cities.length) throw new Error('empty city list');
