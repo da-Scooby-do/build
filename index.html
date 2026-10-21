@@ -5126,6 +5126,49 @@ p {
       z-index: 1200;
     }
     .city-menu.open { display: block; }
+    .city-menu-search {
+      display: block; width: 100%; box-sizing: border-box;
+      margin: 0 0 6px; padding: 9px 12px;
+      border: 1px solid rgba(212,165,99,.4); border-radius: 10px;
+      font: inherit; font-size: .88rem; background: #fff; color: inherit;
+    }
+    .city-menu-list { max-height: min(60vh, 420px); overflow-y: auto; overscroll-behavior: contain; }
+    .city-menu-region {
+      padding: 10px 14px 4px; font-size: .74rem; font-weight: 800;
+      color: #a4762e; letter-spacing: 0;
+    }
+    [data-theme="dark"] .city-menu-search { background: #16243d; border-color: rgba(212,165,99,.35); color: #e8eef8; }
+    [data-theme="dark"] .city-menu-region { color: #d4a563; }
+
+    /* ===== Supplier goal + no-fee note ===== */
+    .supplier-goal-sec { padding-block: 28px 0; }
+    .supplier-goal {
+      max-width: 760px; margin-inline: auto;
+      background: #fff; border: 1px solid rgba(212,165,99,.35);
+      border-radius: 16px; padding: 20px 22px;
+      box-shadow: 0 6px 18px rgba(8,21,42,.05);
+    }
+    .sg-head { display: flex; align-items: baseline; gap: 10px 14px; flex-wrap: wrap; margin-bottom: 12px; }
+    .sg-num { font-family: var(--font-display); font-weight: 800; font-size: 1.6rem; color: var(--navy-900); white-space: nowrap; }
+    .sg-num b { color: var(--amber-500); }
+    .sg-label { color: var(--gray-600); font-size: .95rem; font-weight: 600; }
+    .sg-bar { height: 10px; border-radius: 999px; background: rgba(212,165,99,.18); overflow: hidden; }
+    .sg-bar span {
+      display: block; height: 100%; width: 0;
+      background: linear-gradient(90deg, #E08A2E, #d4a563);
+      border-radius: inherit; transition: width 1.4s cubic-bezier(.22,.61,.36,1);
+    }
+    .no-fee-note {
+      display: flex; align-items: center; gap: 8px;
+      margin: 14px 0 0; color: #1f7a4d; font-weight: 700; font-size: .92rem;
+    }
+    .no-fee-note svg { flex-shrink: 0; }
+    .rfq-form .no-fee-note { margin: 0; }
+    @media (prefers-reduced-motion: reduce) { .sg-bar span { transition: none; } }
+    [data-theme="dark"] .supplier-goal { background: #0f1a2e; border-color: rgba(212,165,99,.3); }
+    [data-theme="dark"] .sg-num { color: #f3f6fc; }
+    [data-theme="dark"] .sg-label { color: #93acd1; }
+    [data-theme="dark"] .no-fee-note { color: #5fd39a; }
     .city-menu-head {
       padding: 8px 14px 12px;
       font-size: .78rem;
@@ -5249,7 +5292,8 @@ p {
       .auth-card input { font-size: 16px !important; }
 
       /* ----- City menu — keep it visible on phone ----- */
-      .city-menu { right: 0 !important; left: auto !important; transform: none !important; min-width: 240px !important; }
+      /* Fixed to the viewport with a 16px gutter; top is set from the pill on open. */
+      .city-menu { position: fixed !important; top: var(--city-menu-top, 120px) !important; right: 16px !important; left: 16px !important; transform: none !important; min-width: 0 !important; }
 
       /* ----- Footer ----- */
       footer .container, .site-footer .container { grid-template-columns: 1fr !important; gap: 24px !important; text-align: right; }
@@ -6562,10 +6606,11 @@ p {
             </button>
             <div class="city-menu" id="cityMenu" role="menu">
               <div class="city-menu-head">اختر المنطقة</div>
-              <button onclick="setCity('كل المملكة')" data-city="كل المملكة"><span>كل المملكة</span></button>
-              <button onclick="setCity('الرياض')" data-city="الرياض"><span>الرياض</span></button>
-              <button onclick="setCity('جدة')" data-city="جدة"><span>جدة</span></button>
-              <button onclick="setCity('المدينة المنورة')" data-city="المدينة المنورة"><span>المدينة المنورة</span></button>
+              <input type="search" class="city-menu-search" id="cityMenuSearch" placeholder="ابحث عن مدينتك…" aria-label="ابحث عن مدينة" autocomplete="off">
+              <div class="city-menu-list" id="cityMenuList">
+                <button onclick="setCity('كل المملكة')" data-city="كل المملكة"><span>كل المملكة</span></button>
+                <!-- Every city, grouped by region — filled from SA_REGIONS at boot. -->
+              </div>
             </div>
           </div>
           <button class="theme-toggle" onclick="toggleTheme()" aria-label="تبديل الوضع الداكن"
@@ -6792,6 +6837,24 @@ p {
       </div>
     </section>
 
+    <!-- Supplier goal — the number is the live count of approved supplier
+         applications (rpc joined_supplier_count), never a timer. -->
+    <section class="section supplier-goal-sec">
+      <div class="container">
+        <div class="supplier-goal" id="supplierGoal">
+          <div class="sg-head">
+            <span class="sg-num" id="sgNumWrap" hidden><b id="sgCount">٠</b> / ١٥٠</span>
+            <span class="sg-label"><span id="sgJoined" hidden>مورد انضموا إلى شبكة مداد — </span>هدفنا ١٥٠ موردًا</span>
+          </div>
+          <div class="sg-bar" id="sgBar" hidden role="progressbar" aria-valuemin="0" aria-valuemax="150" aria-valuenow="0" aria-label="عدد الموردين المنضمين من أصل ١٥٠"><span id="sgFill"></span></div>
+          <p class="no-fee-note">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+            مداد لا يأخذ أي رسوم إضافية على طلبك
+          </p>
+        </div>
+      </div>
+    </section>
+
     <!-- =====================================================
          MEDINA SUPPLIER DIRECTORY
          ===================================================== -->
@@ -6893,6 +6956,10 @@ p {
       })();
     </script>
     <script>
+      // Every Saudi city (governorate seats), grouped by the 13 regions.
+      // Single source for the header city menu and the quote-form dropdown;
+      // the same 140 names live in public.cities for the address forms.
+      window.SA_REGIONS = [["منطقة الرياض",["الرياض","الخرج","الدرعية","المجمعة","الزلفي","الدوادمي","وادي الدواسر","شقراء","عفيف","القويعية","الأفلاج","حوطة بني تميم","السليل","المزاحمية","ضرما","رماح","ثادق","حريملاء","الغاط","الحريق","مرات","الدلم"]],["منطقة مكة المكرمة",["مكة المكرمة","جدة","الطائف","رابغ","القنفذة","الليث","الجموم","خليص","الكامل","بحرة","رنية","تربة","الخرمة","المويه","ميسان","أضم","العرضيات"]],["منطقة المدينة المنورة",["المدينة المنورة","ينبع","العلا","بدر","خيبر","المهد","الحناكية","العيص","وادي الفرع"]],["منطقة القصيم",["بريدة","عنيزة","الرس","المذنب","البكيرية","البدائع","الأسياح","النبهانية","الشماسية","عيون الجواء","رياض الخبراء","عقلة الصقور","ضرية"]],["المنطقة الشرقية",["الدمام","الخبر","الظهران","الأحساء","الجبيل","القطيف","حفر الباطن","الخفجي","رأس تنورة","بقيق","النعيرية","قرية العليا","العديد"]],["منطقة عسير",["أبها","خميس مشيط","بيشة","محايل عسير","النماص","رجال ألمع","سراة عبيدة","ظهران الجنوب","تثليث","أحد رفيدة","بلقرن","المجاردة","البرك"]],["منطقة تبوك",["تبوك","الوجه","ضباء","تيماء","أملج","حقل","البدع"]],["منطقة حائل",["حائل","بقعاء","الغزالة","الشنان","الحائط","السليمي","الشملي","موقق"]],["منطقة الحدود الشمالية",["عرعر","رفحاء","طريف","العويقيلة"]],["منطقة جازان",["جازان","صبيا","أبو عريش","صامطة","بيش","الدرب","العارضة","أحد المسارحة","فرسان","الداير","العيدابي","الحرث","ضمد","الريث","الطوال"]],["منطقة نجران",["نجران","شرورة","حبونا","بدر الجنوب","يدمة","ثار","خباش"]],["منطقة الباحة",["الباحة","بلجرشي","المندق","المخواة","العقيق","قلوة","القرى","بني حسن"]],["منطقة الجوف",["سكاكا","القريات","دومة الجندل","طبرجل"]]];
       (function(){
         const DIR_CITIES = {
           'الرياض': {
@@ -7352,7 +7419,8 @@ p {
         const ICONS = { 'الرمل والبحص':'','الحديد':'','الخرسانة الجاهزة':'','البلوك والإنترلوك':'','الطوب الأحمر':'','مواد العزل':'','الإسمنت':'','الأخشاب ومواد البناء':'','السباكة':'','الكهرباء':'','معدات ثقيلة':'' };
         const ALL_LABEL = 'كل المملكة';
         let activeCity = localStorage.getItem('medad_city') || ALL_LABEL;
-        if (activeCity !== ALL_LABEL && !DIR_CITIES[activeCity]) activeCity = ALL_LABEL;
+        const SA_CITY_SET = new Set(window.SA_REGIONS.flatMap(r => r[1]));
+        if (activeCity !== ALL_LABEL && !SA_CITY_SET.has(activeCity)) activeCity = ALL_LABEL;
         // Build view for current city — either single-city or merged across all
         function getActiveData(){
           if (activeCity === ALL_LABEL) {
@@ -7366,7 +7434,11 @@ p {
             }
             return merged;
           }
-          return DIR_CITIES[activeCity] || {};
+          if (DIR_CITIES[activeCity]) return DIR_CITIES[activeCity];
+          // No area chips recorded for this city yet — show the same categories, empty.
+          const skel = {};
+          for (const city of Object.keys(DIR_CITIES)) for (const cat of Object.keys(DIR_CITIES[city])) skel[cat] = [];
+          return skel;
         }
         let activeCat = Object.keys(getActiveData())[0];
         let dirShowAll = false;
@@ -7376,6 +7448,29 @@ p {
         const dirHead = document.getElementById('dirHead');
         const pillLabel = document.getElementById('cityPillLabel');
         const cityMenu = document.getElementById('cityMenu');
+        const cityMenuList = document.getElementById('cityMenuList');
+        const cityMenuSearch = document.getElementById('cityMenuSearch');
+        if (cityMenuList) {
+          cityMenuList.insertAdjacentHTML('beforeend', window.SA_REGIONS.map(([region, cities]) =>
+            `<div class="city-menu-region" data-region>${region}</div>` +
+            cities.map(c => `<button type="button" onclick="setCity('${c}')" data-city="${c}"><span>${c}</span></button>`).join('')
+          ).join(''));
+        }
+        if (cityMenuSearch && cityMenuList) {
+          const norm = t => String(t).replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').trim();
+          cityMenuSearch.addEventListener('input', () => {
+            const q = norm(cityMenuSearch.value);
+            let header = null, headerHasMatch = false;
+            const flush = () => { if (header) header.style.display = headerHasMatch ? '' : 'none'; };
+            for (const el of cityMenuList.children) {
+              if (el.hasAttribute('data-region')) { flush(); header = el; headerHasMatch = false; continue; }
+              const hit = !q || norm(el.dataset.city).includes(q);
+              el.style.display = hit ? '' : 'none';
+              if (hit && header) headerHasMatch = true;
+            }
+            flush();
+          });
+        }
         if (!tabs || !content) return;
         function toAR(s){ return String(s).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]); }
         function esc(s){ return String(s).replace(/'/g,"\\'"); }
@@ -7417,7 +7512,7 @@ p {
           if (!dirShowAll) document.getElementById('suppliers-directory')?.scrollIntoView({ behavior: 'smooth' });
         };
         window.setCity = function(city){
-          if (city !== ALL_LABEL && !DIR_CITIES[city]) return;
+          if (city !== ALL_LABEL && !SA_CITY_SET.has(city)) return;
           activeCity = city;
           activeCat = Object.keys(getActiveData())[0];
           dirShowAll = false;
@@ -7426,13 +7521,66 @@ p {
           if (cityMenu) cityMenu.classList.remove('open');
           document.getElementById('suppliers-directory')?.scrollIntoView({ behavior: 'smooth' });
         };
-        window.toggleCityMenu = function(e){ if (e) e.stopPropagation(); if (cityMenu) cityMenu.classList.toggle('open'); };
+        window.toggleCityMenu = function(e){
+          if (e) e.stopPropagation();
+          if (!cityMenu) return;
+          const pill = document.getElementById('cityPill');
+          if (pill) cityMenu.style.setProperty('--city-menu-top', (pill.getBoundingClientRect().bottom + 8) + 'px');
+          cityMenu.classList.toggle('open');
+        };
         document.addEventListener('click', (e) => {
           if (!cityMenu) return;
           const pill = document.getElementById('cityPill');
           if (!cityMenu.contains(e.target) && (!pill || !pill.contains(e.target))) cityMenu.classList.remove('open');
         });
         render();
+
+        // Quote-form city dropdown: one optgroup per region, "أخرى" kept last.
+        document.addEventListener('DOMContentLoaded', () => {
+          const sel = document.getElementById('rfqCitySelect');
+          if (!sel) return;
+          const other = sel.lastElementChild;
+          for (const [region, cities] of window.SA_REGIONS) {
+            const g = document.createElement('optgroup');
+            g.label = region;
+            for (const c of cities) g.appendChild(new Option(c, c));
+            sel.insertBefore(g, other);
+          }
+        });
+
+        // Supplier goal: real count of approved suppliers out of 150.
+        // supabase-js resolves with { error } — it does not throw.
+        window.addEventListener('load', async () => {
+          const box = document.getElementById('supplierGoal');
+          if (!box || !window.supabaseClient) return;
+          const GOAL = 150;
+          const { data, error } = await window.supabaseClient.rpc('joined_supplier_count');
+          // Without a real number, show only the goal — never a placeholder count.
+          if (error || typeof data !== 'number') return;
+          for (const id of ['sgNumWrap', 'sgJoined', 'sgBar']) { const el = document.getElementById(id); if (el) el.hidden = false; }
+          const n = Math.max(0, Math.min(data, GOAL));
+          const countEl = document.getElementById('sgCount');
+          const fill = document.getElementById('sgFill');
+          const bar = document.getElementById('sgBar');
+          const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          const show = () => {
+            if (bar) bar.setAttribute('aria-valuenow', String(n));
+            // Keep a small visible sliver for the first few suppliers.
+            if (fill) fill.style.width = n ? `max(10px, ${n / GOAL * 100}%)` : '0';
+            if (reduce || n === 0) { countEl.textContent = toAR(n); return; }
+            const t0 = performance.now(), dur = 1400;
+            const step = now => {
+              const k = Math.min(1, (now - t0) / dur);
+              countEl.textContent = toAR(Math.round(n * (1 - Math.pow(1 - k, 3))));
+              if (k < 1) requestAnimationFrame(step);
+            };
+            requestAnimationFrame(step);
+          };
+          if ('IntersectionObserver' in window) {
+            const io = new IntersectionObserver(es => { if (es.some(x => x.isIntersecting)) { io.disconnect(); show(); } });
+            io.observe(box);
+          } else show();
+        });
 
         /* ===== LAUNCH COUNTDOWN to 1 Nov 2026 ===== */
         const target = new Date('2026-12-01T00:00:00+03:00').getTime();
@@ -7825,35 +7973,10 @@ p {
           <div class="row2">
             <div>
               <label>المدينة / موقع المشروع</label>
-              <!-- Covers all 13 regions so the form matches the
-                   "جميع مناطق المملكة" claim on the homepage. -->
-              <select required name="city">
+              <!-- Every city in all 13 regions, grouped by region — filled
+                   from SA_REGIONS at boot so it matches the header menu. -->
+              <select required name="city" id="rfqCitySelect">
                 <option value="">اختر المدينة…</option>
-                <option>الرياض</option>
-                <option>جدة</option>
-                <option>مكة المكرمة</option>
-                <option>المدينة المنورة</option>
-                <option>الدمام</option>
-                <option>الخبر</option>
-                <option>الظهران</option>
-                <option>الجبيل</option>
-                <option>الأحساء</option>
-                <option>الطائف</option>
-                <option>ينبع</option>
-                <option>تبوك</option>
-                <option>أبها</option>
-                <option>خميس مشيط</option>
-                <option>نجران</option>
-                <option>جازان</option>
-                <option>الباحة</option>
-                <option>بريدة</option>
-                <option>عنيزة</option>
-                <option>حائل</option>
-                <option>سكاكا</option>
-                <option>عرعر</option>
-                <option>القريات</option>
-                <option>الخرج</option>
-                <option>حفر الباطن</option>
                 <option>أخرى — حدّدها في التفاصيل</option>
               </select>
             </div>
@@ -7889,6 +8012,10 @@ p {
               <input type="tel" name="phone" required inputmode="tel" pattern="[+0-9٠-٩][0-9٠-٩\s\-]{8,14}" title="أدخل رقم جوال صحيح مثل 05xxxxxxxx" placeholder="05xxxxxxxx" />
             </div>
           </div>
+          <p class="no-fee-note">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+            مداد لا يأخذ أي رسوم إضافية على طلبك
+          </p>
           <button type="submit" class="btn btn-amber" style="justify-self:start;">
             إرسال طلب العرض
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
