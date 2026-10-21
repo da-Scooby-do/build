@@ -7535,16 +7535,17 @@ p {
         });
         render();
 
-        // Quote-form city dropdown: one optgroup per region, "أخرى" kept last.
+        // Quote-form + supplier-form city dropdowns: one optgroup per region, "أخرى" kept last.
         document.addEventListener('DOMContentLoaded', () => {
-          const sel = document.getElementById('rfqCitySelect');
-          if (!sel) return;
-          const other = sel.lastElementChild;
-          for (const [region, cities] of window.SA_REGIONS) {
-            const g = document.createElement('optgroup');
-            g.label = region;
-            for (const c of cities) g.appendChild(new Option(c, c));
-            sel.insertBefore(g, other);
+          for (const sel of [document.getElementById('rfqCitySelect'), document.getElementById('sregCitySelect')]) {
+            if (!sel) continue;
+            const other = sel.lastElementChild;
+            for (const [region, cities] of window.SA_REGIONS) {
+              const g = document.createElement('optgroup');
+              g.label = region;
+              for (const c of cities) g.appendChild(new Option(c, c));
+              sel.insertBefore(g, other);
+            }
           }
         });
 
@@ -8057,7 +8058,7 @@ p {
           <p>انضم اليوم إلى منصة مداد للبناء، وسهّل على آلاف المقاولين والعملاء في المملكة العثور على منتجاتك. نحن نربطك مباشرة بطلبات السوق الحقيقية، لنضمن لك تدفقاً مستمراً للفرص التجارية وتوسيع نطاق وصولك الجغرافي بكل سهولة.</p>
           <div class="sreg-steps">
             <span>١. عبّئ النموذج</span>
-            <span>٢. نتحقق من السجل التجاري</span>
+            <span>٢. نتواصل معك لإكمال التسجيل</span>
             <span>٣. تبدأ الطلبات بالوصول</span>
           </div>
         </div>
@@ -8071,37 +8072,17 @@ p {
               <input type="text" name="company_name" required placeholder="الاسم الرسمي المسجل" />
             </div>
             <div>
-              <label>رقم السجل التجاري *</label>
-              <input type="text" name="cr_number" required inputmode="numeric" pattern="[0-9٠-٩]{10}"
-                placeholder="١٠ أرقام — إلزامي للتحقق" title="رقم السجل التجاري: ١٠ أرقام" />
-            </div>
-          </div>
-          <div class="row2">
-            <div>
               <label>المدينة / المنطقة *</label>
-              <select name="city" required>
+              <!-- Filled from SA_REGIONS at boot, same list as the quote form. -->
+              <select name="city" required id="sregCitySelect">
                 <option value="">اختر المدينة…</option>
-                <option>الرياض</option>
-                <option>جدة</option>
-                <option>المدينة المنورة</option>
-                <option>مكة المكرمة</option>
-                <option>ينبع</option>
-                <option>الدمام</option>
-                <option>الخبر</option>
-                <option>الطائف</option>
-                <option>تبوك</option>
-                <option>أبها</option>
                 <option>أخرى</option>
               </select>
             </div>
-            <div>
-              <label>رابط موقع قوقل ماب (اختياري)</label>
-              <input type="url" name="maps_url" placeholder="https://maps.app.goo.gl/…" dir="ltr" style="text-align:left;" />
-            </div>
           </div>
           <div>
-            <label>العنوان الرئيسي</label>
-            <input type="text" name="address" placeholder="الحي، الشارع، رقم المبنى…" />
+            <label>رابط موقع قوقل ماب (اختياري)</label>
+            <input type="url" name="maps_url" placeholder="https://maps.app.goo.gl/…" dir="ltr" style="text-align:left;" />
           </div>
 
           <h3 style="margin:18px 0 2px; color:var(--navy-900); font-size:1.05rem;">التخصص والمواد التي توردها *</h3>
@@ -8143,32 +8124,11 @@ p {
                 title="أدخل رقم جوال صحيح مثل 05xxxxxxxx" />
             </div>
           </div>
-          <div>
-            <label>البريد الإلكتروني التجاري</label>
-            <input type="email" name="email" placeholder="sales@company.sa" dir="ltr" style="text-align:left;" />
-          </div>
-
-          <h3 style="margin:18px 0 2px; color:var(--navy-900); font-size:1.05rem;">المرفقات والتوثيق <span style="font-weight:400; font-size:.82rem; color:var(--gray-500);">(اختياري — يسرّع اعتماد حسابك)</span></h3>
-          <div class="row2">
-            <div>
-              <label class="sreg-file" id="crFileLabel">
-                <input type="file" name="cr_doc" accept="application/pdf,image/jpeg,image/png,image/webp" onchange="sregFileChanged(this,'crFileLabel','نسخة السجل التجاري')">
-                <span class="fname">نسخة من السجل التجاري (PDF أو صورة)</span>
-              </label>
-            </div>
-            <div>
-              <label class="sreg-file" id="vatFileLabel">
-                <input type="file" name="vat_doc" accept="application/pdf,image/jpeg,image/png,image/webp" onchange="sregFileChanged(this,'vatFileLabel','شهادة الضريبة')">
-                <span class="fname">شهادة ضريبة القيمة المضافة (VAT)</span>
-              </label>
-            </div>
-          </div>
-
           <button type="submit" class="btn btn-amber" id="sregSubmitBtn" style="margin-top:16px; padding:15px; font-size:1.05rem;">
             إرسال طلب الانضمام
           </button>
           <p style="margin:10px 0 0; font-size:.8rem; color:var(--gray-500); text-align:center;">
-            سيتواصل معك فريق مداد خلال ٢٤ ساعة لتأكيد بياناتك وتفعيل حسابك.
+            سيتواصل معك فريق مداد خلال ٢٤ ساعة لإكمال تسجيلك.
           </p>
         </form>
       </div>
@@ -10164,7 +10124,7 @@ p {
             ${a.address ? `<div style="color:var(--gray-600); font-size:.8rem;">${escapeHtml(a.address)}</div>` : ''}
             ${a.maps_url ? `<a href="${escapeHtml(a.maps_url)}" target="_blank" rel="noopener noreferrer" style="font-size:.8rem;">الموقع على الخريطة</a>` : ''}
           </td>
-          <td style="padding:12px; font-family:monospace; direction:ltr; text-align:right;">${escapeHtml(a.cr_number)}</td>
+          <td style="padding:12px; font-family:monospace; direction:ltr; text-align:right;">${escapeHtml(a.cr_number || '—')}</td>
           <td style="padding:12px;">${escapeHtml(a.city)}</td>
           <td style="padding:12px; font-size:.82rem; color:var(--gray-600);">
             ${(a.categories || []).map(c => `<span style="display:inline-block; background:var(--gray-100); border-radius:10px; padding:2px 9px; margin:2px;">${escapeHtml(c)}</span>`).join('')}
@@ -12941,40 +12901,7 @@ p {
       if (w) w.style.display = this.checked ? 'block' : 'none';
     });
 
-    function sregFileChanged(input, labelId, docLabel) {
-      const label = document.getElementById(labelId);
-      if (!label) return;
-      const f = input.files && input.files[0];
-      const nameEl = label.querySelector('.fname');
-      if (f) {
-        if (f.size > 5 * 1024 * 1024) {
-          toast('حجم الملف يتجاوز ٥ ميجابايت', '');
-          input.value = '';
-          label.classList.remove('has-file');
-          if (nameEl) nameEl.textContent = docLabel;
-          return;
-        }
-        label.classList.add('has-file');
-        if (nameEl) nameEl.textContent = '✓ ' + f.name;
-      } else {
-        label.classList.remove('has-file');
-        if (nameEl) nameEl.textContent = docLabel;
-      }
-    }
-    window.sregFileChanged = sregFileChanged;
-
     const toEnDigits = s => String(s || '').replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d));
-
-    async function uploadSupplierDoc(file, folder, kind) {
-      if (!file) return null;
-      const ext = (file.name.split('.').pop() || 'pdf').toLowerCase().replace(/[^a-z0-9]/g, '') || 'pdf';
-      const path = `${folder}/${kind}.${ext}`;
-      const { error } = await window.supabaseClient.storage
-        .from('supplier-docs')
-        .upload(path, file, { contentType: file.type || 'application/pdf', upsert: false });
-      if (error) throw error;
-      return path;
-    }
 
     async function submitSupplierApp(e) {
       e.preventDefault();
@@ -12999,31 +12926,14 @@ p {
       btn.innerHTML = 'جارٍ إرسال طلبك…';
 
       try {
-        const folder = Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
-        const crFile = f.querySelector('[name=cr_doc]')?.files?.[0] || null;
-        const vatFile = f.querySelector('[name=vat_doc]')?.files?.[0] || null;
-
-        let cr_doc_path = null, vat_doc_path = null;
-        try {
-          cr_doc_path = await uploadSupplierDoc(crFile, folder, 'cr');
-          vat_doc_path = await uploadSupplierDoc(vatFile, folder, 'vat');
-        } catch (upErr) {
-          console.warn('doc upload failed', upErr);
-          toast('تعذّر رفع المستندات — سنستلم طلبك بدونها ويمكن إرسالها لاحقًا عبر واتساب', '');
-        }
-
         const row = {
           company_name: f.querySelector('[name=company_name]').value.trim(),
-          cr_number: toEnDigits(f.querySelector('[name=cr_number]').value.trim()),
           city: f.querySelector('[name=city]').value,
-          address: f.querySelector('[name=address]').value.trim() || null,
           maps_url: f.querySelector('[name=maps_url]').value.trim() || null,
           categories: cats,
           other_category: f.querySelector('[name=other_category]').value.trim() || null,
           contact_name: f.querySelector('[name=contact_name]').value.trim(),
           phone: toEnDigits(f.querySelector('[name=phone]').value.trim()),
-          email: f.querySelector('[name=email]').value.trim() || null,
-          cr_doc_path, vat_doc_path,
           user_id: window.currentUser?.id || null,
         };
         const { error } = await window.supabaseClient.from('supplier_applications').insert(row);
@@ -13032,9 +12942,6 @@ p {
         celebrate();
         toast('تم استلام طلب انضمامك! سيتواصل معك فريق مداد خلال ٢٤ ساعة', '✓');
         f.reset();
-        document.querySelectorAll('.sreg-file').forEach(l => l.classList.remove('has-file'));
-        const crN = document.querySelector('#crFileLabel .fname'); if (crN) crN.textContent = 'نسخة من السجل التجاري (PDF أو صورة)';
-        const vatN = document.querySelector('#vatFileLabel .fname'); if (vatN) vatN.textContent = 'شهادة ضريبة القيمة المضافة (VAT)';
         const ow = document.getElementById('sregOtherWrap'); if (ow) ow.style.display = 'none';
         const ew = document.getElementById('sregEquipWrap'); if (ew) ew.style.display = 'none';
         setTimeout(() => { location.hash = '#home'; }, 1800);
