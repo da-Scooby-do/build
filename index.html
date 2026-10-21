@@ -3540,6 +3540,8 @@ p {
 .modal-backdrop.open {
   display: flex;
 }
+/* The phone tab bar sits above popups and covers their save buttons. */
+body:has(.modal-backdrop.open) .bottom-tab-bar { display: none !important; }
 
 .modal {
   background: var(--white);
@@ -7532,7 +7534,7 @@ p {
 
         // Quote-form + supplier-form city dropdowns: one optgroup per region, "أخرى" kept last.
         document.addEventListener('DOMContentLoaded', () => {
-          for (const sel of [document.getElementById('rfqCitySelect'), document.getElementById('sregCitySelect')]) {
+          for (const sel of [document.getElementById('rfqCitySelect'), document.getElementById('sregCitySelect'), document.getElementById('waCitySelect')]) {
             if (!sel) continue;
             const other = sel.lastElementChild;
             for (const [region, cities] of window.SA_REGIONS) {
@@ -8583,7 +8585,10 @@ p {
       <div class="admin-panel" id="adminPanel-applications" style="display:none;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
           <h3 style="margin:0;">طلبات انضمام الموردين</h3>
-          <button class="btn btn-ghost" onclick="loadAdminApplications()">تحديث</button>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="btn btn-amber" onclick="openWaSupplier()">+ إضافة مورد من واتساب</button>
+            <button class="btn btn-ghost" onclick="loadAdminApplications()">تحديث</button>
+          </div>
         </div>
         <div style="overflow-x:auto; background:var(--white); border:1px solid var(--gray-150); border-radius:var(--radius-lg);">
           <table style="width:100%; border-collapse:collapse;">
@@ -8746,6 +8751,35 @@ p {
       <div class="modal-footer">
         <button type="button" class="btn btn-ghost" onclick="closeSupplierEditor()">إلغاء</button>
         <button type="submit" class="btn btn-amber">حفظ المورد</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Admin: add a supplier who registered over WhatsApp. Saved as an
+       approved application, so the public supplier count goes up by one. -->
+  <div class="modal-backdrop" id="waSupplierModal" onclick="if(event.target===this)closeWaSupplier()">
+    <form class="modal modal-pro" id="waSupplierForm" onsubmit="saveWaSupplier(event)">
+      <div class="modal-header">
+        <h2>إضافة مورد من واتساب</h2>
+        <button type="button" class="close-x" onclick="closeWaSupplier()" aria-label="إغلاق">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="margin:0 0 14px; font-size:.88rem; color:var(--gray-600);">يُحفظ المورد كمقبول ويزيد عدّاد الموردين في الصفحة الرئيسية بواحد. أضف فقط موردًا تواصلت معه فعلًا.</p>
+        <div class="form-grid">
+          <div class="form-grid-2">
+            <div class="fld"><label>اسم الشركة / المؤسسة *</label><input type="text" name="company_name" required></div>
+            <div class="fld"><label>اسم الشخص المسؤول *</label><input type="text" name="contact_name" required></div>
+          </div>
+          <div class="form-grid-2">
+            <div class="fld"><label>رقم الجوال (واتساب) *</label><input type="tel" name="phone" required inputmode="tel" pattern="[+0-9٠-٩][0-9٠-٩\s\-]{8,14}" placeholder="05xxxxxxxx"></div>
+            <div class="fld"><label>المدينة *</label><select name="city" required id="waCitySelect"><option value="">اختر المدينة…</option><option>أخرى</option></select></div>
+          </div>
+          <div class="fld"><label>ما يورّده (اختياري)</label><div class="sreg-cats" id="waCats"></div></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="closeWaSupplier()">إلغاء</button>
+        <button type="submit" class="btn btn-amber" id="waSupplierSave">حفظ وإضافة للعدّاد</button>
       </div>
     </form>
   </div>
@@ -10155,6 +10189,46 @@ p {
       toast(status === 'approved' ? 'تم قبول المورد — أضِفه الآن من تبويب الموردين' : 'تم تحديث حالة الطلب', '✓');
       loadAdminApplications();
     }
+
+    /* ---- Admin: add a WhatsApp supplier as an approved application ---- */
+    function openWaSupplier() {
+      const form = document.getElementById('waSupplierForm');
+      form.reset();
+      const host = document.getElementById('waCats');
+      // Same specialties as the public supplier form.
+      if (host && !host.children.length) {
+        host.innerHTML = [...document.querySelectorAll('#sregCats input[name=cats]')]
+          .map(c => `<label class="cat-chip"><input type="checkbox" name="waCats" value="${escapeHtml(c.value)}"><span class="box">✓</span><span class="txt">${escapeHtml(c.value)}</span></label>`).join('');
+      }
+      document.getElementById('waSupplierModal').classList.add('open');
+    }
+    function closeWaSupplier() { document.getElementById('waSupplierModal').classList.remove('open'); }
+
+    async function saveWaSupplier(e) {
+      e.preventDefault();
+      const f = e.target;
+      const btn = document.getElementById('waSupplierSave');
+      btn.disabled = true;
+      const row = {
+        company_name: f.company_name.value.trim(),
+        contact_name: f.contact_name.value.trim(),
+        phone: toEnDigits(f.phone.value.trim()),
+        city: f.city.value,
+        categories: [...f.querySelectorAll('input[name=waCats]:checked')].map(c => c.value),
+        status: 'approved',
+        reviewed_at: new Date().toISOString(),
+      };
+      // RLS only lets admins insert an approved row; supabase-js resolves with { error }.
+      const { error } = await window.supabaseClient.from('supplier_applications').insert(row);
+      btn.disabled = false;
+      if (error) { toast('تعذّر الحفظ: ' + error.message, ''); return; }
+      closeWaSupplier();
+      toast('تمت إضافة المورد — زاد عدّاد الموردين بواحد', '✓');
+      loadAdminApplications();
+    }
+    window.openWaSupplier = openWaSupplier;
+    window.closeWaSupplier = closeWaSupplier;
+    window.saveWaSupplier = saveWaSupplier;
 
     async function viewAppDoc(path) {
       try {
