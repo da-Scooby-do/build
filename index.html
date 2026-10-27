@@ -5144,6 +5144,84 @@ body:has(.modal-backdrop.open) .bottom-tab-bar { display: none !important; }
     .city-menu button.city-menu-back { color: #a4762e; font-weight: 800; border-bottom: 1px dashed rgba(212,165,99,.4); border-radius: 10px 10px 0 0; margin-bottom: 4px; }
     [data-theme="dark"] .city-menu button.city-menu-back { color: #d4a563; }
 
+    /* ===== Latest customer requests (home section + #requests page) ===== */
+    .req-panel { background: #fff; border: 1px solid rgba(212,165,99,.28); border-radius: 18px; padding: 24px; box-shadow: 0 8px 26px rgba(8,21,42,.06); }
+    .req-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-bottom: 18px; }
+    .req-head h2 { display: flex; align-items: center; gap: 10px; margin: 0; font-size: clamp(1.4rem, 3vw, 2rem); color: var(--navy-900); }
+    .req-head h2 span { color: var(--amber-500); }
+    .req-head h2 svg { color: var(--navy-900); flex-shrink: 0; }
+    .req-head p { margin: 6px 0 0; color: var(--gray-600); font-size: .95rem; }
+    .req-btn-navy { display: inline-flex; align-items: center; gap: 8px; background: var(--navy-900); color: #fff !important; border-radius: 10px; padding: 12px 22px; font-weight: 800; text-decoration: none; white-space: nowrap; border: 0; cursor: pointer; font-family: inherit; font-size: .92rem; }
+    .req-btn-navy:hover { background: var(--navy-800); }
+    .req-filters { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
+    .req-sel { position: relative; display: flex; align-items: center; gap: 8px; flex: 1 1 200px; max-width: 260px; border: 1px solid var(--gray-200); border-radius: 10px; padding: 0 12px; background: #fff; color: var(--navy-900); }
+    .req-sel select, .req-sel input { flex: 1; min-width: 0; border: 0; background: transparent; padding: 11px 0; font: inherit; font-size: .9rem; color: inherit; outline: none; }
+    .req-sel.req-search { max-width: none; flex: 2 1 260px; }
+    .req-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+    .req-card { display: flex; flex-direction: column; gap: 12px; border: 1px solid var(--gray-150); border-radius: 14px; padding: 14px; background: #fff; }
+    .req-card-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: .82rem; color: var(--gray-500); }
+    .req-badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 999px; font-size: .76rem; font-weight: 700; white-space: nowrap; }
+    .req-badge.open { background: #e6f6ec; color: #1f7a4d; }
+    .req-badge.closed { background: #fdecd9; color: #a4561a; }
+    .req-card-mid { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    .req-card-mid h3 { margin: 0; font-size: 1.05rem; color: var(--navy-900); line-height: 1.5; }
+    .req-thumb { width: 104px; height: 66px; flex-shrink: 0; border-radius: 8px; object-fit: cover; background: var(--gray-100); }
+    .req-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 12px; margin: 0; }
+    .req-meta div { min-width: 0; }
+    .req-meta dt { font-size: .74rem; color: var(--gray-500); }
+    .req-meta dd { margin: 2px 0 0; font-weight: 700; color: var(--navy-900); font-size: .9rem; overflow-wrap: anywhere; }
+    .req-offer { margin-top: auto; display: flex; justify-content: center; align-items: center; gap: 8px; background: var(--navy-900); color: #fff !important; border-radius: 9px; padding: 10px; font-weight: 800; font-size: .88rem; text-decoration: none; }
+    .req-offer:hover { background: var(--navy-800); }
+    .req-offer.is-closed { background: var(--gray-200); color: var(--gray-600) !important; pointer-events: none; }
+    .req-empty { text-align: center; padding: 36px 12px; color: var(--gray-600); }
+    .req-preview-pill { position: fixed; bottom: 86px; left: 16px; z-index: 1300; background: #7a1f1f; color: #fff; border-radius: 999px; padding: 8px 14px; font-size: .8rem; font-weight: 700; box-shadow: 0 6px 18px rgba(0,0,0,.25); }
+    .req-preview-pill a { color: #ffd9a8; margin-inline-start: 8px; }
+    /* #requests page */
+    .req-hero { position: relative; background: #0b2347 url('media/hero-poster.webp') center/cover; color: #fff; padding: 56px 0 40px; }
+    .req-hero::before { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(7,26,51,.55), rgba(7,26,51,.92)); }
+    .req-hero .container { position: relative; }
+    .req-hero h1 { display: flex; align-items: center; gap: 12px; margin: 0; font-size: clamp(1.7rem, 4vw, 2.6rem); color: #fff; }
+    .req-hero h1 span { color: var(--amber-400); }
+    .req-hero p { margin: 10px 0 22px; color: #dbe5f3; font-size: 1.02rem; }
+    .req-hero ul { display: flex; flex-wrap: wrap; gap: 12px 30px; list-style: none; margin: 0; padding: 0; color: #fff; font-weight: 600; font-size: .92rem; }
+    .req-hero li { display: flex; align-items: center; gap: 8px; }
+    .req-hero li svg { color: var(--amber-400); }
+    .req-total { display: flex; align-items: center; gap: 12px; font-weight: 700; color: var(--navy-900); }
+    .req-total b { font-size: 1.8rem; font-family: var(--font-display); border-inline-start: 3px solid var(--amber-500); padding-inline-start: 12px; }
+    .req-table { width: 100%; border-collapse: collapse; }
+    .req-table th { background: var(--gray-50); color: var(--navy-900); font-size: .85rem; font-weight: 800; padding: 12px 10px; text-align: right; }
+    .req-table td { padding: 10px; border-bottom: 1px solid var(--gray-150); font-size: .9rem; color: var(--navy-900); vertical-align: middle; }
+    .req-table td.req-cat { display: flex; align-items: center; gap: 12px; font-weight: 800; }
+    .req-table .req-thumb { width: 84px; height: 46px; }
+    .req-table .req-offer { display: inline-flex; padding: 8px 14px; white-space: nowrap; }
+    .req-table .muted { color: var(--gray-500); }
+    .req-foot { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 16px; color: var(--gray-600); font-size: .88rem; }
+    .req-pages { display: flex; gap: 6px; flex-wrap: wrap; }
+    .req-pages button { min-width: 38px; height: 38px; border: 1px solid var(--gray-200); background: #fff; border-radius: 8px; font: inherit; font-weight: 700; color: var(--navy-900); cursor: pointer; }
+    .req-pages button.active { background: var(--navy-900); color: #fff; border-color: var(--navy-900); }
+    .req-pages button:disabled { opacity: .4; cursor: default; }
+    .req-reset { background: none; border: 0; color: var(--navy-700); font: inherit; font-size: .84rem; font-weight: 700; cursor: pointer; padding: 6px 0; }
+    @media (max-width: 1100px) { .req-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 720px) {
+      .req-panel { padding: 16px; border-radius: 14px; }
+      .req-grid { grid-template-columns: 1fr; }
+      .req-sel { max-width: none; }
+      /* table rows become cards on phones */
+      .req-table thead { display: none; }
+      .req-table, .req-table tbody, .req-table tr, .req-table td { display: block; width: 100%; }
+      .req-table tr { border: 1px solid var(--gray-150); border-radius: 12px; padding: 10px 12px; margin-bottom: 12px; }
+      .req-table td { border: 0; padding: 5px 0; display: flex; justify-content: space-between; gap: 12px; }
+      .req-table td[data-label]::before { content: attr(data-label); color: var(--gray-500); font-weight: 600; font-size: .8rem; }
+      .req-table td.req-cat { justify-content: flex-start; }
+      .req-table td.req-act .req-offer { width: 100%; justify-content: center; }
+      .req-table td.req-dup { display: none; }   /* same as the category shown above */
+    }
+    [data-theme="dark"] .req-panel, [data-theme="dark"] .req-card, [data-theme="dark"] .req-sel, [data-theme="dark"] .req-pages button { background: #0f1a2e; border-color: rgba(212,165,99,.25); color: #e8eef8; }
+    [data-theme="dark"] .req-head h2, [data-theme="dark"] .req-card-mid h3, [data-theme="dark"] .req-meta dd, [data-theme="dark"] .req-table td, [data-theme="dark"] .req-total, [data-theme="dark"] .req-table th { color: #f3f6fc; }
+    [data-theme="dark"] .req-head h2 svg { color: #f3f6fc; }
+    [data-theme="dark"] .req-table th { background: #16243d; }
+    [data-theme="dark"] .req-btn-navy, [data-theme="dark"] .req-offer { background: #d4a563; color: #0a1830 !important; }
+
     /* ===== Supplier goal + no-fee note ===== */
     .supplier-goal {
       max-width: 560px; margin-top: 22px;
@@ -6852,6 +6930,29 @@ body:has(.modal-backdrop.open) .bottom-tab-bar { display: none !important; }
       </div>
     </section>
 
+    <!-- Latest customer requests — rpc public_requests returns category,
+         items, quantity, city, needed-by and status only (no name/phone).
+         Stays hidden until there is at least one request to show. -->
+    <section class="section" id="reqHome" hidden style="padding-block: 40px 10px;">
+      <div class="container">
+        <div class="req-panel">
+          <div class="req-head">
+            <div>
+              <h2><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="14" y2="17"/></svg> أحدث <span>طلبات العملاء</span></h2>
+              <p>اطّلع على احتياجات المشاريع في مختلف مناطق المملكة وقدّم عرضك الآن</p>
+            </div>
+            <a href="#requests" data-link class="req-btn-navy">عرض جميع الطلبات ←</a>
+          </div>
+          <div class="req-filters">
+            <label class="req-sel"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg><select id="reqHomeCat" aria-label="الصنف"><option value="">جميع الأصناف</option></select></label>
+            <label class="req-sel"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><select id="reqHomeRegion" aria-label="المنطقة"><option value="">جميع المناطق</option></select></label>
+            <label class="req-sel"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4v16M3 16l4 4 4-4M17 20V4M13 8l4-4 4 4"/></svg><select id="reqHomeSort" aria-label="الترتيب"><option value="new">الأحدث أولًا</option><option value="old">الأقدم أولًا</option></select></label>
+          </div>
+          <div class="req-grid" id="reqHomeGrid"></div>
+        </div>
+      </div>
+    </section>
+
     <!-- =====================================================
          MEDINA SUPPLIER DIRECTORY
          ===================================================== -->
@@ -8045,6 +8146,7 @@ body:has(.modal-backdrop.open) .bottom-tab-bar { display: none !important; }
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
             مداد لا يأخذ أي رسوم إضافية على طلبك
           </p>
+          <p style="margin:0; font-size:.8rem; color:var(--gray-500);">يظهر طلبك في قائمة «أحدث طلبات العملاء» بنوع المادة والكمية والمدينة وموعد التسليم فقط — دون اسمك أو رقمك أو تفاصيلك.</p>
           <button type="submit" class="btn btn-amber" style="justify-self:start;">
             إرسال طلب العرض
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
@@ -8817,6 +8919,59 @@ body:has(.modal-backdrop.open) .bottom-tab-bar { display: none !important; }
       </div>
     </form>
   </div>
+
+  <!-- ============================================================
+       VIEW: ALL CUSTOMER REQUESTS (#requests) — same public_requests RPC
+       ============================================================ -->
+  <section class="view" id="view-requests">
+    <section class="req-hero">
+      <div class="container">
+        <h1><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="14" y2="17"/></svg> <span>طلبات</span> مواد البناء والمعدات</h1>
+        <p>اطّلع على أحدث احتياجات المشاريع في مختلف مناطق المملكة</p>
+        <ul>
+          <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg> طلبات حقيقية من العملاء</li>
+          <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg> مفتوح لجميع الموردين</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> مناطق المملكة كلها</li>
+          <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> تحديث مستمر</li>
+        </ul>
+      </div>
+    </section>
+    <section class="catalog-shell">
+      <div class="container">
+        <form class="req-panel" id="reqPageFilters" style="margin-bottom:18px;" onsubmit="event.preventDefault(); window.reqPageLoad && window.reqPageLoad(1);">
+          <div class="req-filters" style="margin:0;">
+            <label class="req-sel req-search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="search" id="reqPageSearch" placeholder="ابحث في الطلبات…" aria-label="ابحث في الطلبات"></label>
+            <label class="req-sel"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg><select id="reqPageCat" aria-label="الصنف"><option value="">جميع الأصناف</option></select></label>
+            <label class="req-sel"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><select id="reqPageRegion" aria-label="المنطقة"><option value="">جميع المناطق</option></select></label>
+            <label class="req-sel"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg><select id="reqPageStatus" aria-label="حالة الطلب"><option value="">حالة الطلب</option><option value="open">مفتوح للعروض</option><option value="closed">مغلق</option></select></label>
+            <div style="display:flex; flex-direction:column; align-items:center; gap:2px;">
+              <button type="submit" class="req-btn-navy">تطبيق الفلاتر</button>
+              <button type="button" class="req-reset" onclick="window.reqPageReset && window.reqPageReset()">↻ إعادة تعيين الفلاتر</button>
+            </div>
+          </div>
+        </form>
+        <div class="req-panel">
+          <div class="req-head">
+            <div>
+              <h2 style="font-size:1.4rem;"><span>أحدث الطلبات</span></h2>
+              <p>مرتبة من الأحدث إلى الأقدم</p>
+            </div>
+            <div class="req-total">إجمالي الطلبات <b id="reqPageTotal">—</b></div>
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="req-table">
+              <thead><tr><th>#</th><th>الصنف</th><th>الوصف</th><th>الكمية المطلوبة</th><th>المنطقة</th><th>موعد التسليم</th><th>تاريخ النشر</th><th>الحالة</th><th>الإجراء</th></tr></thead>
+              <tbody id="reqPageBody"><tr><td colspan="9" class="req-empty">جارٍ التحميل…</td></tr></tbody>
+            </table>
+          </div>
+          <div class="req-foot">
+            <div class="req-pages" id="reqPagePager"></div>
+            <div id="reqPageRange"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </section>
 
   <section class="view" id="view-how">
     <section class="page-intro">
@@ -11487,7 +11642,7 @@ body:has(.modal-backdrop.open) .bottom-tab-bar { display: none !important; }
     function go(hash) {
       const raw = (hash || '#home').replace('#', '');
       const [route, param] = raw.split('/');
-      const views = ['home', 'supplier', 'wishlist', 'rfq', 'concrete', 'cart', 'confirm', 'policy', 'supplier-register', 'how'];
+      const views = ['home', 'supplier', 'wishlist', 'rfq', 'concrete', 'cart', 'confirm', 'policy', 'supplier-register', 'how', 'requests'];
       let target = views.includes(route) ? route : 'home';
       // catalog / product no longer exist — redirect to home (or directory for product)
       if (route === 'catalog' || route === 'product') target = 'home';
@@ -11509,6 +11664,7 @@ body:has(.modal-backdrop.open) .bottom-tab-bar { display: none !important; }
       if (target === 'cart') renderCart();
       if (target === 'wishlist') renderWishlist();
       if (target === 'supplier' && param) renderSupplier(param);
+      if (target === 'requests' && window.reqPageLoad) window.reqPageLoad(1);
     }
 
     document.addEventListener('click', (e) => {
@@ -13054,6 +13210,162 @@ body:has(.modal-backdrop.open) .bottom-tab-bar { display: none !important; }
       }
     }
     window.submitSupplierApp = submitSupplierApp;
+
+    /* ============================================================
+       LATEST CUSTOMER REQUESTS — home section (#reqHome) + #requests page
+       Data: rpc public_requests (category, items, qty, city, needed-by,
+       status, date only). ?preview=1 also shows rows tagged as tests;
+       ?preview=0 turns it off. supabase-js resolves with { error }.
+       ============================================================ */
+    (function () {
+      const PREVIEW = (() => {
+        try {
+          const q = new URLSearchParams(location.search).get('preview');
+          if (q === '1') localStorage.setItem('midad_preview', '1');
+          if (q === '0') localStorage.removeItem('midad_preview');
+          return localStorage.getItem('midad_preview') === '1';
+        } catch { return /[?&]preview=1/.test(location.search); }
+      })();
+      if (PREVIEW) {
+        document.body.insertAdjacentHTML('beforeend',
+          '<div class="req-preview-pill">وضع المعاينة — تظهر الطلبات التجريبية<a href="?preview=0">إيقاف</a></div>');
+      }
+
+      const AR = v => String(v ?? '').replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
+      const esc = v => escapeHtml(v == null ? '' : String(v));
+      const DAY = 864e5;
+      // "needed by" shown relative to when the request was posted, like the brief.
+      function deliveryLabel(neededBy, createdAt) {
+        if (!neededBy) return '—';
+        const days = Math.round((new Date(neededBy + 'T12:00:00') - new Date(createdAt)) / DAY);
+        if (days < 0) return '—';   // needed-by earlier than the posting date: no honest label
+        if (days <= 2) return 'فوري';
+        if (days <= 7) return 'خلال أسبوع';
+        if (days <= 14) return 'خلال أسبوعين';
+        if (days <= 21) return 'خلال ٣ أسابيع';
+        if (days <= 35) return 'خلال شهر';
+        return 'خلال ' + AR(Math.round(days / 30)) + ' أشهر';
+      }
+      const postedLabel = iso => AR(String(iso || '').slice(0, 10));
+      const offerHref = r => waLink(MEDAD_WA, `مرحبًا، أرغب بتقديم عرض على الطلب رقم #${r.ref} (${r.items || r.category} — ${r.qty || ''} — ${r.city || ''}) من منصة مداد.`);
+      const badge = st => st === 'open'
+        ? '<span class="req-badge open">✓ مفتوح للعروض</span>'
+        : '<span class="req-badge closed">مغلق</span>';
+      const thumb = cat => { const src = window.catBgImagePath ? window.catBgImagePath(cat) : ''; return src ? `<img class="req-thumb" src="${src}" alt="" loading="lazy" decoding="async">` : ''; };
+      const offerBtn = r => r.status === 'open'
+        ? `<a class="req-offer" href="${offerHref(r)}" target="_blank" rel="noopener">تقديم عرض ←</a>`
+        : '<span class="req-offer is-closed">مغلق</span>';
+
+      async function fetchRequests(opts) {
+        if (!window.supabaseClient) return { rows: [], total: 0, error: true };
+        const { data, error } = await window.supabaseClient.rpc('public_requests', { ...opts, p_include_test: PREVIEW });
+        if (error) { console.warn('[requests]', error.message); return { rows: [], total: 0, error: true }; }
+        return { rows: data || [], total: data && data.length ? Number(data[0].total_count) : 0 };
+      }
+
+      // Shared filter options: categories from the quote form, regions from SA_REGIONS.
+      function fillOptions(catSel, regionSel) {
+        const cats = [...document.querySelectorAll('#rfq-cat option')].map(o => o.value).filter(Boolean);
+        if (catSel) catSel.insertAdjacentHTML('beforeend', cats.map(c => `<option>${esc(c)}</option>`).join(''));
+        if (regionSel) regionSel.insertAdjacentHTML('beforeend', (window.SA_REGIONS || []).map(([r], i) => `<option value="${i}">${esc(r)}</option>`).join(''));
+      }
+      const citiesOf = v => v === '' ? null : (window.SA_REGIONS || [])[+v]?.[1] || null;
+
+      /* ---------- home section ---------- */
+      const home = document.getElementById('reqHome');
+      const hCat = document.getElementById('reqHomeCat'), hReg = document.getElementById('reqHomeRegion'), hSort = document.getElementById('reqHomeSort');
+      const hGrid = document.getElementById('reqHomeGrid');
+      let homeShown = false;
+      async function loadHome() {
+        if (!home || !hGrid) return;
+        const { rows, error } = await fetchRequests({
+          p_limit: 4,
+          p_category: hCat.value || null,
+          p_cities: citiesOf(hReg.value),
+          p_oldest_first: hSort.value === 'old',
+        });
+        if (error) return;
+        // Only reveal the section when at least one request is open for offers —
+        // a strip of closed, past-due requests would read as a dead market.
+        if (!homeShown) {
+          const open = await fetchRequests({ p_limit: 1, p_status: 'open' });
+          if (!open.total) return;
+          home.hidden = false; homeShown = true;
+        }
+        hGrid.innerHTML = rows.length ? rows.map(r => `
+          <article class="req-card">
+            <div class="req-card-top"><span>طلب #${AR(esc(r.ref))}</span>${badge(r.status)}</div>
+            <div class="req-card-mid"><h3>${esc(r.items || r.category)}</h3>${thumb(r.category)}</div>
+            <dl class="req-meta">
+              <div><dt>المنطقة</dt><dd>${esc(r.city || '—')}</dd></div>
+              <div><dt>الكمية المطلوبة</dt><dd>${AR(esc(r.qty || '—'))}</dd></div>
+              <div><dt>موعد التسليم</dt><dd>${deliveryLabel(r.needed_by, r.created_at)}</dd></div>
+              <div><dt>تاريخ النشر</dt><dd>${postedLabel(r.created_at)}</dd></div>
+            </dl>
+            ${offerBtn(r)}
+          </article>`).join('')
+          : '<div class="req-empty" style="grid-column:1/-1;">لا توجد طلبات بهذه الفلاتر حاليًا.</div>';
+      }
+      if (home) {
+        fillOptions(hCat, hReg);
+        [hCat, hReg, hSort].forEach(el => el && el.addEventListener('change', loadHome));
+        window.addEventListener('load', loadHome);
+      }
+
+      /* ---------- #requests page ---------- */
+      const PAGE = 8;
+      const pSearch = document.getElementById('reqPageSearch'), pCat = document.getElementById('reqPageCat'),
+            pReg = document.getElementById('reqPageRegion'), pStatus = document.getElementById('reqPageStatus');
+      const pBody = document.getElementById('reqPageBody'), pTotal = document.getElementById('reqPageTotal'),
+            pPager = document.getElementById('reqPagePager'), pRange = document.getElementById('reqPageRange');
+      fillOptions(pCat, pReg);
+      let pageNo = 1;
+      window.reqPageLoad = async function (n) {
+        if (!pBody) return;
+        pageNo = n || 1;
+        const { rows, total, error } = await fetchRequests({
+          p_limit: PAGE, p_offset: (pageNo - 1) * PAGE,
+          p_category: pCat.value || null, p_cities: citiesOf(pReg.value),
+          p_status: pStatus.value || null, p_search: pSearch.value.trim() || null,
+        });
+        if (error) { pBody.innerHTML = '<tr><td colspan="9" class="req-empty">تعذّر تحميل الطلبات — حدّث الصفحة وحاول مجددًا.</td></tr>'; return; }
+        pTotal.textContent = AR(total);
+        pBody.innerHTML = rows.length ? rows.map(r => `
+          <tr>
+            <td data-label="رقم الطلب" class="muted">#${AR(esc(r.ref))}</td>
+            <td class="req-cat">${thumb(r.category)}<span>${esc(r.category)}</span></td>
+            <td data-label="الوصف" class="${r.items ? '' : 'req-dup'}">${esc(r.items || r.category)}</td>
+            <td data-label="الكمية المطلوبة"><b>${AR(esc(r.qty || '—'))}</b></td>
+            <td data-label="المنطقة">${esc(r.city || '—')}</td>
+            <td data-label="موعد التسليم">${deliveryLabel(r.needed_by, r.created_at)}</td>
+            <td data-label="تاريخ النشر" class="muted">${postedLabel(r.created_at)}</td>
+            <td data-label="الحالة">${badge(r.status)}</td>
+            <td class="req-act">${offerBtn(r)}</td>
+          </tr>`).join('')
+          : '<tr><td colspan="9" class="req-empty">لا توجد طلبات منشورة بهذه الفلاتر بعد. <a href="#rfq" data-link>أرسل طلبك الآن</a></td></tr>';
+        const pages = Math.max(1, Math.ceil(total / PAGE));
+        const from = total ? (pageNo - 1) * PAGE + 1 : 0, to = Math.min(pageNo * PAGE, total);
+        pRange.textContent = total ? `عرض ${AR(from)} - ${AR(to)} من ${AR(total)} طلب` : '';
+        // Pager: prev, up to 5 numbered pages around the current one, next.
+        const start = Math.max(1, Math.min(pageNo - 2, pages - 4)), end = Math.min(pages, start + 4);
+        let html = `<button type="button" aria-label="السابق" ${pageNo <= 1 ? 'disabled' : ''} data-p="${pageNo - 1}">›</button>`;
+        for (let i = start; i <= end; i++) html += `<button type="button" class="${i === pageNo ? 'active' : ''}" data-p="${i}">${AR(i)}</button>`;
+        html += `<button type="button" aria-label="التالي" ${pageNo >= pages ? 'disabled' : ''} data-p="${pageNo + 1}">‹</button>`;
+        pPager.innerHTML = pages > 1 ? html : '';
+      };
+      pPager?.addEventListener('click', e => {
+        const b = e.target.closest('button[data-p]');
+        if (!b || b.disabled) return;
+        window.reqPageLoad(+b.dataset.p);
+        document.getElementById('view-requests')?.scrollIntoView({ behavior: 'smooth' });
+      });
+      window.reqPageReset = function () {
+        document.getElementById('reqPageFilters').reset();
+        window.reqPageLoad(1);
+      };
+      // Deep link straight to #requests.
+      if ((location.hash || '').replace('#', '').split('/')[0] === 'requests') window.addEventListener('load', () => window.reqPageLoad(1));
+    })();
 
     /* ============================================================
        BOOT
