@@ -13285,13 +13285,8 @@ body:has(.modal-backdrop.open) .bottom-tab-bar { display: none !important; }
           p_oldest_first: hSort.value === 'old',
         });
         if (error) return;
-        // Only reveal the section when at least one request is open for offers —
-        // a strip of closed, past-due requests would read as a dead market.
-        if (!homeShown) {
-          const open = await fetchRequests({ p_limit: 1, p_status: 'open' });
-          if (!open.total) return;
-          home.hidden = false; homeShown = true;
-        }
+        // Reveal the section once there is at least one request to show.
+        if (!homeShown) { if (!rows.length) return; home.hidden = false; homeShown = true; }
         hGrid.innerHTML = rows.length ? rows.map(r => `
           <article class="req-card">
             <div class="req-card-top"><span>طلب #${AR(esc(r.ref))}</span>${badge(r.status)}</div>
